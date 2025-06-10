@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Redis 7.x Cluster in DMZVPC Private Subnets"
+
+Parameters:
+  DMZVPCStackName:
+    Type: String
+    Default: "DMZVPC"
+    Description: "Name of the DMZVPC CloudFormation stack"
+
+  RedisNodeType:
+    Type: String
+    Default: cache.t4g.small
+    Description: "ElastiCache node type for Redis cluster"
+    AllowedValues:
+      - cache.t4g.micro
+      - cache.t4g.small
+      - cache.t4g.medium
+      - cache.t3.micro
+      - cache.t3.small
+      - cache.t3.medium
+
+  RedisNumCacheNodes:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 6
+    Description: "Number of cache nodes in the Redis cluster"
+
+  RedisEngineVersion:
+    Type: String
+    Default: "7.0"
+    Description: "Redis engine version"
+    AllowedValues:
+      - "6.2"
+      - "7.0"
+
+  RedisPort:
+    Type: Number
+    Default: 6379
+    Description: "Port number for Redis cluster"
+
+Resources:
+  # Redis Cluster Security Group
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Redis cluster
+      GroupName: !Sub "${AWS::StackName}-RedisSecurityGroup"
+      VpcId: 
+        Fn::ImportValue: "DMZVPC"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref RedisPort
+          ToPort: !Ref RedisPort
+          CidrIp: 
+            Fn::ImportValue: "DMZVPC-CIDR"
+          Description: "Allow Redis access from VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-RedisSecurityGroup"
+
+  # Redis Subnet Group
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: "Subnet group for Redis cluster in private subnets"
+      SubnetIds: 
+        - Fn::ImportValue: "DMZVPC-Private-Subnet-A"
+        - Fn::ImportValue: "DMZVPC-Private-Subnet-B"
+      CacheSubnetGroupName: !Sub "${AWS::StackName}-redis-subnet-group"
+
+  # Redis Parameter Group
+  RedisParameterGroup:
+    Type: AWS::ElastiCache::ParameterGroup
+    Properties:
+      CacheParameterGroupFamily: "redis7"
+      Description: "Parameter group for Redis 7.x cluster"
+      Properties:
+        maxmemory-policy: "allkeys-lru"
+        timeout: "300"
+
+  # Redis Replication Group (Cluster)
+  RedisCluster:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupId: !Sub "${AWS::StackName}-redis"
+      ReplicationGroupDescription: "Redis 7.x cluster in DMZVPC private subnets"
+      Engine: "redis"
+      EngineVersion: !Ref RedisEngineVersion
+      CacheNodeType: !Ref RedisNodeType
+      NumCacheClusters: !Ref RedisNumCacheNodes
+      Port: !Ref RedisPort
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      SecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      CacheParameterGroupName: !Ref RedisParameterGroup
+      MultiAZEnabled: true
+      AutomaticFailoverEnabled: true
+      PreferredMaintenanceWindow: "sun:05:00-sun:06:00"
+      AtRestEncryptionEnabled: true
+      TransitEncryptionEnabled: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-redis-cluster"
+        - Key: Environment
+          Value: "private-subnet"
+        - Key: Engine
+          Value: "Redis 7.x"
+
+Outputs:
+  RedisClusterEndpoint:
+    Description: "Redis cluster primary endpoint"
+    Value: !GetAtt RedisCluster.PrimaryEndPoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisClusterEndpoint"
+
+  RedisClusterPort:
+    Description: "Redis cluster port"
+    Value: !GetAtt RedisCluster.PrimaryEndPoint.Port
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisClusterPort"
+
+  RedisClusterReaderEndpoint:
+    Description: "Redis cluster reader endpoint"
+    Value: !GetAtt RedisCluster.ReaderEndPoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisClusterReaderEndpoint"
+
+  RedisSecurityGroupId:
+    Description: "Redis cluster security group ID"
+    Value: !Ref RedisSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisSecurityGroupId"
+
+  RedisClusterArn:
+    Description: "Redis cluster ARN"
+    Value: !Sub "arn:aws:elasticache:${AWS::Region}:${AWS::AccountId}:replicationgroup:${RedisCluster}"
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisClusterArn"

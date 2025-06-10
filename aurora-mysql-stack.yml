@@ -1,0 +1,183 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Aurora MySQL Cluster in VPC01 Private Subnets"
+
+Parameters:
+  VPC01StackName:
+    Type: String
+    Default: "VPC01"
+    Description: "Name of the VPC01 CloudFormation stack"
+
+  DBName:
+    Type: String
+    Default: "mydb"
+    Description: "Database name"
+    MinLength: "1"
+    MaxLength: "64"
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+
+  DBMasterUsername:
+    Type: String
+    Default: "admin"
+    Description: "Database master username"
+    MinLength: "1"
+    MaxLength: "16"
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+
+  DBMasterPassword:
+    Type: String
+    NoEcho: true
+    Description: "Database master password"
+    MinLength: "8"
+    MaxLength: "41"
+    AllowedPattern: "[a-zA-Z0-9]+[a-zA-Z0-9@#$%^&*]*"
+
+  DBInstanceClass:
+    Type: String
+    Default: "db.t4g.medium"
+    Description: "Database instance class"
+    AllowedValues:
+      - "db.t4g.medium"
+      - "db.t4g.large"
+      - "db.r6g.large"
+      - "db.r6g.xlarge"
+
+  DBEngineVersion:
+    Type: String
+    Default: "8.0.mysql_aurora.3.04.0"
+    Description: "Aurora MySQL engine version"
+    AllowedValues:
+      - "8.0.mysql_aurora.3.02.0"
+      - "8.0.mysql_aurora.3.03.0"
+      - "8.0.mysql_aurora.3.04.0"
+
+Resources:
+  # Aurora Security Group
+  AuroraSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Aurora MySQL cluster
+      GroupName: !Sub "${AWS::StackName}-AuroraSecurityGroup"
+      VpcId: 
+        Fn::ImportValue: "VPC01"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: "10.1.0.0/16"
+          Description: "Allow MySQL access from VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-AuroraSecurityGroup"
+
+  # Aurora Subnet Group
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Subnet group for Aurora MySQL cluster in private subnets"
+      SubnetIds: 
+        - Fn::ImportValue: "VPC01-PrivateSubnet-A"
+        - Fn::ImportValue: "VPC01-Private-Subnet-B"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-aurora-subnet-group"
+
+  # Aurora Parameter Group
+  DBClusterParameterGroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: "Parameter group for Aurora MySQL 8.0 cluster"
+      Family: "aurora-mysql8.0"
+      Parameters:
+        time_zone: "UTC"
+        character_set_server: "utf8mb4"
+        collation_server: "utf8mb4_unicode_ci"
+
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: "Parameter group for Aurora MySQL 8.0 instances"
+      Family: "aurora-mysql8.0"
+      Parameters:
+        max_connections: "1000"
+        innodb_buffer_pool_size: "{DBInstanceClassMemory*3/4}"
+
+  # Aurora Cluster
+  DBCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: "aurora-mysql"
+      EngineVersion: !Ref DBEngineVersion
+      DatabaseName: !Ref DBName
+      MasterUsername: !Ref DBMasterUsername
+      MasterUserPassword: !Ref DBMasterPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref AuroraSecurityGroup
+      DBClusterParameterGroupName: !Ref DBClusterParameterGroup
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: "03:00-04:00"
+      PreferredMaintenanceWindow: "sun:05:00-sun:06:00"
+      Port: 3306
+      StorageEncrypted: true
+      DeletionProtection: true
+      EnableIAMDatabaseAuthentication: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-aurora-cluster"
+
+  # Primary Instance
+  DBPrimaryInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: "aurora-mysql"
+      DBClusterIdentifier: !Ref DBCluster
+      DBInstanceClass: !Ref DBInstanceClass
+      DBParameterGroupName: !Ref DBParameterGroup
+      PubliclyAccessible: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-aurora-primary"
+
+  # Replica Instance
+  DBReplicaInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: "aurora-mysql"
+      DBClusterIdentifier: !Ref DBCluster
+      DBInstanceClass: !Ref DBInstanceClass
+      DBParameterGroupName: !Ref DBParameterGroup
+      PubliclyAccessible: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-aurora-replica"
+
+Outputs:
+  ClusterEndpoint:
+    Description: "Aurora cluster endpoint (writer)"
+    Value: !GetAtt DBCluster.Endpoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-ClusterEndpoint"
+
+  ReaderEndpoint:
+    Description: "Aurora cluster reader endpoint"
+    Value: !GetAtt DBCluster.ReadEndpoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-ReaderEndpoint"
+
+  ClusterPort:
+    Description: "Aurora cluster port"
+    Value: !GetAtt DBCluster.Endpoint.Port
+    Export:
+      Name: !Sub "${AWS::StackName}-ClusterPort"
+
+  SecurityGroupId:
+    Description: "Aurora security group ID"
+    Value: !Ref AuroraSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupId"
+
+  ClusterResourceId:
+    Description: "Aurora cluster resource ID"
+    Value: !Ref DBCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-ClusterResourceId"
