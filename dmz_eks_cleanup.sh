@@ -23,8 +23,8 @@ echo "🚀 EKS 클러스터 삭제를 시작합니다..."
 echo "⏰ 예상 소요 시간: 10-15분"
 
 # EKS 클러스터 삭제 실행
-if [[ -f ~/amazonqcli_lab/dmz-eks-cluster.yaml ]]; then
-    eksctl delete cluster -f ~/amazonqcli_lab/dmz-eks-cluster.yaml
+if [[ -f ~/amazonqcli_lab/ekscluster.yaml ]]; then
+    eksctl delete cluster -f ~/amazonqcli_lab/ekscluster.yaml 
 else
     eksctl delete cluster --name ${EKSCLUSTER_NAME} --region ${AWS_REGION}
 fi

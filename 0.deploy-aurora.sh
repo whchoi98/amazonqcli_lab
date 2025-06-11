@@ -14,8 +14,8 @@ echo "📋 배포 정보:"
 echo "   - 리전: ${AWS_REGION}"
 echo "   - 스택 이름: VPC01-Aurora-MySQL"
 echo "   - 템플릿: ~/amazonqcli_lab/aurora-mysql-stack.yml"
-echo "   - 데이터베이스: mydb"
-echo "   - 사용자명: admin"
+echo "   - 데이터베이스: ${DB_NAME:-mydb}"
+echo "   - 사용자명: ${DB_USERNAME:-admin}"
 echo "   - 인스턴스 클래스: db.t4g.medium"
 echo "   - 엔진 버전: Aurora MySQL 8.0.mysql_aurora.3.04.0"
 echo "   - 위치: VPC01 Private Subnets"
@@ -54,13 +54,21 @@ fi
 
 # 패스워드 보안 확인
 echo ""
-echo "🔐 데이터베이스 보안 설정 확인..."
-DB_PASSWORD="1234Qwer"
+echo "🔐 데이터베이스 마스터 계정 설정..."
+read -p "데이터베이스 이름 (기본값: mydb): " DB_NAME
+DB_NAME=${DB_NAME:-mydb}
+
+read -p "마스터 사용자명 (기본값: admin): " DB_USERNAME
+DB_USERNAME=${DB_USERNAME:-admin}
+
+read -s -p "마스터 패스워드 (8자 이상): " DB_PASSWORD
+echo ""
+
 if [ ${#DB_PASSWORD} -lt 8 ]; then
     echo "❌ 패스워드는 8자 이상이어야 합니다."
     exit 1
 fi
-echo "✅ 패스워드 요구사항을 만족합니다."
+echo "✅ 데이터베이스 계정 설정 완료"
 
 # Aurora MySQL 클러스터 배포
 echo ""
@@ -74,9 +82,9 @@ aws cloudformation deploy \
   --template-file "~/amazonqcli_lab/aurora-mysql-stack.yml" \
   --parameter-overrides \
     VPC01StackName=VPC01 \
-    DBName=mydb \
-    DBMasterUsername=admin \
-    DBMasterPassword=1234Qwer \
+    DBName=$DB_NAME \
+    DBMasterUsername=$DB_USERNAME \
+    DBMasterPassword=$DB_PASSWORD \
     DBInstanceClass=db.t4g.medium \
     DBEngineVersion=8.0.mysql_aurora.3.04.0 \
   --capabilities CAPABILITY_IAM
@@ -106,10 +114,10 @@ echo "aws rds describe-db-clusters --db-cluster-identifier VPC01-Aurora-MySQL-db
 echo ""
 echo "💡 연결 테스트 (VPC01 Private Subnet의 EC2에서):"
 echo "# Writer 엔드포인트 연결"
-echo "mysql -h <Writer-Endpoint> -u admin -p mydb"
+echo "mysql -h <Writer-Endpoint> -u $DB_USERNAME -p $DB_NAME"
 echo ""
 echo "# Reader 엔드포인트 연결"
-echo "mysql -h <Reader-Endpoint> -u admin -p mydb"
+echo "mysql -h <Reader-Endpoint> -u $DB_USERNAME -p $DB_NAME"
 echo ""
 echo "🔒 보안 정보:"
 echo "   - Aurora 클러스터는 VPC01 Private Subnet에 배포됨"
@@ -130,7 +138,9 @@ echo "   - RDS 콘솔에서 클러스터 상태 모니터링"
 echo "   - Performance Insights 활용 가능"
 echo ""
 echo "⚠️  중요 사항:"
-echo "   - 마스터 패스워드: 1234Qwer (보안을 위해 변경 권장)"
+echo "   - 데이터베이스: $DB_NAME"
+echo "   - 마스터 사용자명: $DB_USERNAME"
+echo "   - 마스터 패스워드: [입력한 패스워드] (안전하게 보관하세요)"
 echo "   - 삭제 방지가 활성화되어 있어 실수로 삭제되지 않음"
 echo "   - 프로덕션 사용 시 패스워드 정책 강화 필요"
 echo "======================================================"

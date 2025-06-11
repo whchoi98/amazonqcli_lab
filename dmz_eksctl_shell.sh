@@ -1,80 +1,99 @@
 #!/bin/bash
-# dmz_eksctl_shell.sh: DMZPVPC용 eksctl yaml 생성 및 실행 스크립트
-# Private subnet에 managed node group을 설치하도록 구성
+
+# DMZVPC에 EKS 클러스터를 배포하는 스크립트
+# dmz_eks_shell.sh에 의해 자동 생성됨
 
 set -e
 
-echo "🚀 DMZPVPC EKS 클러스터 생성 시작"
-echo 'export AWS_REGION=ap-northeast-2' >> ~/.bash_profile
+# 환경 변수 로드
 source ~/.bash_profile
 
-# 환경 변수 로드 확인
-if [[ -z "$VPC_ID" || -z "$PrivateSubnetA" || -z "$PrivateSubnetB" ]]; then
-    echo "❌ 환경 변수가 설정되지 않았습니다. 먼저 ./dmz_eks_shell.sh를 실행하세요."
-    exit 1
-fi
+echo "🚀 DMZVPC EKS 클러스터 배포 시작"
+echo "======================================================"
+echo "📋 배포 정보:"
+echo "   - 클러스터 이름: ${EKSCLUSTER_NAME}"
+echo "   - 버전: ${EKS_VERSION}"
+echo "   - 리전: ap-northeast-2"
+echo "   - VPC ID: ${VPCID}"
+echo "   - Private Subnet A: ${PRIVATE_SUBNET_A}"
+echo "   - Private Subnet B: ${PRIVATE_SUBNET_B}"
+echo "   - 인스턴스 타입: ${INSTANCE_TYPE}"
+echo "   - Managed 노드 그룹:"
+echo "     · Public: ${PUBLIC_MGMD_NODE}"
+echo "     · Private: ${PRIVATE_MGMD_NODE}"
+echo "======================================================"
 
-echo "📋 사용할 환경 변수:"
-echo "   VPC_ID: $VPC_ID"
-echo "   PrivateSubnetA: $PrivateSubnetA"
-echo "   PrivateSubnetB: $PrivateSubnetB"
-echo "   EKSCLUSTER_NAME: $EKSCLUSTER_NAME"
-echo "   EKS_VERSION: $EKS_VERSION"
+# EKS 클러스터 구성 파일 생성
+echo ""
+echo "🔄 EKS 클러스터 구성 파일 생성 중..."
 
-# EKS 클러스터 구성 YAML 파일 생성
-cat << EOF > ~/amazonqcli_lab/dmz-eks-cluster.yaml
----
+cat > ~/amazonqcli_lab/ekscluster.yaml << YAML_EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
   name: ${EKSCLUSTER_NAME}
-  region: ${AWS_REGION}
+  region: ap-northeast-2
   version: "${EKS_VERSION}"
 
-vpc: 
-  id: ${VPC_ID}
+vpc:
+  id: "${VPCID}"
   subnets:
     private:
-      PrivateSubnetA:
-        az: ${AWS_REGION}a
-        id: ${PrivateSubnetA}
-      PrivateSubnetB:
-        az: ${AWS_REGION}b
-        id: ${PrivateSubnetB}
+      private-subnet-a:
+        id: "${PRIVATE_SUBNET_A}"
+      private-subnet-b:
+        id: "${PRIVATE_SUBNET_B}"
 
-# Private subnet에만 managed node group 설치
+secretsEncryption:
+  keyARN: ${MASTER_ARN}
+  # Set encryption key ARN for secrets
+  # 비밀값 암호화를 위한 키 ARN 설정
+
 managedNodeGroups:
   - name: ${PRIVATE_MGMD_NODE}
     instanceType: ${INSTANCE_TYPE}
-    subnets:
-      - ${PrivateSubnetA}
-      - ${PrivateSubnetB}
     desiredCapacity: 8
     minSize: 4
-    maxSize: 12
+    maxSize: 8
     volumeSize: 50
     volumeType: gp3
     volumeEncrypted: true
+    # Node volume configuration
+    # 노드 볼륨 설정
     amiFamily: AmazonLinux2
+    # Use Amazon Linux 2 AMI
+    # Amazon Linux 2 AMI 사용
     labels:
       nodegroup-type: "${PRIVATE_MGMD_NODE}"
-      environment: "dmz-private"
+      # Label for node group
     privateNetworking: true
+    subnets:
+      - "${PRIVATE_SUBNET_A}"
+      - "${PRIVATE_SUBNET_B}"
+    ssh:
+      enableSsm: true
     iam:
       withAddonPolicies:
+        imageBuilder: true
         autoScaler: true
-        cloudWatch: true
+        externalDNS: true
+        certManager: true
         ebs: true
-        fsx: true
         efs: true
+        awsLoadBalancerController: true
+        cloudWatch: true
 
 cloudWatch:
-  clusterLogging:
-    enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+    clusterLogging:
+        enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+        # Enable CloudWatch logging for specified components
+        # 지정된 구성 요소에 대해 CloudWatch 로깅 활성화
 
 iam:
   withOIDC: true
+  # Enable IAM OIDC provider for the cluster
+  # 클러스터에 IAM OIDC 프로바이더 활성화
 
 addons:
 - name: vpc-cni
@@ -87,32 +106,17 @@ addons:
 - name: aws-ebs-csi-driver
   wellKnownPolicies:
     ebsCSIController: true
-EOF
+    # Enable add-ons for network, storage, and DN
 
-echo "✅ EKS 클러스터 구성 파일 생성 완료: ~/amazonqcli_lab/dmz-eks-cluster.yaml"
-echo ""
-echo "📄 생성된 구성 요약:"
-echo "   - 클러스터 이름: ${EKSCLUSTER_NAME}"
-echo "   - EKS 버전: ${EKS_VERSION}"
-echo "   - VPC: ${VPC_ID}"
-echo "   - Private Subnet A: ${PrivateSubnetA}"
-echo "   - Private Subnet B: ${PrivateSubnetB}"
-echo "   - Managed Node Group: ${PRIVATE_MGMD_NODE}"
-echo "   - 인스턴스 타입: ${INSTANCE_TYPE}"
-echo "   - 노드 수: 2 (최소 1, 최대 4)"
-echo ""
-echo "🚀 EKS 클러스터 생성을 시작합니다..."
-echo "⏰ 예상 소요 시간: 15-20분"
+YAML_EOF
 
-# EKS 클러스터 생성 실행
-eksctl create cluster -f ~/amazonqcli_lab/dmz-eks-cluster.yaml
+echo "✅ EKS 클러스터 구성 파일 생성 완료"
 
 echo ""
-echo "🎉 EKS 클러스터 생성이 완료되었습니다!"
-echo ""
-echo "💡 다음 단계:"
-echo "   1. kubectl 컨텍스트 확인: kubectl config current-context"
-echo "   2. 노드 확인: kubectl get nodes"
-echo "   3. 클러스터 정보 확인: kubectl cluster-info"
-echo "   4. K9s로 클러스터 관리: k9s"
-EOF
+echo "======================================================"
+echo "📋 클러스터 정보:"
+echo "   - 이름: ${EKSCLUSTER_NAME}"
+echo "   - 버전: ${EKS_VERSION}"
+echo "   - 리전: ap-northeast-2"
+echo "   - VPC ID: ${VPCID}"
+echo "======================================================"
