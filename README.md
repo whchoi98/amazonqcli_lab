@@ -36,7 +36,7 @@
 
 ```bash
 git clone https://github.com/whchoi98/amazonqcli_lab.git
-cd ~/code/amazonqcli_lab/
+cd ~/amazonqcli_lab/
 ```
 
 ### 2. 기본 인프라 배포
