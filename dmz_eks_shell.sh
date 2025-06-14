@@ -112,54 +112,6 @@ echo "     · Public: ${PUBLIC_MGMD_NODE}"
 echo "     · Private: ${PRIVATE_MGMD_NODE}"
 echo "======================================================"
 
-# EKS 클러스터 구성 파일 생성
-echo ""
-echo "🔄 [1/3] EKS 클러스터 구성 파일 생성 중..."
-
-cat > ~/amazonqcli_lab/ekscluster.yaml << YAML_EOF
-apiVersion: eksctl.io/v1alpha5
-kind: ClusterConfig
-
-metadata:
-  name: ${EKSCLUSTER_NAME}
-  region: ap-northeast-2
-  version: "${EKS_VERSION}"
-
-vpc:
-  id: "${VPCID}"
-  subnets:
-    private:
-      private-subnet-a:
-        id: "${PRIVATE_SUBNET_A}"
-      private-subnet-b:
-        id: "${PRIVATE_SUBNET_B}"
-
-managedNodeGroups:
-  - name: ${PRIVATE_MGMD_NODE}
-    instanceType: ${INSTANCE_TYPE}
-    desiredCapacity: 8
-    minSize: 4
-    maxSize: 8
-    privateNetworking: true
-    subnets:
-      - "${PRIVATE_SUBNET_A}"
-      - "${PRIVATE_SUBNET_B}"
-    ssh:
-      enableSsm: true
-    iam:
-      withAddonPolicies:
-        imageBuilder: true
-        autoScaler: true
-        externalDNS: true
-        certManager: true
-        ebs: true
-        efs: true
-        awsLoadBalancerController: true
-        cloudWatch: true
-YAML_EOF
-
-echo "✅ EKS 클러스터 구성 파일 생성 완료"
-
 echo ""
 echo "======================================================"
 echo "📋 클러스터 정보:"
@@ -190,5 +142,5 @@ echo ""
 echo "💡 다음 단계:"
 echo "1. 환경변수가 bash_profile에 저장되었습니다"
 echo "2. 새 터미널에서도 환경변수가 자동으로 로드됩니다"
-echo "3. EKS 클러스터를 배포하세요"
+echo "3. 필요시 별도로 EKS 클러스터 구성 파일을 생성하여 배포하세요"
 echo "======================================================"
