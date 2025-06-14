@@ -24,7 +24,7 @@ echo "🚀 DMZVPC 환경 변수 추출 시작"
 echo "======================================================"
 
 # VPC/Subnet 정보 추출
-echo "🧭 [1/5] DMZVPC VPC/Subnet 정보 추출 중..."
+echo "🧭 [1/3] DMZVPC VPC/Subnet 정보 추출 중..."
 
 # VPC ID 추출
 VPCID=$(aws cloudformation describe-stacks \
@@ -58,7 +58,7 @@ fi
 
 # EKS 관련 환경변수 설정
 echo ""
-echo "🔧 [2/5] EKS 환경변수 설정 중..."
+echo "🔧 [2/3] EKS 환경변수 설정 중..."
 
 EKSCLUSTER_NAME="eksworkshop"
 EKS_VERSION="1.31"
@@ -69,7 +69,7 @@ echo "✅ EKS 환경변수 설정 완료"
 
 # bash_profile에 환경변수 저장
 echo ""
-echo "📝 [3/5] bash_profile에 환경변수 저장 중..."
+echo "📝 [3/3] bash_profile에 환경변수 저장 중..."
 
 append_to_bash_profile "VPCID" "$VPCID"
 append_to_bash_profile "PRIVATE_SUBNET_A" "$PRIVATE_SUBNET_A"
@@ -82,52 +82,12 @@ append_to_bash_profile "PRIVATE_MGMD_NODE" "$PRIVATE_MGMD_NODE"
 
 echo "✅ bash_profile에 환경변수 저장 완료"
 
-# dmz_eksctl_shell.sh 생성
-echo ""
-echo "📝 [4/5] dmz_eksctl_shell.sh 생성 중..."
-
-cat > dmz_eksctl_shell.sh << 'EOF'
-#!/bin/bash
-
-# DMZVPC에 EKS 클러스터를 배포하는 스크립트
-# dmz_eks_shell.sh에 의해 자동 생성됨
-
-set -e
-
-# 환경 변수 로드
-source ~/.bash_profile
-
-echo "🚀 DMZVPC EKS 클러스터 배포 시작"
-echo "======================================================"
-echo "📋 배포 정보:"
-echo "   - 클러스터 이름: ${EKSCLUSTER_NAME}"
-echo "   - 버전: ${EKS_VERSION}"
-echo "   - 리전: ap-northeast-2"
-echo "   - VPC ID: ${VPCID}"
-echo "   - Private Subnet A: ${PRIVATE_SUBNET_A}"
-echo "   - Private Subnet B: ${PRIVATE_SUBNET_B}"
-echo "   - 인스턴스 타입: ${INSTANCE_TYPE}"
-echo "   - Managed 노드 그룹:"
-echo "     · Public: ${PUBLIC_MGMD_NODE}"
-echo "     · Private: ${PRIVATE_MGMD_NODE}"
-echo "======================================================"
-
-echo ""
-echo "======================================================"
-echo "📋 클러스터 정보:"
-echo "   - 이름: ${EKSCLUSTER_NAME}"
-echo "   - 버전: ${EKS_VERSION}"
-echo "   - 리전: ap-northeast-2"
-echo "   - VPC ID: ${VPCID}"
-echo "======================================================"
-EOF
-
 # bash_profile 다시 로드
 source ~/.bash_profile
 
 echo ""
 echo "======================================================"
-echo "✅ dmz_eksctl_shell.sh 생성 및 환경변수 설정 완료!"
+echo "✅ 환경변수 설정 완료!"
 echo ""
 echo "📋 bash_profile에 저장된 환경변수:"
 echo "export VPCID=\"${VPCID}\""
@@ -142,5 +102,5 @@ echo ""
 echo "💡 다음 단계:"
 echo "1. 환경변수가 bash_profile에 저장되었습니다"
 echo "2. 새 터미널에서도 환경변수가 자동으로 로드됩니다"
-echo "3. 필요시 별도로 EKS 클러스터 구성 파일을 생성하여 배포하세요"
+echo "3. 필요시 이 환경변수들을 사용하여 EKS 클러스터를 구성하세요"
 echo "======================================================"
