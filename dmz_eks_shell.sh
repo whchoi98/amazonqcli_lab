@@ -134,29 +134,6 @@ vpc:
       private-subnet-b:
         id: "${PRIVATE_SUBNET_B}"
 
-nodeGroups:
-  - name: ${PRIVATE_SELFMGMD_NODE}
-    instanceType: ${INSTANCE_TYPE}
-    desiredCapacity: 2
-    minSize: 1
-    maxSize: 4
-    privateNetworking: true
-    subnets:
-      - "${PRIVATE_SUBNET_A}"
-      - "${PRIVATE_SUBNET_B}"
-    ssh:
-      enableSsm: true
-    iam:
-      withAddonPolicies:
-        imageBuilder: true
-        autoScaler: true
-        externalDNS: true
-        certManager: true
-        ebs: true
-        efs: true
-        awsLoadBalancerController: true
-        cloudWatch: true
-
 managedNodeGroups:
   - name: ${PRIVATE_MGMD_NODE}
     instanceType: ${INSTANCE_TYPE}
