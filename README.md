@@ -145,8 +145,8 @@ cd ~/amazonqcli_lab/
 ./dmz_eksctl_shell.sh
 
 # ekscluster 배포
-eksctl create cluster --config-file=~/amazonq_cli/eksworkshop.yaml --dry-run
-eksctl create cluster --config-file=~/amazonq_cli/eksworkshop.yaml
+eksctl create cluster --config-file=~/amazonqcli_lab/eksworkshop.yaml --dry-run
+eksctl create cluster --config-file=~/amazonqcli_lab/eksworkshop.yaml
 
 # 정리 (필요시)
 ./dmz_eks_cleanup.sh
