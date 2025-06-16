@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS 계정 종합 분석 보고서 - 인덱스</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header class="report-header">
+            <h1>🎯 AWS 계정 종합 분석 보고서</h1>
+            <div class="report-meta">
+                <div class="meta-item">
+                    <strong>분석 대상:</strong> AWS 계정 157148350697
+                </div>
+                <div class="meta-item">
+                    <strong>분석 리전:</strong> ap-northeast-2 (서울)
+                </div>
+                <div class="meta-item">
+                    <strong>분석 일시:</strong> 2025년 6월 15일
+                </div>
+                <div class="meta-item">
+                    <strong>분석 도구:</strong> Steampipe + AWS CLI + Glow
+                </div>
+            </div>
+        </header>
+
+        <section class="executive-summary">
+            <h2>📋 Executive Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card success">
+                    <h3>✅ 강점</h3>
+                    <ul>
+                        <li>잘 구조화된 네트워킹 (5개 VPC)</li>
+                        <li>컨테이너 기반 워크로드 (EKS 1.31)</li>
+                        <li>적절한 보안 분리</li>
+                        <li>고가용성 구성 (Multi-AZ)</li>
+                    </ul>
+                </div>
+                <div class="summary-card warning">
+                    <h3>⚠️ 개선 기회</h3>
+                    <ul>
+                        <li>비용 최적화: 월 $420 절약 가능</li>
+                        <li>보안 강화: EBS 암호화 필요</li>
+                        <li>모니터링 개선 필요</li>
+                        <li>운영 효율성 향상</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="cost-overview">
+                <h3>💰 비용 분석 요약</h3>
+                <div class="cost-metrics">
+                    <div class="metric">
+                        <span class="metric-value">$1,400</span>
+                        <span class="metric-label">현재 월간 비용</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$420</span>
+                        <span class="metric-label">절약 가능 금액</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">30%</span>
+                        <span class="metric-label">절감 비율</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$7,440</span>
+                        <span class="metric-label">연간 절약 효과</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="report-navigation">
+            <h2>📚 상세 분석 보고서</h2>
+            <div class="nav-grid">
+                <a href="networking.html" class="nav-card">
+                    <div class="nav-icon">🌐</div>
+                    <h3>Phase 1: 네트워킹 분석</h3>
+                    <p>VPC, 서브넷, Transit Gateway, 보안 그룹 분석</p>
+                    <div class="nav-stats">
+                        <span>5개 VPC</span>
+                        <span>35개 서브넷</span>
+                        <span>1개 TGW</span>
+                    </div>
+                </a>
+
+                <a href="computing.html" class="nav-card">
+                    <div class="nav-icon">💻</div>
+                    <h3>Phase 2: 컴퓨팅 분석</h3>
+                    <p>EC2 인스턴스, EKS 클러스터, 워크로드 분석</p>
+                    <div class="nav-stats">
+                        <span>18개 인스턴스</span>
+                        <span>1개 EKS 클러스터</span>
+                        <span>4개 워커 노드</span>
+                    </div>
+                </a>
+
+                <a href="storage.html" class="nav-card">
+                    <div class="nav-icon">💾</div>
+                    <h3>Phase 3: 스토리지 분석</h3>
+                    <p>EBS 볼륨, 스냅샷, 스토리지 최적화</p>
+                    <div class="nav-stats">
+                        <span>18개 볼륨</span>
+                        <span>360GB 용량</span>
+                        <span>$36/월 비용</span>
+                    </div>
+                </a>
+
+                <a href="database.html" class="nav-card">
+                    <div class="nav-icon">🗄️</div>
+                    <h3>Phase 4: 데이터베이스 분석</h3>
+                    <p>RDS, Aurora, ElastiCache, DynamoDB 분석</p>
+                    <div class="nav-stats">
+                        <span>관리형 DB 없음</span>
+                        <span>구축 검토</span>
+                        <span>마이그레이션</span>
+                    </div>
+                </a>
+
+                <a href="security.html" class="nav-card">
+                    <div class="nav-icon">🔐</div>
+                    <h3>Phase 5: 보안 분석</h3>
+                    <p>IAM, 보안 그룹, 암호화, 컴플라이언스</p>
+                    <div class="nav-stats">
+                        <span>15개 IAM 역할</span>
+                        <span>8개 보안 그룹</span>
+                        <span>부분 암호화</span>
+                    </div>
+                </a>
+
+                <a href="cost-optimization.html" class="nav-card">
+                    <div class="nav-icon">💰</div>
+                    <h3>Phase 6: 비용 최적화</h3>
+                    <p>Reserved Instance, Spot Instance, 사용하지 않는 리소스</p>
+                    <div class="nav-stats">
+                        <span>$420/월 절약</span>
+                        <span>30% 절감</span>
+                        <span>RI 기회</span>
+                    </div>
+                </a>
+
+                <a href="monitoring.html" class="nav-card">
+                    <div class="nav-icon">📊</div>
+                    <h3>Phase 7: 모니터링 분석</h3>
+                    <p>CloudWatch, 로깅, 알람, 운영 효율성</p>
+                    <div class="nav-stats">
+                        <span>모니터링 부족</span>
+                        <span>알람 부재</span>
+                        <span>개선 필요</span>
+                    </div>
+                </a>
+
+                <a href="recommendations.html" class="nav-card">
+                    <div class="nav-icon">🎯</div>
+                    <h3>Phase 8: 권장사항</h3>
+                    <p>우선순위별 실행 계획, 구현 가이드</p>
+                    <div class="nav-stats">
+                        <span>즉시 실행</span>
+                        <span>1개월 내</span>
+                        <span>3개월 내</span>
+                    </div>
+                </a>
+
+                <a href="implementation.html" class="nav-card">
+                    <div class="nav-icon">🔧</div>
+                    <h3>Phase 9: 구현 가이드</h3>
+                    <p>단계별 실행 방법, 스크립트, 체크리스트</p>
+                    <div class="nav-stats">
+                        <span>실행 스크립트</span>
+                        <span>체크리스트</span>
+                        <span>ROI 계산</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="quick-actions">
+            <h2>🚀 빠른 실행</h2>
+            <div class="action-grid">
+                <div class="action-card high-priority">
+                    <h3>🔴 High Priority</h3>
+                    <ul>
+                        <li>Reserved Instance 구매</li>
+                        <li>EBS 볼륨 암호화</li>
+                        <li>보안 그룹 검토</li>
+                    </ul>
+                    <div class="action-impact">예상 절약: $280/월</div>
+                </div>
+                <div class="action-card medium-priority">
+                    <h3>🟡 Medium Priority</h3>
+                    <ul>
+                        <li>CloudWatch Agent 배포</li>
+                        <li>Container Insights 활성화</li>
+                        <li>백업 정책 수립</li>
+                    </ul>
+                    <div class="action-impact">운영 효율성 50% 향상</div>
+                </div>
+                <div class="action-card low-priority">
+                    <h3>🟢 Low Priority</h3>
+                    <ul>
+                        <li>서버리스 전환 검토</li>
+                        <li>멀티 리전 DR</li>
+                        <li>성능 최적화</li>
+                    </ul>
+                    <div class="action-impact">장기적 최적화</div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="report-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>분석 도구</h4>
+                    <ul>
+                        <li>Steampipe (SQL 기반 분석)</li>
+                        <li>AWS CLI (리소스 수집)</li>
+                        <li>Glow (마크다운 뷰티파이)</li>
+                        <li>Python (HTML 생성)</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>분석 범위</h4>
+                    <ul>
+                        <li>서울 리전 (ap-northeast-2)</li>
+                        <li>모든 활성 리소스</li>
+                        <li>비용 및 보안 분석</li>
+                        <li>최적화 권장사항</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>추가 질문이나 상세 분석이 필요한 경우<br>
+                    언제든 문의해 주세요.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AWS 계정 종합 분석 보고서 | 생성 시간: 2025년 6월 15일</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

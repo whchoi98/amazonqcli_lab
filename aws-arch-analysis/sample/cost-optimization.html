@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6: 비용 최적화 분석</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .detail-page {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .analysis-table th {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .analysis-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .analysis-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .cost-overview {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #28a745;
+        }
+        
+        .savings-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .optimization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .optimization-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .optimization-card.high-impact {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border-left-color: #28a745;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="index.html">🏠 홈</a> > <strong>Phase 6: 비용 최적화 분석</strong>
+        </div>
+
+        <div class="detail-page">
+            <header>
+                <h1>💰 Phase 6: 비용 최적화 완전 분석</h1>
+                <p>현재 AWS 비용을 분석하고 최적화 기회를 식별하여 구체적인 비용 절감 방안을 제시합니다.</p>
+            </header>
+
+            <section>
+                <h2>📊 현재 월간 비용 분석</h2>
+                <div class="cost-overview">
+                    <h3>💸 비용 구조 분석</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div><strong>총 월간 비용:</strong> $1,400</div>
+                        <div><strong>컴퓨팅 비용:</strong> $1,168 (83%)</div>
+                        <div><strong>네트워킹 비용:</strong> $144 (10%)</div>
+                        <div><strong>스토리지 비용:</strong> $53 (4%)</div>
+                        <div><strong>기타 비용:</strong> $35 (3%)</div>
+                    </div>
+                </div>
+                
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>서비스 카테고리</th>
+                            <th>예상 비용</th>
+                            <th>비중</th>
+                            <th>주요 구성 요소</th>
+                            <th>최적화 기회</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EC2 인스턴스</strong></td>
+                            <td>$1,055.58</td>
+                            <td>75%</td>
+                            <td>18개 인스턴스</td>
+                            <td>Reserved Instance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EKS 클러스터</strong></td>
+                            <td>$73.00</td>
+                            <td>5%</td>
+                            <td>1개 클러스터</td>
+                            <td>Fargate 검토</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NAT Gateway</strong></td>
+                            <td>$90.00</td>
+                            <td>6%</td>
+                            <td>2개 게이트웨이</td>
+                            <td>사용률 최적화</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EBS 스토리지</strong></td>
+                            <td>$36.00</td>
+                            <td>3%</td>
+                            <td>360GB</td>
+                            <td>gp3 전환</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transit Gateway</strong></td>
+                            <td>$36.00</td>
+                            <td>3%</td>
+                            <td>1개 TGW</td>
+                            <td>데이터 전송 최적화</td>
+                        </tr>
+                        <tr>
+                            <td><strong>로드 밸런서</strong></td>
+                            <td>$25.00</td>
+                            <td>2%</td>
+                            <td>ALB/NLB</td>
+                            <td>통합 검토</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elastic IP</strong></td>
+                            <td>$18.25</td>
+                            <td>1%</td>
+                            <td>5개 IP</td>
+                            <td>미사용 IP 해제</td>
+                        </tr>
+                        <tr>
+                            <td><strong>스냅샷</strong></td>
+                            <td>$17.00</td>
+                            <td>1%</td>
+                            <td>28개 스냅샷</td>
+                            <td>정책 최적화</td>
+                        </tr>
+                        <tr>
+                            <td><strong>기타</strong></td>
+                            <td>$39.17</td>
+                            <td>3%</td>
+                            <td>CloudWatch, 기타</td>
+                            <td>리소스 정리</td>
+                        </tr>
+                        <tr style="background: #e8f5e8; font-weight: bold;">
+                            <td><strong>총계</strong></td>
+                            <td><strong>$1,400.00</strong></td>
+                            <td><strong>100%</strong></td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>🎯 즉시 적용 가능한 절약 방안</h2>
+                <p>다음 최적화 방안들은 즉시 적용 가능하며, 상당한 비용 절감 효과를 기대할 수 있습니다.</p>
+                
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>최적화 방법</th>
+                            <th>대상</th>
+                            <th>현재 비용</th>
+                            <th>절약 금액</th>
+                            <th>절약률</th>
+                            <th>구현 난이도</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Reserved Instance (1년)</strong></td>
+                            <td>t3.small (12개)</td>
+                            <td>$183.96</td>
+                            <td>$110.37</td>
+                            <td>60%</td>
+                            <td>쉬움</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reserved Instance (1년)</strong></td>
+                            <td>m6i.xlarge (4개)</td>
+                            <td>$560.64</td>
+                            <td>$168.19</td>
+                            <td>30%</td>
+                            <td>쉬움</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spot Instance</strong></td>
+                            <td>개발/테스트 (8개)</td>
+                            <td>$245.28</td>
+                            <td>$171.70</td>
+                            <td>70%</td>
+                            <td>중간</td>
+                        </tr>
+                        <tr>
+                            <td><strong>인스턴스 크기 조정</strong></td>
+                            <td>과소 사용 (4개)</td>
+                            <td>$122.64</td>
+                            <td>$61.32</td>
+                            <td>50%</td>
+                            <td>중간</td>
+                        </tr>
+                        <tr>
+                            <td><strong>미사용 Elastic IP</strong></td>
+                            <td>2개 IP</td>
+                            <td>$7.30</td>
+                            <td>$7.30</td>
+                            <td>100%</td>
+                            <td>쉬움</td>
+                        </tr>
+                        <tr>
+                            <td><strong>gp2 → gp3 전환</strong></td>
+                            <td>6개 볼륨</td>
+                            <td>$12.00</td>
+                            <td>$2.40</td>
+                            <td>20%</td>
+                            <td>쉬움</td>
+                        </tr>
+                        <tr>
+                            <td><strong>스냅샷 정리</strong></td>
+                            <td>오래된 스냅샷</td>
+                            <td>$5.00</td>
+                            <td>$3.00</td>
+                            <td>60%</td>
+                            <td>쉬움</td>
+                        </tr>
+                        <tr style="background: #e8f5e8; font-weight: bold;">
+                            <td><strong>즉시 절약 가능</strong></td>
+                            <td>-</td>
+                            <td><strong>$1,136.82</strong></td>
+                            <td><strong>$524.28</strong></td>
+                            <td><strong>46%</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>📈 예상 절약 효과</h2>
+                <div class="savings-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #28a745;">$524</div>
+                        <div>월간 절약</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #28a745;">46%</div>
+                        <div>절약률</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #28a745;">$6,291</div>
+                        <div>연간 절약</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #3498db;">$876</div>
+                        <div>최적화 후 월비용</div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔍 상세 최적화 전략</h2>
+                <div class="optimization-grid">
+                    <div class="optimization-card high-impact">
+                        <h4>💎 Reserved Instance 전략</h4>
+                        <p><strong>절약 효과:</strong> $278.56/월</p>
+                        <ul>
+                            <li>1년 약정으로 30-60% 절약</li>
+                            <li>안정적인 워크로드에 적용</li>
+                            <li>즉시 구매 가능</li>
+                            <li>위험도: 낮음</li>
+                        </ul>
+                        <p><strong>구현 방법:</strong> AWS 콘솔에서 RI 구매</p>
+                    </div>
+                    
+                    <div class="optimization-card high-impact">
+                        <h4>⚡ Spot Instance 활용</h4>
+                        <p><strong>절약 효과:</strong> $171.70/월</p>
+                        <ul>
+                            <li>개발/테스트 환경에 적용</li>
+                            <li>최대 70% 비용 절감</li>
+                            <li>중단 허용 워크로드</li>
+                            <li>위험도: 중간</li>
+                        </ul>
+                        <p><strong>구현 방법:</strong> Auto Scaling Group 설정</p>
+                    </div>
+                    
+                    <div class="optimization-card">
+                        <h4>📏 인스턴스 크기 최적화</h4>
+                        <p><strong>절약 효과:</strong> $61.32/월</p>
+                        <ul>
+                            <li>CPU/메모리 사용률 분석</li>
+                            <li>과소 사용 인스턴스 다운사이징</li>
+                            <li>성능 영향 최소화</li>
+                            <li>위험도: 중간</li>
+                        </ul>
+                        <p><strong>구현 방법:</strong> CloudWatch 메트릭 기반</p>
+                    </div>
+                    
+                    <div class="optimization-card">
+                        <h4>🌐 네트워크 최적화</h4>
+                        <p><strong>절약 효과:</strong> $15-30/월</p>
+                        <ul>
+                            <li>NAT Gateway 사용률 분석</li>
+                            <li>VPC Endpoints 활용</li>
+                            <li>데이터 전송 최적화</li>
+                            <li>위험도: 낮음</li>
+                        </ul>
+                        <p><strong>구현 방법:</strong> S3/DynamoDB 엔드포인트</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>📅 단계별 구현 로드맵</h2>
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>단계</th>
+                            <th>기간</th>
+                            <th>최적화 항목</th>
+                            <th>절약 금액</th>
+                            <th>누적 절약</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1단계</strong></td>
+                            <td>1주</td>
+                            <td>RI 구매, Elastic IP 해제</td>
+                            <td>$285.86</td>
+                            <td>$285.86</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2단계</strong></td>
+                            <td>2주</td>
+                            <td>Spot Instance 전환</td>
+                            <td>$171.70</td>
+                            <td>$457.56</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3단계</strong></td>
+                            <td>1개월</td>
+                            <td>인스턴스 크기 조정</td>
+                            <td>$61.32</td>
+                            <td>$518.88</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4단계</strong></td>
+                            <td>2개월</td>
+                            <td>스토리지 최적화</td>
+                            <td>$5.40</td>
+                            <td>$524.28</td>
+                        </tr>
+                        <tr style="background: #e8f5e8; font-weight: bold;">
+                            <td><strong>완료</strong></td>
+                            <td><strong>2개월</strong></td>
+                            <td><strong>전체 최적화</strong></td>
+                            <td>-</td>
+                            <td><strong>$524.28</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>🎯 비용 최적화 실행 계획</h2>
+                
+                <div class="action-grid">
+                    <div class="action-card high-priority">
+                        <h3>🔴 즉시 실행 (1주 내)</h3>
+                        <ul>
+                            <li>Reserved Instance 구매 (t3.small, m6i.xlarge)</li>
+                            <li>미사용 Elastic IP 해제</li>
+                            <li>비용 알람 설정</li>
+                            <li>Cost Explorer 분석</li>
+                        </ul>
+                        <div class="action-impact">월 $286 절약</div>
+                    </div>
+                    
+                    <div class="action-card medium-priority">
+                        <h3>🟡 1개월 내 실행</h3>
+                        <ul>
+                            <li>개발 환경 Spot Instance 전환</li>
+                            <li>인스턴스 크기 최적화</li>
+                            <li>gp2 → gp3 스토리지 전환</li>
+                            <li>스냅샷 정리 및 정책 수립</li>
+                        </ul>
+                        <div class="action-impact">월 $238 절약</div>
+                    </div>
+                    
+                    <div class="action-card low-priority">
+                        <h3>🟢 3개월 내 실행</h3>
+                        <ul>
+                            <li>VPC Endpoints 구성</li>
+                            <li>Savings Plans 검토</li>
+                            <li>서버리스 전환 검토</li>
+                            <li>자동화된 비용 최적화</li>
+                        </ul>
+                        <div class="action-impact">추가 10-15% 절약</div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>📊 ROI 및 투자 회수 분석</h2>
+                <div class="cost-overview">
+                    <h3>💹 투자 수익률 분석</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div><strong>초기 투자:</strong> $0 (RI 선불 없음)</div>
+                        <div><strong>월간 절약:</strong> $524</div>
+                        <div><strong>연간 절약:</strong> $6,291</div>
+                        <div><strong>투자 회수:</strong> 즉시</div>
+                        <div><strong>3년 총 절약:</strong> $18,873</div>
+                        <div><strong>ROI:</strong> 무한대</div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px;">비용 최적화 효과</h4>
+                    <ul style="margin-top: 10px;">
+                        <li>💰 <strong>즉시 효과:</strong> Reserved Instance 구매로 월 $286 절약</li>
+                        <li>📈 <strong>점진적 효과:</strong> 2개월 내 총 46% 비용 절감</li>
+                        <li>🔄 <strong>지속적 효과:</strong> 자동화를 통한 지속적 최적화</li>
+                        <li>📊 <strong>가시성 확보:</strong> 비용 모니터링 및 알람</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="security.html" class="nav-btn">← 이전: 보안 분석</a>
+                <a href="monitoring.html" class="nav-btn">다음: 모니터링 분석 →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

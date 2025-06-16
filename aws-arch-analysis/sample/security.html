@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 5: 보안 분석</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .detail-page {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .analysis-table th {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .analysis-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .analysis-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .security-overview {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #ff9800;
+        }
+        
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .risk-card {
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        
+        .risk-card.high {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left-color: #f44336;
+        }
+        
+        .risk-card.medium {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left-color: #ff9800;
+        }
+        
+        .risk-card.low {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border-left-color: #4caf50;
+        }
+        
+        .compliance-status {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #9c27b0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="index.html">🏠 홈</a> > <strong>Phase 5: 보안 분석</strong>
+        </div>
+
+        <div class="detail-page">
+            <header>
+                <h1>🔐 Phase 5: 보안 완전 분석</h1>
+                <p>IAM, 보안 그룹, 암호화, 컴플라이언스 등 보안 상태를 종합 분석하고 위험 요소를 식별합니다.</p>
+            </header>
+
+            <section>
+                <h2>🛡️ 보안 현황 개요</h2>
+                <div class="security-overview">
+                    <h3>🔍 보안 상태 요약</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div><strong>IAM 역할:</strong> 15개</div>
+                        <div><strong>보안 그룹:</strong> 8개</div>
+                        <div><strong>암호화 상태:</strong> 부분적</div>
+                        <div><strong>전체 위험도:</strong> 중간</div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px;">주요 보안 이슈</h4>
+                    <ul style="margin-top: 10px;">
+                        <li>🔴 <strong>높은 위험:</strong> EBS 볼륨 50% 미암호화</li>
+                        <li>🟡 <strong>중간 위험:</strong> 일부 보안 그룹 과도한 권한</li>
+                        <li>🟡 <strong>중간 위험:</strong> MFA 미적용 계정 존재</li>
+                        <li>🟢 <strong>낮은 위험:</strong> EKS 보안 설정 양호</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>👥 IAM 분석</h2>
+                <p>총 15개의 IAM 역할이 운영되고 있으며, 대부분 적절한 권한으로 구성되어 있습니다.</p>
+                
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>역할 유형</th>
+                            <th>개수</th>
+                            <th>설명</th>
+                            <th>권한 수준</th>
+                            <th>위험도</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EC2 Service Role</strong></td>
+                            <td>8개</td>
+                            <td>EC2 인스턴스용 역할</td>
+                            <td>제한적</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>EKS Service Role</strong></td>
+                            <td>3개</td>
+                            <td>EKS 클러스터 및 노드 그룹</td>
+                            <td>적절</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lambda Execution Role</strong></td>
+                            <td>2개</td>
+                            <td>Lambda 함수 실행</td>
+                            <td>제한적</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>기타 서비스 역할</strong></td>
+                            <td>2개</td>
+                            <td>CloudFormation, 기타</td>
+                            <td>검토 필요</td>
+                            <td><span style="color: #ffc107;">중간</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>IAM 권한 분석</h3>
+                <div class="risk-grid">
+                    <div class="risk-card low">
+                        <h4>✅ 적절한 권한 구성</h4>
+                        <ul>
+                            <li>최소 권한 원칙 준수</li>
+                            <li>서비스별 역할 분리</li>
+                            <li>임시 자격 증명 사용</li>
+                            <li>정기적 권한 검토</li>
+                        </ul>
+                    </div>
+                    <div class="risk-card medium">
+                        <h4>⚠️ 개선 필요 영역</h4>
+                        <ul>
+                            <li>일부 역할 과도한 권한</li>
+                            <li>MFA 미적용 계정</li>
+                            <li>액세스 키 순환 부족</li>
+                            <li>권한 경계 미설정</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🛡️ 보안 그룹 위험 분석</h2>
+                <p>8개의 보안 그룹이 운영되고 있으며, 일부 그룹에서 보안 위험이 발견되었습니다.</p>
+                
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>보안 그룹</th>
+                            <th>VPC</th>
+                            <th>인바운드 규칙</th>
+                            <th>아웃바운드 규칙</th>
+                            <th>위험도</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>default (Default VPC)</td>
+                            <td>Default</td>
+                            <td>SSH (0.0.0.0/0)</td>
+                            <td>All Traffic</td>
+                            <td><span style="color: #dc3545;">높음</span></td>
+                        </tr>
+                        <tr>
+                            <td>EKS-cluster-sg</td>
+                            <td>DMZVPC</td>
+                            <td>HTTPS (제한적)</td>
+                            <td>All Traffic</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                        <tr>
+                            <td>EKS-node-sg</td>
+                            <td>DMZVPC</td>
+                            <td>클러스터 통신</td>
+                            <td>All Traffic</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                        <tr>
+                            <td>Web-tier-sg</td>
+                            <td>VPC01/VPC02</td>
+                            <td>HTTP/HTTPS</td>
+                            <td>제한적</td>
+                            <td><span style="color: #ffc107;">중간</span></td>
+                        </tr>
+                        <tr>
+                            <td>Management-sg</td>
+                            <td>mgmtvpc</td>
+                            <td>SSH (제한적)</td>
+                            <td>제한적</td>
+                            <td><span style="color: #28a745;">낮음</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="summary-grid">
+                    <div class="summary-card warning">
+                        <h3>🔴 보안 위험 발견</h3>
+                        <ul>
+                            <li>Default VPC에서 0.0.0.0/0 SSH 허용</li>
+                            <li>과도한 포트 범위 허용</li>
+                            <li>불필요한 인바운드 규칙</li>
+                            <li>즉시 검토 및 수정 필요</li>
+                        </ul>
+                    </div>
+                    <div class="summary-card success">
+                        <h3>✅ 보안 상태 양호</h3>
+                        <ul>
+                            <li>EKS 보안 그룹 적절히 구성</li>
+                            <li>VPC별 보안 그룹 분리</li>
+                            <li>서비스별 전용 보안 그룹</li>
+                            <li>기본 보안 정책 준수</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔒 암호화 상태 분석</h2>
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>서비스</th>
+                            <th>암호화 상태</th>
+                            <th>KMS 키</th>
+                            <th>암호화 비율</th>
+                            <th>권장사항</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EBS 볼륨</strong></td>
+                            <td>부분 암호화</td>
+                            <td>일부 적용</td>
+                            <td>50%</td>
+                            <td>전체 암호화 필요</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EKS Secrets</strong></td>
+                            <td>✅ 암호화됨</td>
+                            <td>KMS 적용</td>
+                            <td>100%</td>
+                            <td>양호</td>
+                        </tr>
+                        <tr>
+                            <td><strong>S3 버킷</strong></td>
+                            <td>확인 필요</td>
+                            <td>-</td>
+                            <td>미확인</td>
+                            <td>암호화 활성화</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RDS/Aurora</strong></td>
+                            <td>해당 없음</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>구축 시 암호화</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CloudTrail</strong></td>
+                            <td>기본 설정</td>
+                            <td>AWS 관리형</td>
+                            <td>100%</td>
+                            <td>고객 관리형 키 검토</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>📋 컴플라이언스 상태</h2>
+                <div class="compliance-status">
+                    <h3>🏛️ 보안 프레임워크 준수 현황</h3>
+                    
+                    <h4 style="margin-top: 20px;">AWS Well-Architected Security Pillar</h4>
+                    <div style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                            <div><strong>Identity & Access:</strong> 70% 준수</div>
+                            <div><strong>Detective Controls:</strong> 40% 준수</div>
+                            <div><strong>Infrastructure Protection:</strong> 60% 준수</div>
+                            <div><strong>Data Protection:</strong> 50% 준수</div>
+                            <div><strong>Incident Response:</strong> 30% 준수</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 20px;">주요 컴플라이언스 갭</h4>
+                    <ul style="margin-top: 10px;">
+                        <li>🔴 <strong>데이터 암호화:</strong> 저장 데이터 암호화 부분적</li>
+                        <li>🟡 <strong>로깅 및 모니터링:</strong> 중앙화된 로깅 부족</li>
+                        <li>🟡 <strong>네트워크 보안:</strong> Network ACL 미사용</li>
+                        <li>🟡 <strong>인시던트 대응:</strong> 자동화된 대응 체계 부족</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔍 보안 모니터링 현황</h2>
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>보안 서비스</th>
+                            <th>현재 상태</th>
+                            <th>설정 수준</th>
+                            <th>권장 조치</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CloudTrail</td>
+                            <td>✅ 활성화</td>
+                            <td>기본</td>
+                            <td>다중 리전 활성화</td>
+                        </tr>
+                        <tr>
+                            <td>GuardDuty</td>
+                            <td>❌ 비활성화</td>
+                            <td>-</td>
+                            <td>즉시 활성화</td>
+                        </tr>
+                        <tr>
+                            <td>Security Hub</td>
+                            <td>❌ 비활성화</td>
+                            <td>-</td>
+                            <td>중앙 보안 관리</td>
+                        </tr>
+                        <tr>
+                            <td>Config</td>
+                            <td>❌ 비활성화</td>
+                            <td>-</td>
+                            <td>구성 변경 추적</td>
+                        </tr>
+                        <tr>
+                            <td>VPC Flow Logs</td>
+                            <td>⚠️ 부분적</td>
+                            <td>일부 VPC</td>
+                            <td>모든 VPC 활성화</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>🎯 보안 강화 권장사항</h2>
+                
+                <div class="action-grid">
+                    <div class="action-card high-priority">
+                        <h3>🔴 즉시 실행 (1주 내)</h3>
+                        <ul>
+                            <li>보안 그룹 규칙 검토 및 수정</li>
+                            <li>EBS 볼륨 전체 암호화</li>
+                            <li>Default VPC SSH 접근 제한</li>
+                            <li>MFA 강제 적용</li>
+                        </ul>
+                        <div class="action-impact">보안 위험 제거</div>
+                    </div>
+                    
+                    <div class="action-card medium-priority">
+                        <h3>🟡 1개월 내 실행</h3>
+                        <ul>
+                            <li>GuardDuty 활성화</li>
+                            <li>Security Hub 구성</li>
+                            <li>Config Rules 설정</li>
+                            <li>VPC Flow Logs 전체 활성화</li>
+                        </ul>
+                        <div class="action-impact">컴플라이언스 70% 향상</div>
+                    </div>
+                    
+                    <div class="action-card low-priority">
+                        <h3>🟢 3개월 내 실행</h3>
+                        <ul>
+                            <li>WAF 구성</li>
+                            <li>Network ACL 추가 보안</li>
+                            <li>인시던트 대응 자동화</li>
+                            <li>보안 교육 및 훈련</li>
+                        </ul>
+                        <div class="action-impact">완전한 보안 체계</div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>📊 보안 투자 ROI 분석</h2>
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>보안 투자</th>
+                            <th>월간 비용</th>
+                            <th>연간 비용</th>
+                            <th>위험 감소</th>
+                            <th>ROI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GuardDuty</td>
+                            <td>$30</td>
+                            <td>$360</td>
+                            <td>위협 탐지 90%</td>
+                            <td>높음</td>
+                        </tr>
+                        <tr>
+                            <td>Security Hub</td>
+                            <td>$15</td>
+                            <td>$180</td>
+                            <td>컴플라이언스 관리</td>
+                            <td>중간</td>
+                        </tr>
+                        <tr>
+                            <td>Config</td>
+                            <td>$20</td>
+                            <td>$240</td>
+                            <td>구성 드리프트 방지</td>
+                            <td>중간</td>
+                        </tr>
+                        <tr>
+                            <td>WAF</td>
+                            <td>$25</td>
+                            <td>$300</td>
+                            <td>웹 공격 차단</td>
+                            <td>높음</td>
+                        </tr>
+                        <tr style="background: #e8f5e8; font-weight: bold;">
+                            <td><strong>총 보안 투자</strong></td>
+                            <td><strong>$90</strong></td>
+                            <td><strong>$1,080</strong></td>
+                            <td><strong>보안 사고 95% 감소</strong></td>
+                            <td><strong>매우 높음</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="database.html" class="nav-btn">← 이전: 데이터베이스 분석</a>
+                <a href="cost-optimization.html" class="nav-btn">다음: 비용 최적화 →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
