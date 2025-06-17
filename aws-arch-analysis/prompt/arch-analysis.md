@@ -10,14 +10,13 @@ AWS 계정 종합 분석 보고서
 - terraform 배포 내용
 
 3. 계정 분석 방법
-- 프롬프트 활용 : ~/amazonqcli_lab/aws-arch-analysis/prompt/AWS_Report_Generation_Prompt_Part1.md , ~/amazonqcli_lab/aws-arch-analysis/prompt/AWS_Report_Generation_Prompt_Part2.md, ~/amazonqcli_lab/aws-arch-analysis/prompt/AWS_Report_Generation_Prompt_Part3.md , ~/amazonqcli_lab/aws-arch-analysis/prompt/AWS_Report_Generation_Prompt_Part4.md
-
-4. 보고서 생성 도구
+- 프롬프트 활용 : ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part1.md , ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part2.md, ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part3.md
+1. 보고서 생성 도구
 - Markdown: 프롬프트 및 문서 작성
 - 전체 계정 분석 요약, 네트워킹 분석, 컴퓨팅 분석, 스토리지 분석, 데이터베이스 분석, 보안 분석, 비용 최적화, 애플리케이션 서비스 및 모니터링 분석, 종합 분석 및 권장사항, 구현가이드 파트로 분리해서 생성
 - 보고서 생성 : ~/report에 생성
 
-5. 보고서 생성 후 HTML로 변환
+1. 보고서 생성 후 HTML로 변환
 - index.html 파일 생성 : 전체 계정 분석 요약
 - 네트워킹 분석, 컴퓨팅 분석, 스토리지 분석, 데이터베이스 분석, 보안 분석, 비용 최적화, 애플리케이션 서비스 및 모니터링 분석, 종합 분석 및 권장사항, 구현가이드 파트 html 생성
 - markdown to HTML 변환 : ~/amazonqcli_lab/aws-arch-analysis/style_converter.py 를 사용
