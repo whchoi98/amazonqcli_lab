@@ -1,11 +1,11 @@
-
 # Amazon Q CLI Lab 환경 구축 가이드
 
-이 저장소는 Amazon Q CLI와 MCP(Model Context Protocol) 서버를 활용한 AWS 인프라 실습 환경을 구축하기 위한 스크립트와 CloudFormation 템플릿을 제공합니다.
+Amazon Q CLI와 MCP(Model Context Protocol) 서버를 활용한 AWS 인프라 실습 환경을 구축하기 위한 자동화 스크립트와 CloudFormation 템플릿 모음입니다.
 
 ## 📋 목차
 
-- [아키텍처 개요](#아키텍처-개요)
+- [프로젝트 개요](#프로젝트-개요)
+- [아키텍처 구성](#아키텍처-구성)
 - [사전 요구사항](#사전-요구사항)
 - [빠른 시작](#빠른-시작)
 - [상세 배포 가이드](#상세-배포-가이드)
@@ -14,45 +14,78 @@
 - [문제 해결](#문제-해결)
 - [정리](#정리)
 
-## 🏗️ 아키텍처 개요
+## 🚀 프로젝트 개요
 
-이 실습 환경은 다음과 같은 AWS 리소스를 구성합니다:
+이 프로젝트는 AWS 클라우드 환경에서 Amazon Q CLI를 활용한 실습 환경을 자동으로 구축합니다. 네트워킹 인프라부터 개발 도구, AI 지원 도구까지 포괄적인 환경을 제공합니다.
 
-- **네트워킹**: DMZ VPC, VPC01, VPC02와 Transit Gateway를 통한 연결
-- **개발 환경**: VSCode 도구, AWS CLI, Amazon Q CLI
-- **보안**: KMS 키 관리, IAM 역할 및 정책
-- **선택적 서비스**: Redis, Aurora MySQL, OpenSearch, EKS
+### 주요 특징
+- **자동화된 인프라 배포**: CloudFormation을 통한 일관된 환경 구축
+- **병렬 배포 지원**: 여러 VPC를 동시에 배포하여 시간 단축
+- **개발 도구 통합**: VSCode, AWS CLI, kubectl, helm 등 필수 도구 자동 설치
+- **AI 지원**: Amazon Q CLI와 MCP 서버 연동으로 향상된 개발 경험
+
+## 🏗️아키텍처 구성
+
+### 네트워킹 인프라
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│    DMZ VPC      │    │     VPC01       │    │     VPC02       │
+│  (Public/NAT)   │    │   (Private)     │    │   (Private)     │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                    ┌─────────────┴─────────────┐
+                    │    Transit Gateway        │
+                    │   (Cross-VPC Routing)     │
+                    └───────────────────────────┘
+```
+
+### 서비스 구성
+- **DMZ VPC**: 퍼블릭 서브넷, NAT Gateway, Redis, OpenSearch
+- **VPC01**: 프라이빗 워크로드, Aurora MySQL
+- **VPC02**: 추가 워크로드 영역
+- **EKS**: 컨테이너 오케스트레이션 (선택적)
 
 ## 📋 사전 요구사항
 
-- AWS CLI 구성 완료
-- 적절한 IAM 권한 (VPC, EC2, RDS, ElastiCache, OpenSearch, EKS 등)
-- Linux/macOS 환경 (bash 스크립트 실행)
-- Git 설치
+- **AWS CLI 구성 완료**
+  ```bash
+  aws configure
+  aws sts get-caller-identity
+  ```
+- **필요한 IAM 권한**
+  - VPC, EC2, RDS, ElastiCache 관리 권한
+  - CloudFormation 스택 생성/수정/삭제 권한
+  - S3 버킷 생성 및 객체 업로드 권한
+- **운영 체제**: Linux/macOS (bash 스크립트 실행 환경)
+- **Git 설치**
 
 ## 🚀 빠른 시작
 
-### 1. 저장소 클론
-
+### 1. 저장소 클론 및 이동
 ```bash
 git clone https://github.com/whchoi98/amazonqcli_lab.git
-cd ~/amazonqcli_lab/
+cd amazonqcli_lab/LabSetup
 ```
 
-### 2. 기본 인프라 배포
-
+### 2. 스크립트 실행 권한 부여
 ```bash
-# VPC 및 네트워킹 구성
+chmod +x *.sh
+```
+
+### 3. 기본 인프라 배포 (병렬 실행)
+```bash
+# 모든 VPC 동시 배포 (약 10-15분 소요)
 ./0.depoly-all-vpcs.sh
 
 # Transit Gateway 배포
 ./0.deploy-tgw.sh
 ```
 
-### 3. 개발 환경 설정
-
+### 4. 개발 환경 설정
 ```bash
-# VSCode 도구 설치
+# VSCode 및 개발 도구 설치 (약 5-10분 소요)
 ./1.vscode-tools-installer.sh
 
 # AWS 환경 변수 설정
@@ -62,91 +95,111 @@ cd ~/amazonqcli_lab/
 ./3.kms-setup.sh
 ```
 
-### 4. Amazon Q CLI 및 MCP 설정
-
+### 5. Amazon Q CLI 및 MCP 설정
 ```bash
-# 핵심 MCP 서버 설치
+# Python 3.12, uv, Node.js 설치
 ./4.install_core_mcp.sh
 
-# MCP 구성 설정
+# MCP 구성 파일 생성
 ./5.setup-mcp-config.sh
 ```
 
 ## 📖 상세 배포 가이드
 
-### 네트워킹 구성
+### Phase 1: 네트워킹 인프라
 
 #### 1. VPC 배포 (`0.depoly-all-vpcs.sh`)
-- **DMZ VPC** (`1.DMZVPC.yml`): 퍼블릭 서브넷과 NAT Gateway
-- **VPC01** (`2.VPC01.yml`): 프라이빗 서브넷 구성
-- **VPC02** (`3.VPC02.yml`): 추가 워크로드용 VPC
+```bash
+# 배포되는 스택:
+# - dmz-vpc-stack (1.DMZVPC.yml)
+# - vpc01-stack (2.VPC01.yml) 
+# - vpc02-stack (3.VPC02.yml)
+
+# 특징:
+# - 병렬 배포로 시간 단축
+# - S3 버킷 자동 생성 및 템플릿 업로드
+# - 배포 상태 실시간 모니터링
+```
+
+**배포 리소스:**
+- **DMZ VPC**: 퍼블릭/프라이빗 서브넷, NAT Gateway, Internet Gateway
+- **VPC01/VPC02**: 프라이빗 서브넷, 라우팅 테이블
 
 #### 2. Transit Gateway 구성 (`0.deploy-tgw.sh`)
-- VPC 간 연결을 위한 Transit Gateway 배포 (`4.TGW.yml`)
-- 라우팅 테이블 및 연결 설정
+```bash
+# VPC 간 연결 및 라우팅 설정
+# - Transit Gateway 생성
+# - VPC Attachment 구성
+# - 라우팅 테이블 설정
+```
 
-### 개발 환경 구성
+### Phase 2: 개발 환경 구성
 
-#### 3. VSCode 도구 설치 (`1.vscode-tools-installer.sh`)
-- 필수 개발 도구 및 확장 프로그램 설치
-- AWS 관련 도구 구성
+#### 3. 개발 도구 설치 (`1.vscode-tools-installer.sh`)
+**설치되는 도구:**
+- **AWS CLI**: 최신 버전 + 자동완성
+- **Session Manager Plugin**: EC2 인스턴스 접근
+- **kubectl** (v1.31.3): Kubernetes 클러스터 관리
+- **eksctl**: EKS 클러스터 생성/관리
+- **Helm** (v3.16.4): Kubernetes 패키지 관리
+- **k9s** (v0.32.7): Kubernetes 클러스터 모니터링
+- **추가 도구**: fzf, jq, gettext, bash-completion
 
 #### 4. AWS 환경 설정 (`2.set-aws-env.sh`)
 - AWS CLI 프로파일 구성
 - 환경 변수 설정
+- 리전 및 계정 정보 확인
 
 #### 5. KMS 설정 (`3.kms-setup.sh`)
-- 암호화를 위한 KMS 키 생성
-- 키 정책 구성
+- 암호화용 KMS 키 생성
+- 키 정책 및 별칭 구성
 
-### Amazon Q CLI 및 MCP 구성
+### Phase 3: Amazon Q CLI 및 MCP
 
-#### 6. MCP 서버 설치 (`4.install_core_mcp.sh`)
-- 핵심 MCP 서버 패키지 설치
-- 의존성 관리
+#### 6. 핵심 런타임 설치 (`4.install_core_mcp.sh`)
+**설치 구성요소:**
+- **Python 3.12**: 최신 Python 런타임
+- **uv**: 고성능 Python 패키지 관리자
+- **Node.js**: JavaScript 런타임 (MCP 서버용)
 
 #### 7. MCP 구성 (`5.setup-mcp-config.sh`)
 - MCP 서버 구성 파일 생성
 - Amazon Q CLI와 MCP 연동 설정
+- 필요한 의존성 패키지 설치
 
 ## 🔧 선택적 서비스 배포
 
-### Option 1: Redis 클러스터 배포
-
+### Redis 클러스터
 ```bash
 ./0.deploy-redis.sh
 ```
-- DMZ VPC에 ElastiCache Redis 클러스터 배포
-- 템플릿: `redis-cluster-stack.yml`
+- **위치**: DMZ VPC
+- **구성**: ElastiCache Redis 클러스터
+- **템플릿**: `redis-cluster-stack.yml`
 
-### Option 2: Aurora MySQL 배포
-
+### Aurora MySQL
 ```bash
 ./0.deploy-aurora.sh
 ```
-- VPC01에 Aurora MySQL 클러스터 배포
-- 템플릿: `aurora-mysql-stack.yml`
+- **위치**: VPC01
+- **구성**: Aurora MySQL 클러스터 (Multi-AZ)
+- **템플릿**: `aurora-mysql-stack.yml`
 
-### Option 3: OpenSearch 배포
-
+### OpenSearch
 ```bash
 ./deploy-opensearch.sh
 ```
-- DMZ VPC에 OpenSearch 클러스터 배포
-- 템플릿: `opensearch-stack.yml`
+- **위치**: DMZ VPC
+- **구성**: OpenSearch 클러스터
+- **템플릿**: `opensearch-stack.yml`
 
-### Option 4: EKS 클러스터 배포
-
+### EKS 클러스터
 ```bash
 # EKS 클러스터 생성
 ./dmz_eks_shell.sh
 
-# eksctl을 사용한 추가 구성
+# eksctl 구성 및 배포
 ./dmz_eksctl_shell.sh
-
-# ekscluster 배포
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/eksworkshop.yaml --dry-run
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/eksworkshop.yaml
 
 # 정리 (필요시)
 ./dmz_eks_cleanup.sh
@@ -155,81 +208,134 @@ eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/eksworkshop.ya
 ## 📁 파일 구조
 
 ```
-amazonqcli_lab/
-├── README.md                          # 이 파일
-├── 0.depoly-all-vpcs.sh              # VPC 일괄 배포 스크립트
-├── 0.deploy-tgw.sh                   # Transit Gateway 배포
-├── 0.deploy-redis.sh                 # Redis 배포
-├── 0.deploy-aurora.sh                # Aurora MySQL 배포
-├── deploy-opensearch.sh              # OpenSearch 배포
-├── 1.vscode-tools-installer.sh       # VSCode 도구 설치
-├── 2.set-aws-env.sh                  # AWS 환경 설정
-├── 3.kms-setup.sh                    # KMS 키 설정
-├── 4.install_core_mcp.sh             # MCP 서버 설치
-├── 5.setup-mcp-config.sh             # MCP 구성 설정
-├── dmz_eks_shell.sh                  # EKS 클러스터 생성
-├── dmz_eksctl_shell.sh               # eksctl 구성
-├── dmz_eks_cleanup.sh                # EKS 정리
-├── 1.DMZVPC.yml                      # DMZ VPC CloudFormation 템플릿
-├── 2.VPC01.yml                       # VPC01 CloudFormation 템플릿
-├── 3.VPC02.yml                       # VPC02 CloudFormation 템플릿
-├── 4.TGW.yml                         # Transit Gateway 템플릿
-├── redis-cluster-stack.yml           # Redis 클러스터 템플릿
-├── aurora-mysql-stack.yml            # Aurora MySQL 템플릿
-└── opensearch-stack.yml              # OpenSearch 템플릿
+LabSetup/
+├── 배포 스크립트
+│   ├── 0.depoly-all-vpcs.sh          # VPC 일괄 배포
+│   ├── 0.deploy-tgw.sh               # Transit Gateway 배포
+│   ├── 0.deploy-redis.sh             # Redis 배포
+│   └── 0.deploy-aurora.sh            # Aurora MySQL 배포
+├── 환경 설정 스크립트
+│   ├── 1.vscode-tools-installer.sh   # 개발 도구 설치
+│   ├── 2.set-aws-env.sh              # AWS 환경 설정
+│   └── 3.kms-setup.sh                # KMS 키 설정
+├── MCP 및 Q CLI 설정
+│   ├── 4.install_core_mcp.sh         # 핵심 런타임 설치
+│   └── 5.setup-mcp-config.sh         # MCP 구성
+├── EKS 관리 스크립트
+│   ├── dmz_eks_shell.sh              # EKS 클러스터 생성
+│   ├── dmz_eksctl_shell.sh           # eksctl 구성
+│   └── dmz_eks_cleanup.sh            # EKS 정리
+├── 추가 서비스
+│   └── deploy-opensearch.sh          # OpenSearch 배포
+└── CloudFormation 템플릿
+    ├── 1.DMZVPC.yml                  # DMZ VPC 템플릿
+    ├── 2.VPC01.yml                   # VPC01 템플릿
+    ├── 3.VPC02.yml                   # VPC02 템플릿
+    ├── 4.TGW.yml                     # Transit Gateway 템플릿
+    ├── aurora-mysql-stack.yml        # Aurora MySQL 템플릿
+    ├── redis-cluster-stack.yml       # Redis 클러스터 템플릿
+    └── opensearch-stack.yml          # OpenSearch 템플릿
 ```
 
 ## 🔍 문제 해결
 
 ### 일반적인 문제
 
-1. **권한 오류**
-   - IAM 사용자/역할에 필요한 권한이 있는지 확인
-   - AWS CLI 구성 상태 확인: `aws sts get-caller-identity`
+#### 1. 권한 오류
+```bash
+# IAM 권한 확인
+aws sts get-caller-identity
+aws iam get-user
 
-2. **스크립트 실행 권한**
-   ```bash
-   chmod +x *.sh
-   ```
+# 필요한 권한이 있는지 확인
+aws iam simulate-principal-policy \
+  --policy-source-arn $(aws sts get-caller-identity --query Arn --output text) \
+  --action-names cloudformation:CreateStack \
+  --resource-arns "*"
+```
 
-3. **리전 설정**
-   - 스크립트에서 사용하는 AWS 리전이 올바른지 확인
-   - 환경 변수 `AWS_DEFAULT_REGION` 설정
+#### 2. 스크립트 실행 권한
+```bash
+chmod +x *.sh
+```
 
-4. **리소스 한도**
-   - VPC, 서브넷, 보안 그룹 등의 AWS 서비스 한도 확인
-   - 필요시 AWS Support를 통해 한도 증가 요청
+#### 3. 리전 설정 확인
+```bash
+# 현재 리전 확인
+aws configure get region
+
+# 환경 변수로 리전 설정
+export AWS_DEFAULT_REGION=ap-northeast-2
+```
+
+#### 4. 서비스 한도 확인
+- VPC 한도: 계정당 5개 (기본값)
+- 서브넷 한도: VPC당 200개
+- 보안 그룹 한도: VPC당 2500개
+
+### 배포 상태 확인
+```bash
+# CloudFormation 스택 상태 확인
+aws cloudformation describe-stacks \
+  --stack-name dmz-vpc-stack \
+  --query 'Stacks[0].StackStatus'
+
+# 스택 이벤트 확인
+aws cloudformation describe-stack-events \
+  --stack-name dmz-vpc-stack \
+  --query 'StackEvents[0:5].[Timestamp,ResourceStatus,ResourceType,LogicalResourceId]' \
+  --output table
+```
 
 ### 로그 확인
-
-각 스크립트는 실행 로그를 출력합니다. 오류 발생 시 로그를 확인하여 문제를 진단하세요.
+각 스크립트는 상세한 실행 로그를 제공합니다:
+- ✅ 성공 단계
+- ❌ 오류 발생 시 상세 정보
+- 📊 진행 상황 표시
 
 ## 🧹 정리
 
-실습 완료 후 리소스 정리:
-
+### 전체 환경 정리 (역순)
 ```bash
 # EKS 클러스터 정리 (배포한 경우)
 ./dmz_eks_cleanup.sh
 
-# CloudFormation 스택 삭제 (역순으로)
+# CloudFormation 스택 삭제 (의존성 순서 고려)
 aws cloudformation delete-stack --stack-name opensearch-stack
-aws cloudformation delete-stack --stack-name aurora-mysql-stack
+aws cloudformation delete-stack --stack-name aurora-mysql-stack  
 aws cloudformation delete-stack --stack-name redis-cluster-stack
 aws cloudformation delete-stack --stack-name tgw-stack
 aws cloudformation delete-stack --stack-name vpc02-stack
 aws cloudformation delete-stack --stack-name vpc01-stack
 aws cloudformation delete-stack --stack-name dmz-vpc-stack
+
+# S3 버킷 정리 (필요시)
+aws s3 rb s3://$(aws iam list-account-aliases --query 'AccountAliases[0]' --output text)-$(date +%Y%m%d)-cf-template --force
 ```
 
-## 📞 지원
+### 선택적 정리
+```bash
+# 특정 스택만 삭제
+aws cloudformation delete-stack --stack-name [스택이름]
 
-문제가 발생하거나 질문이 있으시면:
-- GitHub Issues를 통해 문의
-- AWS 문서 참조
-- Amazon Q CLI 도움말: `q --help`
+# 삭제 상태 확인
+aws cloudformation describe-stacks --stack-name [스택이름] --query 'Stacks[0].StackStatus'
+```
+
+## 📞 지원 및 문의
+
+- **GitHub Issues**: 버그 리포트 및 기능 요청
+- **AWS 문서**: [AWS CloudFormation 사용자 가이드](https://docs.aws.amazon.com/cloudformation/)
+- **Amazon Q CLI**: `q --help` 명령어로 도움말 확인
 
 ---
 
-**주의**: 이 실습 환경은 학습 목적으로 설계되었습니다. 프로덕션 환경에서 사용하기 전에 보안 및 비용 최적화를 검토하세요.
+**⚠️ 주의사항**: 
+- 이 실습 환경은 학습 및 개발 목적으로 설계되었습니다
+- 프로덕션 환경 사용 전 보안 검토 및 비용 최적화 필요
+- 리소스 사용 후 반드시 정리하여 불필요한 비용 발생 방지
 
+**💡 팁**: 
+- 병렬 배포를 통해 전체 구축 시간을 약 50% 단축
+- 각 단계별로 로그를 확인하여 문제 조기 발견
+- AWS 서비스 한도를 미리 확인하여 배포 실패 방지
