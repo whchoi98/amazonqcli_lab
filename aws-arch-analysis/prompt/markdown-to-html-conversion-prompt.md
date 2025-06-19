@@ -11,7 +11,6 @@ AWS 아키텍처 진단 프롬프트(aws-diagnosis-prompt.md, aws-diagnosis-prom
 
 **메인 파일:**
 □ index.html - 전체 보고서 개요 및 네비게이션
-□ styles/main.css - 스타일시트 (기존 참조 파일 복사)
 
 **상세 분석 페이지:**
 □ networking.html - Phase 1: 네트워킹 리소스 분석
@@ -569,8 +568,7 @@ reports/
 ├── cost-optimization.html    # 비용 최적화
 ├── recommendations.html      # 권장사항
 ├── implementation.html       # 구현 가이드
-└── styles/
-    └── main.css             # 스타일시트
+
 ```
 
 ### 7. 품질 보증 체크리스트
