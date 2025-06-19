@@ -201,6 +201,9 @@ chmod +x *.sh
 # eksctl 구성 및 배포
 ./dmz_eksctl_shell.sh
 
+eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
+eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml
+
 # 정리 (필요시)
 ./dmz_eks_cleanup.sh
 ```
