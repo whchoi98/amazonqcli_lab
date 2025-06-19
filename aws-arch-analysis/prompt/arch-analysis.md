@@ -3,7 +3,7 @@ AWS 계정 종합 분석 보고서
 - region : ap-northeast-2
 
 2. 데이터 수집 도구
-- Steampipe: SQL 기반 AWS 리소스 분석
+- Steampipe로 우선 수집해줘 : SQL 기반 AWS 리소스 분석
 - AWS CLI: 추가 리소스 정보 수집
 - Bash 스크립트: 자동화된 데이터 처리
 - cloudformation 배포 내용 분석
