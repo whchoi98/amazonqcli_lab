@@ -28,7 +28,7 @@ echo "🔄 [1/3] DMZVPC 배포 시작..."
     aws cloudformation deploy \
       --region ${AWS_REGION} \
       --stack-name DMZVPC \
-      --template-file ~/amazonqcli_lab/LabSetup/LabSetup/1.DMZVPC.yml \
+      --template-file ~/amazonqcli_lab/LabSetup/1.DMZVPC.yml \
       --s3-bucket ${BUCKET_NAME} \
       --capabilities CAPABILITY_NAMED_IAM
     
