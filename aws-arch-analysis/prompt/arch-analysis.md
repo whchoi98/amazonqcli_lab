@@ -11,7 +11,7 @@ AWS 계정 종합 분석 보고서
 - 수집된 데이터는 ~/report에 json 형태로 수집
 
 3. 계정 분석 방법
-- 프롬프트 활용 : ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part1.md , ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part2.md, ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part3.md
+- 프롬프트 활용 : ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-part1.md , ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part2.md, ~/amazonqcli_lab/aws-arch-analysis/prompt/aws-diagnosis-prompt-Part3.md
   
 4. 보고서 생성 도구
 - Markdown: 프롬프트 및 문서 작성
