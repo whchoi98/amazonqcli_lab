@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>애플리케이션 서비스 및 모니터링</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>애플리케이션 서비스 및 모니터링</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 애플리케이션 서비스 및 모니터링 분석</h1>
+<h2 id="_1">🔧 애플리케이션 서비스 및 모니터링 종합 분석</h2>
+<p><strong>분석 범위</strong>: API Gateway, Lambda, 모니터링, 로깅, 알림 서비스<br />
+<strong>분석 일시</strong>: 2025년 6월 17일<br />
+<strong>현재 상태</strong>: 기본 인프라 중심, 애플리케이션 서비스 확장 필요</p>
+<hr />
+<h2 id="_2">📊 애플리케이션 서비스 현황 개요</h2>
+<h3 id="_3">현재 애플리케이션 아키텍처 상태</h3>
+<table>
+<thead>
+<tr>
+<th>서비스 카테고리</th>
+<th>현재 상태</th>
+<th>구성 요소</th>
+<th>성숙도</th>
+<th>권장 조치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API 게이트웨이</strong></td>
+<td>🟡 미확인</td>
+<td>API Gateway 분석 필요</td>
+<td>2/10</td>
+<td>구현 검토</td>
+</tr>
+<tr>
+<td><strong>서버리스 컴퓨팅</strong></td>
+<td>🟡 미확인</td>
+<td>Lambda 함수 분석 필요</td>
+<td>2/10</td>
+<td>활용 확대</td>
+</tr>
+<tr>
+<td><strong>메시징</strong></td>
+<td>🟡 미확인</td>
+<td>SNS/SQS 분석 필요</td>
+<td>2/10</td>
+<td>구현 검토</td>
+</tr>
+<tr>
+<td><strong>모니터링</strong></td>
+<td>🟡 기본</td>
+<td>CloudWatch 기본 설정</td>
+<td>4/10</td>
+<td>강화 필요</td>
+</tr>
+<tr>
+<td><strong>로깅</strong></td>
+<td>🟡 기본</td>
+<td>CloudTrail 활성화</td>
+<td>5/10</td>
+<td>중앙화 필요</td>
+</tr>
+<tr>
+<td><strong>알림</strong></td>
+<td>🔴 부족</td>
+<td>알림 체계 부재</td>
+<td>2/10</td>
+<td>구축 필요</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3010">애플리케이션 서비스 성숙도: <strong>3.0/10</strong> (초기 단계)</h3>
+<hr />
+<h2 id="api">🌐 API 및 애플리케이션 게이트웨이 분석</h2>
+<h3 id="api-gateway">현재 API Gateway 상태</h3>
+<div class="codehilite"><pre><span></span><code>🟡 분석 필요 영역:
+- API Gateway REST API 존재 여부 확인
+- HTTP API 사용 현황 파악
+- 커스텀 도메인 설정 상태
+- 사용량 계획 및 API 키 관리
+
+예상 구성 (EKS 기반):
+- Kubernetes Ingress Controller 사용 가능성
+- ALB Ingress Controller 활용
+- 서비스 메시 (Istio/App Mesh) 미적용
+</code></pre></div>
+
+<h3 id="api-gateway_1">API Gateway 구현 권장사항</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">Gateway</span><span class="w"> </span><span class="n">도입</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">마이크로서비스</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">통합</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인증</span><span class="o">/</span><span class="n">인가</span><span class="w"> </span><span class="n">중앙</span><span class="w"> </span><span class="n">집중화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">요청</span><span class="w"> </span><span class="n">제한</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">버전</span><span class="w"> </span><span class="n">관리</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">EKS와</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">Gateway</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="kr">Load</span><span class="w"> </span><span class="n">Balancer</span><span class="w"> </span><span class="kr">Cont</span><span class="n">roller</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">Gateway</span><span class="w"> </span><span class="n">VPC</span><span class="w"> </span><span class="n">Link</span><span class="w"> </span><span class="n">구성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">디스커버리</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">통합</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">모범</span><span class="w"> </span><span class="n">사례</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="kr">Open</span><span class="n">API</span><span class="w"> </span><span class="n">스펙</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">설계</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">문서화</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">개발자</span><span class="w"> </span><span class="n">포털</span><span class="w"> </span><span class="n">구축</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_4">⚡ 서버리스 컴퓨팅 분석</h2>
+<h3 id="lambda">Lambda 함수 현황</h3>
+<div class="codehilite"><pre><span></span><code>🟡 현재 상태 분석 필요:
+- Lambda 함수 존재 여부 확인
+- 트리거 및 이벤트 소스 분석
+- 실행 환경 및 런타임 검토
+- 비용 및 성능 분석
+
+예상 활용 시나리오:
+- EKS 이벤트 처리
+- 데이터 파이프라인 처리
+- API 백엔드 기능
+- 자동화 스크립트 실행
+</code></pre></div>
+
+<h3 id="_5">서버리스 아키텍처 확장 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">아키텍처</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">S3</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">Lambda</span><span class="w"> </span><span class="n">처리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">DynamoDB</span><span class="w"> </span><span class="n">Streams</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">동기화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">CloudWatch</span><span class="w"> </span><span class="n">Events</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">자동화</span><span class="w"> </span><span class="n">작업</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">Gateway</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">Lambda</span><span class="w"> </span><span class="n">백엔드</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">마이크로서비스</span><span class="w"> </span><span class="n">보완</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">EKS</span><span class="w"> </span><span class="n">워크로드와</span><span class="w"> </span><span class="n">Lambda</span><span class="w"> </span><span class="n">하이브리드</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비동기</span><span class="w"> </span><span class="n">처리</span><span class="w"> </span><span class="n">Lambda</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">배치</span><span class="w"> </span><span class="n">작업</span><span class="w"> </span><span class="n">Lambda</span><span class="w"> </span><span class="n">처리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">통신</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">운영</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인프라</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">대응</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">최적화</span><span class="w"> </span><span class="n">자동화</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_6">📨 메시징 및 이벤트 서비스 분석</h2>
+<h3 id="_7">현재 메시징 아키텍처</h3>
+<div class="codehilite"><pre><span></span><code><span class="err">🔴</span><span class="w"> </span><span class="nx">메시징</span><span class="w"> </span><span class="nx">서비스</span><span class="w"> </span><span class="nx">부재</span><span class="p">:</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">SNS</span><span class="w"> </span><span class="p">(</span><span class="nx">Simple</span><span class="w"> </span><span class="nx">Notification</span><span class="w"> </span><span class="nx">Service</span><span class="p">)</span><span class="w"> </span><span class="nx">미확인</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">SQS</span><span class="w"> </span><span class="p">(</span><span class="nx">Simple</span><span class="w"> </span><span class="nx">Queue</span><span class="w"> </span><span class="nx">Service</span><span class="p">)</span><span class="w"> </span><span class="nx">미확인</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">EventBridge</span><span class="w"> </span><span class="nx">미활용</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">서비스</span><span class="w"> </span><span class="nx">간</span><span class="w"> </span><span class="nx">통신</span><span class="w"> </span><span class="nx">패턴</span><span class="w"> </span><span class="nx">분석</span><span class="w"> </span><span class="nx">필요</span>
+
+<span class="nx">현재</span><span class="w"> </span><span class="nx">통신</span><span class="w"> </span><span class="nx">방식</span><span class="w"> </span><span class="p">(</span><span class="nx">추정</span><span class="p">):</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">동기식</span><span class="w"> </span><span class="nx">HTTP</span><span class="w"> </span><span class="nx">통신</span><span class="w"> </span><span class="nx">위주</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">데이터베이스</span><span class="w"> </span><span class="nx">기반</span><span class="w"> </span><span class="nx">상태</span><span class="w"> </span><span class="nx">공유</span>
+<span class="o">-</span><span class="w"> </span><span class="nx">파일</span><span class="w"> </span><span class="nx">시스템</span><span class="w"> </span><span class="nx">기반</span><span class="w"> </span><span class="nx">데이터</span><span class="w"> </span><span class="nx">교환</span>
+</code></pre></div>
+
+<h3 id="_8">메시징 아키텍처 구축 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">비동기</span><span class="w"> </span><span class="n">메시징</span><span class="w"> </span><span class="n">도입</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">SNS</span><span class="w"> </span><span class="n">토픽</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">발행</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">SQS</span><span class="w"> </span><span class="n">큐를</span><span class="w"> </span><span class="n">통한</span><span class="w"> </span><span class="n">안정적</span><span class="w"> </span><span class="n">메시지</span><span class="w"> </span><span class="n">처리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Dead</span><span class="w"> </span><span class="kd">Let</span><span class="n">ter</span><span class="w"> </span><span class="n">Queue</span><span class="w"> </span><span class="n">구성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">메시지</span><span class="w"> </span><span class="n">순서</span><span class="w"> </span><span class="n">보장</span><span class="w"> </span><span class="p">(</span><span class="n">FIFO</span><span class="w"> </span><span class="n">큐</span><span class="p">)</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">아키텍처</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">EventBridge</span><span class="w"> </span><span class="n">커스텀</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">버스</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">간</span><span class="w"> </span><span class="n">느슨한</span><span class="w"> </span><span class="n">결합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">소싱</span><span class="w"> </span><span class="n">패턴</span><span class="w"> </span><span class="n">적용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">사가</span><span class="w"> </span><span class="n">패턴</span><span class="w"> </span><span class="n">구현</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">실시간</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">처리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Kinesis</span><span class="w"> </span><span class="kd">Data</span><span class="w"> </span><span class="n">Streams</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">실시간</span><span class="w"> </span><span class="n">분석</span><span class="w"> </span><span class="n">파이프라인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스트리밍</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">처리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">스토어</span><span class="w"> </span><span class="n">구축</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_9">📊 모니터링 및 관찰성 분석</h2>
+<h3 id="_10">현재 모니터링 상태</h3>
+<div class="codehilite"><pre><span></span><code>기본 모니터링 구성:
+✅ CloudWatch 기본 메트릭 수집
+✅ CloudTrail API 로깅 ($0.40/월)
+🟡 커스텀 메트릭 부족
+🟡 애플리케이션 성능 모니터링 부재
+🔴 분산 추적 시스템 부재
+
+모니터링 성숙도: 4/10 (기본 수준)
+</code></pre></div>
+
+<h3 id="_11">관찰성 강화 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">메트릭</span><span class="w"> </span><span class="n">수집</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">커스텀</span><span class="w"> </span><span class="n">CloudWatch</span><span class="w"> </span><span class="n">메트릭</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">메트릭</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비즈니스</span><span class="w"> </span><span class="n">메트릭</span><span class="w"> </span><span class="n">수집</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인프라</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">메트릭</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">로깅</span><span class="w"> </span><span class="n">중앙화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">모든</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">CloudWatch</span><span class="w"> </span><span class="nb">Log</span><span class="n">s</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">구조화된</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">포맷</span><span class="w"> </span><span class="n">표준화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">집계</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">검색</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">보존</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">수립</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">분산</span><span class="w"> </span><span class="n">추적</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">X</span><span class="o">-</span><span class="n">Ray</span><span class="w"> </span><span class="n">도입</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">마이크로서비스</span><span class="w"> </span><span class="n">간</span><span class="w"> </span><span class="n">요청</span><span class="w"> </span><span class="n">추적</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">병목</span><span class="w"> </span><span class="n">지점</span><span class="w"> </span><span class="n">식별</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">오류</span><span class="w"> </span><span class="n">전파</span><span class="w"> </span><span class="n">경로</span><span class="w"> </span><span class="n">분석</span>
+
+<span class="mf">4.</span><span class="w"> </span><span class="n">대시보드</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">시각화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">CloudWatch</span><span class="w"> </span><span class="n">대시보드</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Grafana</span><span class="w"> </span><span class="n">통합</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">실시간</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">화면</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비즈니스</span><span class="w"> </span><span class="n">KPI</span><span class="w"> </span><span class="n">대시보드</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_12">🚨 알림 및 인시던트 관리</h2>
+<h3 id="_13">현재 알림 체계</h3>
+<div class="codehilite"><pre><span></span><code>🔴 알림 시스템 부재:
+- CloudWatch 알람 미설정
+- SNS 알림 토픽 부재
+- 인시던트 대응 프로세스 미정의
+- 에스컬레이션 체계 부재
+
+위험 요소:
+- 시스템 장애 조기 감지 불가
+- 성능 저하 인지 지연
+- 보안 이벤트 대응 지연
+- 비용 초과 감지 불가
+</code></pre></div>
+
+<h3 id="_14">알림 체계 구축 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">기본</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">시스템</span><span class="w"> </span><span class="n">리소스</span><span class="w"> </span><span class="n">임계값</span><span class="w"> </span><span class="n">알람</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">오류율</span><span class="w"> </span><span class="n">알람</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">알람</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">알람</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">채널</span><span class="w"> </span><span class="n">구성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">SNS</span><span class="w"> </span><span class="n">토픽</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">배포</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">이메일</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Slack</span><span class="o">/</span><span class="n">Teams</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">SMS</span><span class="w"> </span><span class="n">긴급</span><span class="w"> </span><span class="n">알림</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">인시던트</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">프로세스</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인시던트</span><span class="w"> </span><span class="n">분류</span><span class="w"> </span><span class="n">체계</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">대응</span><span class="w"> </span><span class="n">팀</span><span class="w"> </span><span class="n">역할</span><span class="w"> </span><span class="n">정의</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">에스컬레이션</span><span class="w"> </span><span class="n">절차</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">사후</span><span class="w"> </span><span class="n">분석</span><span class="w"> </span><span class="n">프로세스</span>
+
+<span class="mf">4.</span><span class="w"> </span><span class="n">자동화된</span><span class="w"> </span><span class="n">대응</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">스크립트</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스케일링</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">장애</span><span class="w"> </span><span class="n">조치</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">피로도</span><span class="w"> </span><span class="n">관리</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_15">📈 성능 모니터링 및 최적화</h2>
+<h3 id="_16">현재 성능 모니터링 상태</h3>
+<div class="codehilite"><pre><span></span><code>🟡 기본 수준의 성능 모니터링:
+- EC2 인스턴스 기본 메트릭
+- RDS 성능 인사이트 미활용
+- EKS 클러스터 메트릭 부족
+- 애플리케이션 레벨 메트릭 부재
+
+성능 최적화 기회:
+- 응답 시간 최적화
+- 처리량 향상
+- 리소스 사용률 최적화
+- 병목 지점 식별
+</code></pre></div>
+
+<h3 id="_17">성능 모니터링 강화 전략</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">인프라</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">EC2</span><span class="w"> </span><span class="n">Enhanced</span><span class="w"> </span><span class="n">Monitoring</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">RDS</span><span class="w"> </span><span class="n">Performance</span><span class="w"> </span><span class="n">Insights</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">EKS</span><span class="w"> </span><span class="kr">Cont</span><span class="n">ainer</span><span class="w"> </span><span class="n">Insights</span><span class="w"> </span><span class="n">구성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">네트워크</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">메트릭</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="p">(</span><span class="n">APM</span><span class="p">)</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">X</span><span class="o">-</span><span class="n">Ray</span><span class="w"> </span><span class="n">분산</span><span class="w"> </span><span class="n">추적</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">커스텀</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">메트릭</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">사용자</span><span class="w"> </span><span class="n">경험</span><span class="w"> </span><span class="n">메트릭</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비즈니스</span><span class="w"> </span><span class="n">트랜잭션</span><span class="w"> </span><span class="n">추적</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">스케일링</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">캐싱</span><span class="w"> </span><span class="n">전략</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">CDN</span><span class="w"> </span><span class="n">활용</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">4.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">벤치마킹</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">부하</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">회귀</span><span class="w"> </span><span class="n">테스트</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">용량</span><span class="w"> </span><span class="n">계획</span><span class="w"> </span><span class="n">수립</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">SLA</span><span class="o">/</span><span class="n">SLO</span><span class="w"> </span><span class="n">정의</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">모니터링</span>
+</code></pre></div>
+
+<hr />
+<h2 id="cicd-devops">🔄 CI/CD 및 DevOps 도구 분석</h2>
+<h3 id="devops">현재 DevOps 성숙도</h3>
+<div class="codehilite"><pre><span></span><code>🟡 기본 수준의 DevOps:
+- CloudFormation 기반 IaC
+- eksctl을 통한 EKS 관리
+- 수동 배포 프로세스 (추정)
+- CI/CD 파이프라인 부재
+
+개선 필요 영역:
+- 자동화된 빌드/배포
+- 테스트 자동화
+- 코드 품질 관리
+- 배포 전략 고도화
+</code></pre></div>
+
+<h3 id="cicd">CI/CD 파이프라인 구축 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">소스</span><span class="w"> </span><span class="n">코드</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">CodeCommit</span><span class="w"> </span><span class="n">또는</span><span class="w"> </span><span class="n">GitHub</span><span class="w"> </span><span class="n">통합</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">브랜치</span><span class="w"> </span><span class="n">전략</span><span class="w"> </span><span class="n">수립</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">코드</span><span class="w"> </span><span class="n">리뷰</span><span class="w"> </span><span class="n">프로세스</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">스캔</span><span class="w"> </span><span class="n">통합</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">빌드</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">CodeBuild</span><span class="w"> </span><span class="n">파이프라인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">단위</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">통합</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">구성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">통합</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">배포</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">CodeDeploy</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">EKS</span><span class="w"> </span><span class="n">배포</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Blue</span><span class="o">/</span><span class="n">Green</span><span class="w"> </span><span class="n">배포</span><span class="w"> </span><span class="n">전략</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">카나리</span><span class="w"> </span><span class="n">배포</span><span class="w"> </span><span class="n">구현</span>
+
+<span class="mf">4.</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">피드백</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">배포</span><span class="w"> </span><span class="n">성공률</span><span class="w"> </span><span class="n">추적</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">롤백</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">회귀</span><span class="w"> </span><span class="n">감지</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">사용자</span><span class="w"> </span><span class="n">피드백</span><span class="w"> </span><span class="n">수집</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_18">🛠️ 운영 자동화 및 도구</h2>
+<h3 id="_19">현재 운영 자동화 상태</h3>
+<div class="codehilite"><pre><span></span><code>✅ 기본 자동화 구현:
+- CloudFormation 인프라 자동화
+- Auto Scaling 그룹 구성
+- 자동 백업 (Aurora)
+
+🟡 개선 필요 영역:
+- 패치 관리 자동화
+- 보안 컴플라이언스 자동화
+- 비용 최적화 자동화
+- 장애 대응 자동화
+</code></pre></div>
+
+<h3 id="_20">운영 자동화 확장 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">시스템</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="kr">Sys</span><span class="n">tems</span><span class="w"> </span><span class="n">Manager</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">패치</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">구성</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">표준화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인벤토리</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">자동화</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">컴플라이언스</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">검사</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">취약점</span><span class="w"> </span><span class="n">스캔</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">패치</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">적용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인시던트</span><span class="w"> </span><span class="n">대응</span><span class="w"> </span><span class="n">자동화</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">리소스</span><span class="w"> </span><span class="n">사용률</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">분석</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">미사용</span><span class="w"> </span><span class="n">리소스</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">정리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">알람</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Right</span><span class="o">-</span><span class="n">sizing</span><span class="w"> </span><span class="n">권장사항</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">생성</span>
+
+<span class="mf">4.</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">Backup</span><span class="w"> </span><span class="n">통합</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">RTO</span><span class="o">/</span><span class="n">RPO</span><span class="w"> </span><span class="n">모니터링</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_21">🚀 애플리케이션 서비스 로드맵</h2>
+<h3 id="phase-1-1-2">Phase 1: 기본 모니터링 구축 (1-2주)</h3>
+<ul>
+<li>[ ] CloudWatch 알람 및 대시보드 구성</li>
+<li>[ ] SNS 알림 토픽 설정</li>
+<li>[ ] 기본 성능 메트릭 수집</li>
+<li>[ ] 로그 중앙화 구현</li>
+</ul>
+<h3 id="phase-2-1-2">Phase 2: 관찰성 강화 (1-2개월)</h3>
+<ul>
+<li>[ ] AWS X-Ray 분산 추적 구현</li>
+<li>[ ] 커스텀 메트릭 수집 확대</li>
+<li>[ ] 성능 모니터링 대시보드 구축</li>
+<li>[ ] 인시던트 관리 프로세스 수립</li>
+</ul>
+<h3 id="phase-3-2-3">Phase 3: 서비스 확장 (2-3개월)</h3>
+<ul>
+<li>[ ] API Gateway 도입 검토</li>
+<li>[ ] 서버리스 아키텍처 확대</li>
+<li>[ ] 메시징 시스템 구축</li>
+<li>[ ] CI/CD 파이프라인 구현</li>
+</ul>
+<h3 id="phase-4-3-6">Phase 4: 고도화 (3-6개월)</h3>
+<ul>
+<li>[ ] 이벤트 기반 아키텍처 구축</li>
+<li>[ ] 고급 모니터링 및 분석</li>
+<li>[ ] 자동화 확대</li>
+<li>[ ] DevOps 문화 정착</li>
+</ul>
+<hr />
+<h2 id="_22">📋 애플리케이션 서비스 체크리스트</h2>
+<h3 id="_23">모니터링 체크리스트</h3>
+<ul>
+<li>[ ] CloudWatch 대시보드 구축</li>
+<li>[ ] 알람 및 알림 설정</li>
+<li>[ ] 로그 중앙화 구현</li>
+<li>[ ] 성능 메트릭 수집</li>
+</ul>
+<h3 id="_24">서비스 아키텍처 체크리스트</h3>
+<ul>
+<li>[ ] API Gateway 도입 검토</li>
+<li>[ ] 서버리스 함수 활용 계획</li>
+<li>[ ] 메시징 시스템 설계</li>
+<li>[ ] 이벤트 기반 아키텍처 검토</li>
+</ul>
+<h3 id="_25">운영 자동화 체크리스트</h3>
+<ul>
+<li>[ ] CI/CD 파이프라인 구축</li>
+<li>[ ] 인프라 자동화 확대</li>
+<li>[ ] 보안 자동화 구현</li>
+<li>[ ] 백업 및 복구 자동화</li>
+</ul>
+<h3 id="devops_1">DevOps 체크리스트</h3>
+<ul>
+<li>[ ] 코드 품질 관리 도구</li>
+<li>[ ] 테스트 자동화 구현</li>
+<li>[ ] 배포 전략 수립</li>
+<li>[ ] 모니터링 및 피드백 루프</li>
+</ul>
+<hr />
+<h2 id="_26">🎯 종합 평가</h2>
+<h3 id="3010_1">애플리케이션 서비스 성숙도: <strong>3.0/10</strong> (초기 단계)</h3>
+<p><strong>현재 강점</strong>:
+- 견고한 인프라 기반 (EKS, Aurora, Redis)
+- 기본적인 모니터링 구성 (CloudTrail)
+- IaC 기반 인프라 관리
+- 확장 가능한 아키텍처 설계</p>
+<p><strong>개선 영역</strong>:
+- 애플리케이션 레벨 모니터링 부족
+- 서버리스 서비스 활용 미흡
+- 자동화된 운영 도구 부재
+- CI/CD 파이프라인 미구축</p>
+<p><strong>권장 우선순위</strong>:
+1. 기본 모니터링 및 알림 체계 구축
+2. 관찰성 강화 (로깅, 메트릭, 추적)
+3. 운영 자동화 도구 구현
+4. 서비스 아키텍처 현대화</p>
+<p><strong>예상 투자 비용</strong>:
+- 모니터링 강화: $10-30/월
+- 서버리스 서비스: $5-20/월
+- CI/CD 도구: $10-50/월
+- 총 예상 비용: $25-100/월</p>
+<hr />
+<p><em>애플리케이션 서비스 및 모니터링 분석 완료. 다음 단계로 종합 분석 및 권장사항을 진행합니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -13,7 +13,7 @@ echo "======================================================"
 echo "📋 배포 정보:"
 echo "   - 리전: ${AWS_REGION}"
 echo "   - 스택 이름: DMZVPC-Redis"
-echo "   - 템플릿: ~/amazonqcli_lab/redis-cluster-stack.yml"
+echo "   - 템플릿: ~/amazonqcli_lab/LabSetup/redis-cluster-stack.yml"
 echo "   - 노드 타입: cache.t4g.small"
 echo "   - 노드 수: 2개"
 echo "   - 엔진 버전: Redis 7.0"
@@ -59,7 +59,7 @@ echo "   예상 소요 시간: 15-20분"
 # Option1: DMZVPC에 Redis Stack 배포
 aws cloudformation deploy \
   --stack-name DMZVPC-Redis \
-  --template-file "~/amazonqcli_lab/redis-cluster-stack.yml" \
+  --template-file "~/amazonqcli_lab/LabSetup/redis-cluster-stack.yml" \
   --parameter-overrides \
     DMZVPCStackName=DMZVPC \
     RedisNodeType=cache.t4g.small \

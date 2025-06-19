@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컴퓨팅 분석</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>컴퓨팅 분석</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 컴퓨팅 분석</h1>
+<h2 id="_1">💻 컴퓨팅 리소스 종합 분석</h2>
+<p><strong>분석 범위</strong>: EC2, EKS, Lambda, Auto Scaling, Load Balancer<br />
+<strong>분석 일시</strong>: 2025년 6월 17일<br />
+<strong>총 컴퓨팅 리소스</strong>: 34개 EC2 인스턴스, 1개 EKS 클러스터</p>
+<hr />
+<h2 id="_2">📊 컴퓨팅 현황 개요</h2>
+<h3 id="_3">전체 컴퓨팅 리소스 분포</h3>
+<table>
+<thead>
+<tr>
+<th>리소스 타입</th>
+<th>수량</th>
+<th>상태</th>
+<th>비용 비중</th>
+<th>평가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>EC2 인스턴스</strong></td>
+<td>34개</td>
+<td>모두 실행 중</td>
+<td>46.8% ($25.90)</td>
+<td>🟢 양호</td>
+</tr>
+<tr>
+<td><strong>EKS 클러스터</strong></td>
+<td>1개</td>
+<td>활성</td>
+<td>1.4% ($0.78)</td>
+<td>🟢 우수</td>
+</tr>
+<tr>
+<td><strong>로드밸런서</strong></td>
+<td>다수</td>
+<td>활성</td>
+<td>1.1% ($0.61)</td>
+<td>🟢 양호</td>
+</tr>
+<tr>
+<td><strong>Lambda 함수</strong></td>
+<td>분석 필요</td>
+<td>-</td>
+<td>미확인</td>
+<td>🟡 검토 필요</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4">컴퓨팅 아키텍처 평가</h3>
+<table>
+<thead>
+<tr>
+<th>평가 항목</th>
+<th>점수</th>
+<th>상태</th>
+<th>세부 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>인스턴스 분산</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>Multi-VPC, Multi-AZ 배치</td>
+</tr>
+<tr>
+<td><strong>타입 최적화</strong></td>
+<td>7/10</td>
+<td>🟡 개선 가능</td>
+<td>일부 오버프로비저닝 가능성</td>
+</tr>
+<tr>
+<td><strong>고가용성</strong></td>
+<td>9/10</td>
+<td>🟢 우수</td>
+<td>EKS, Aurora 고가용성 구성</td>
+</tr>
+<tr>
+<td><strong>확장성</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>EKS Auto Scaling 구성</td>
+</tr>
+<tr>
+<td><strong>비용 효율성</strong></td>
+<td>6/10</td>
+<td>🟡 개선 필요</td>
+<td>사용률 분석 및 최적화 필요</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ec2">🖥️ EC2 인스턴스 상세 분석</h2>
+<h3 id="_5">인스턴스 타입별 분포</h3>
+<table>
+<thead>
+<tr>
+<th>인스턴스 타입</th>
+<th>수량</th>
+<th>비율</th>
+<th>vCPU</th>
+<th>메모리</th>
+<th>용도</th>
+<th>최적화 점수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>t3.small</strong></td>
+<td>24개</td>
+<td>70.6%</td>
+<td>2</td>
+<td>2GB</td>
+<td>일반 워크로드</td>
+<td>🟢 8/10</td>
+</tr>
+<tr>
+<td><strong>m6i.xlarge</strong></td>
+<td>8개</td>
+<td>23.5%</td>
+<td>4</td>
+<td>16GB</td>
+<td>EKS 노드</td>
+<td>🟢 9/10</td>
+</tr>
+<tr>
+<td><strong>m6i.2xlarge</strong></td>
+<td>1개</td>
+<td>2.9%</td>
+<td>8</td>
+<td>32GB</td>
+<td>VSCode 서버</td>
+<td>🟢 9/10</td>
+</tr>
+<tr>
+<td><strong>t3.medium</strong></td>
+<td>1개</td>
+<td>2.9%</td>
+<td>2</td>
+<td>4GB</td>
+<td>Cloud9</td>
+<td>🟡 7/10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vpc">VPC별 인스턴스 분포</h3>
+<h4 id="1-vpc-mgmtvpc">1. 관리용 VPC (mgmtvpc)</h4>
+<div class="codehilite"><pre><span></span><code>인스턴스 수: 1개
+타입: m6i.2xlarge (VSCode 서버)
+용도: 개발 환경, 코드 편집
+
+✅ 최적화 상태:
+- 개발 환경에 적합한 고성능 인스턴스
+- 충분한 메모리와 CPU 리소스
+- 중앙 집중식 개발 환경 구현
+
+📊 사용률 모니터링 권장:
+- CPU/메모리 사용률 추적
+- 개발자 동시 접속 수 모니터링
+- 필요시 인스턴스 크기 조정
+</code></pre></div>
+
+<h4 id="2-dmz-vpc-dmzvpc">2. DMZ VPC (DMZVPC)</h4>
+<div class="codehilite"><pre><span></span><code>인스턴스 수: 14개
+- t3.small: 8개 (일반 워크로드)
+- m6i.xlarge: 6개 (EKS 노드)
+
+✅ 강점:
+- EKS 노드 그룹 적절한 크기 선택
+- 워크로드별 인스턴스 타입 분리
+- Multi-AZ 배치로 고가용성 확보
+
+🔧 최적화 기회:
+- EKS 노드 Auto Scaling 활용
+- Spot Instance 도입 검토
+- 컨테이너 리소스 최적화
+</code></pre></div>
+
+<h4 id="3-vpc-vpc01-vpc02">3. 워크로드 VPC (VPC01, VPC02)</h4>
+<div class="codehilite"><pre><span></span><code><span class="n">VPC01</span><span class="o">:</span><span class="w"> </span><span class="mi">8</span><span class="err">개</span><span class="w"> </span><span class="err">인스턴스</span><span class="w"> </span><span class="o">(</span><span class="err">모두</span><span class="w"> </span><span class="n">t3</span><span class="o">.</span><span class="na">small</span><span class="o">)</span>
+<span class="n">VPC02</span><span class="o">:</span><span class="w"> </span><span class="mi">8</span><span class="err">개</span><span class="w"> </span><span class="err">인스턴스</span><span class="w"> </span><span class="o">(</span><span class="err">모두</span><span class="w"> </span><span class="n">t3</span><span class="o">.</span><span class="na">small</span><span class="o">)</span>
+
+<span class="err">✅</span><span class="w"> </span><span class="err">일관된</span><span class="w"> </span><span class="err">구성</span><span class="o">:</span>
+<span class="o">-</span><span class="w"> </span><span class="err">표준화된</span><span class="w"> </span><span class="err">인스턴스</span><span class="w"> </span><span class="err">타입</span>
+<span class="o">-</span><span class="w"> </span><span class="err">균등한</span><span class="w"> </span><span class="err">워크로드</span><span class="w"> </span><span class="err">분산</span>
+<span class="o">-</span><span class="w"> </span><span class="err">예측</span><span class="w"> </span><span class="err">가능한</span><span class="w"> </span><span class="err">성능</span>
+
+<span class="err">📈</span><span class="w"> </span><span class="err">확장</span><span class="w"> </span><span class="err">계획</span><span class="o">:</span>
+<span class="o">-</span><span class="w"> </span><span class="err">워크로드</span><span class="w"> </span><span class="err">증가</span><span class="w"> </span><span class="err">시</span><span class="w"> </span><span class="n">Auto</span><span class="w"> </span><span class="n">Scaling</span><span class="w"> </span><span class="err">그룹</span><span class="w"> </span><span class="err">활용</span>
+<span class="o">-</span><span class="w"> </span><span class="err">성능</span><span class="w"> </span><span class="err">요구사항에</span><span class="w"> </span><span class="err">따른</span><span class="w"> </span><span class="err">인스턴스</span><span class="w"> </span><span class="err">타입</span><span class="w"> </span><span class="err">조정</span>
+<span class="o">-</span><span class="w"> </span><span class="err">로드밸런싱을</span><span class="w"> </span><span class="err">통한</span><span class="w"> </span><span class="err">트래픽</span><span class="w"> </span><span class="err">분산</span>
+</code></pre></div>
+
+<h4 id="4-vpc-default">4. 기본 VPC (Default)</h4>
+<div class="codehilite"><pre><span></span><code>인스턴스 수: 3개
+- t3.medium: 1개 (Cloud9)
+- m6i.xlarge: 2개 (기타 워크로드)
+
+⚠️ 개선 필요:
+- 기본 VPC 사용 최소화 권장
+- 전용 VPC로 마이그레이션 검토
+- 보안 정책 강화 필요
+</code></pre></div>
+
+<hr />
+<h2 id="eks">☸️ EKS 클러스터 분석</h2>
+<h3 id="_6">클러스터 구성 현황</h3>
+<div class="codehilite"><pre><span></span><code><span class="err">클러스터명</span><span class="o">:</span><span class="w"> </span><span class="n">eksworkshop</span>
+<span class="err">버전</span><span class="o">:</span><span class="w"> </span><span class="mf">1.31</span><span class="w"> </span><span class="o">(</span><span class="err">최신</span><span class="w"> </span><span class="err">버전</span><span class="o">)</span>
+<span class="err">플랫폼</span><span class="w"> </span><span class="err">버전</span><span class="o">:</span><span class="w"> </span><span class="n">eks</span><span class="o">.</span><span class="mi">28</span>
+<span class="err">상태</span><span class="o">:</span><span class="w"> </span><span class="n">ACTIVE</span>
+<span class="err">엔드포인트</span><span class="o">:</span><span class="w"> </span><span class="err">활성화됨</span>
+
+<span class="err">✅</span><span class="w"> </span><span class="err">우수한</span><span class="w"> </span><span class="err">구성</span><span class="o">:</span>
+<span class="o">-</span><span class="w"> </span><span class="err">최신</span><span class="w"> </span><span class="n">Kubernetes</span><span class="w"> </span><span class="err">버전</span><span class="w"> </span><span class="err">사용</span>
+<span class="o">-</span><span class="w"> </span><span class="err">관리형</span><span class="w"> </span><span class="err">노드</span><span class="w"> </span><span class="err">그룹</span><span class="w"> </span><span class="err">활용</span>
+<span class="o">-</span><span class="w"> </span><span class="err">적절한</span><span class="w"> </span><span class="err">애드온</span><span class="w"> </span><span class="err">구성</span><span class="w"> </span><span class="o">(</span><span class="n">VPC</span><span class="w"> </span><span class="n">CNI</span><span class="o">,</span><span class="w"> </span><span class="n">EBS</span><span class="w"> </span><span class="n">CSI</span><span class="o">)</span>
+</code></pre></div>
+
+<h3 id="_7">노드 그룹 분석</h3>
+<div class="codehilite"><pre><span></span><code><span class="err">노드</span><span class="w"> </span><span class="err">그룹명</span><span class="p">:</span><span class="w"> </span><span class="n">managed</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">workloads</span>
+<span class="err">인스턴스</span><span class="w"> </span><span class="err">타입</span><span class="p">:</span><span class="w"> </span><span class="n">m6i</span><span class="o">.</span><span class="n">xlarge</span>
+<span class="err">노드</span><span class="w"> </span><span class="err">수</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="err">개</span><span class="w"> </span><span class="p">(</span><span class="err">추정</span><span class="p">)</span>
+<span class="err">배치</span><span class="p">:</span><span class="w"> </span><span class="n">Multi</span><span class="o">-</span><span class="n">AZ</span>
+
+<span class="err">✅</span><span class="w"> </span><span class="err">최적화된</span><span class="w"> </span><span class="err">설정</span><span class="p">:</span>
+<span class="o">-</span><span class="w"> </span><span class="err">적절한</span><span class="w"> </span><span class="err">인스턴스</span><span class="w"> </span><span class="err">타입</span><span class="w"> </span><span class="err">선택</span>
+<span class="o">-</span><span class="w"> </span><span class="err">관리형</span><span class="w"> </span><span class="err">노드</span><span class="w"> </span><span class="err">그룹</span><span class="w"> </span><span class="err">사용</span>
+<span class="o">-</span><span class="w"> </span><span class="err">고가용성</span><span class="w"> </span><span class="err">배치</span>
+
+<span class="err">🔧</span><span class="w"> </span><span class="err">개선</span><span class="w"> </span><span class="err">기회</span><span class="p">:</span>
+<span class="err">□</span><span class="w"> </span><span class="n">Cluster</span><span class="w"> </span><span class="n">Autoscaler</span><span class="w"> </span><span class="err">설정</span><span class="w"> </span><span class="err">확인</span>
+<span class="err">□</span><span class="w"> </span><span class="n">Horizontal</span><span class="w"> </span><span class="n">Pod</span><span class="w"> </span><span class="n">Autoscaler</span><span class="w"> </span><span class="err">활용</span>
+<span class="err">□</span><span class="w"> </span><span class="n">Vertical</span><span class="w"> </span><span class="n">Pod</span><span class="w"> </span><span class="n">Autoscaler</span><span class="w"> </span><span class="err">검토</span>
+<span class="err">□</span><span class="w"> </span><span class="n">Spot</span><span class="w"> </span><span class="n">Instance</span><span class="w"> </span><span class="err">노드</span><span class="w"> </span><span class="err">그룹</span><span class="w"> </span><span class="err">추가</span>
+</code></pre></div>
+
+<h3 id="eks_1">EKS 애드온 현황</h3>
+<div class="codehilite"><pre><span></span><code>설치된 애드온:
+- VPC CNI: 네트워킹 플러그인
+- EBS CSI Driver: 스토리지 드라이버
+
+권장 추가 애드온:
+□ AWS Load Balancer Controller
+□ Cluster Autoscaler
+□ Metrics Server
+□ CoreDNS 최적화
+</code></pre></div>
+
+<hr />
+<h2 id="_8">⚖️ 로드밸런서 분석</h2>
+<h3 id="_9">로드밸런서 구성</h3>
+<div class="codehilite"><pre><span></span><code>현재 구성:
+- Application Load Balancer (ALB)
+- 다중 VPC 배치
+- 적절한 보안 그룹 설정
+
+✅ 장점:
+- Layer 7 로드밸런싱
+- 고급 라우팅 규칙 지원
+- SSL/TLS 종료 지원
+
+📊 모니터링 권장:
+- 타겟 헬스 상태 모니터링
+- 응답 시간 및 처리량 추적
+- 오류율 모니터링
+</code></pre></div>
+
+<hr />
+<h2 id="_10">📈 성능 및 사용률 분석</h2>
+<h3 id="_11">현재 성능 모니터링 상태</h3>
+<div class="codehilite"><pre><span></span><code>🟡 개선 필요 영역:
+- 인스턴스별 CPU/메모리 사용률 데이터 부족
+- 애플리케이션 성능 메트릭 미흡
+- 용량 계획 데이터 부재
+
+📊 권장 모니터링 구성:
+□ CloudWatch 상세 모니터링 활성화
+□ 커스텀 메트릭 수집
+□ 성능 대시보드 구축
+□ 알람 및 알림 설정
+</code></pre></div>
+
+<h3 id="_12">성능 최적화 기회</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">인스턴스</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">CPU</span><span class="w"> </span><span class="n">크레딧</span><span class="w"> </span><span class="n">사용률</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="p">(</span><span class="n">t3</span><span class="w"> </span><span class="n">인스턴스</span><span class="p">)</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">메모리</span><span class="w"> </span><span class="n">사용률</span><span class="w"> </span><span class="n">분석</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">네트워크</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">EKS</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">컨테이너</span><span class="w"> </span><span class="n">리소스</span><span class="w"> </span><span class="n">요청</span><span class="o">/</span><span class="n">제한</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">노드</span><span class="w"> </span><span class="n">리소스</span><span class="w"> </span><span class="n">활용률</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">파드</span><span class="w"> </span><span class="n">배치</span><span class="w"> </span><span class="n">전략</span><span class="w"> </span><span class="n">개선</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">애플리케이션</span><span class="w"> </span><span class="n">프로파일링</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">캐싱</span><span class="w"> </span><span class="n">전략</span><span class="w"> </span><span class="n">구현</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_13">💰 컴퓨팅 비용 분석</h2>
+<h3 id="_14">현재 비용 구조</h3>
+<div class="codehilite"><pre><span></span><code>Amazon EC2: $25.90 (전체의 46.8%)
+- 온디맨드 인스턴스 비용
+- EBS 스토리지 비용 포함
+
+Amazon EKS: $0.78 (전체의 1.4%)
+- 클러스터 관리 비용
+- 매우 효율적인 비용 구조
+
+Elastic Load Balancing: $0.61 (전체의 1.1%)
+- ALB 운영 비용
+- 적정 수준의 비용
+</code></pre></div>
+
+<h3 id="_15">비용 최적화 전략</h3>
+<h4 id="_16">즉시 적용 가능한 최적화</h4>
+<div class="codehilite"><pre><span></span><code>🔴 높은 우선순위:
+□ 사용률이 낮은 인스턴스 식별
+□ 적절한 인스턴스 타입으로 다운사이징
+□ 개발/테스트 환경 스케줄링 (야간/주말 중지)
+
+🟡 중간 우선순위:
+□ Reserved Instance 구매 계획
+□ Savings Plans 검토
+□ Spot Instance 활용 (개발 환경)
+</code></pre></div>
+
+<h4 id="_17">중장기 비용 최적화</h4>
+<div class="codehilite"><pre><span></span><code>🟢 장기 계획:
+□ 컨테이너화 확대 (리소스 효율성 향상)
+□ 서버리스 아키텍처 도입
+□ 자동 스케일링 최적화
+□ 리소스 태그 기반 비용 관리
+</code></pre></div>
+
+<hr />
+<h2 id="_18">🔧 운영 효율성 분석</h2>
+<h3 id="_19">현재 운영 상태</h3>
+<div class="codehilite"><pre><span></span><code>✅ 우수한 점:
+- CloudFormation을 통한 IaC 구현
+- eksctl을 통한 EKS 관리
+- 체계적인 태그 정책
+
+⚠️ 개선 필요:
+- 자동화된 패치 관리 부족
+- 백업 정책 표준화 필요
+- 모니터링 및 알람 체계 미흡
+</code></pre></div>
+
+<h3 id="_20">운영 자동화 권장사항</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">패치</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="kr">Sys</span><span class="n">tems</span><span class="w"> </span><span class="n">Manager</span><span class="w"> </span><span class="n">Patch</span><span class="w"> </span><span class="n">Manager</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">패치</span><span class="w"> </span><span class="n">스케줄</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">패치</span><span class="w"> </span><span class="n">컴플라이언스</span><span class="w"> </span><span class="n">모니터링</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">Backup</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">표준화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">테스트</span><span class="w"> </span><span class="n">자동화</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">자동화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">CloudWatch</span><span class="w"> </span><span class="n">대시보드</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">알람</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">집중화</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">분석</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_21">🚀 컴퓨팅 로드맵</h2>
+<h3 id="phase-1-1-2">Phase 1: 즉시 조치 (1-2주)</h3>
+<ul>
+<li>[ ] 인스턴스 사용률 모니터링 설정</li>
+<li>[ ] 미사용 또는 저사용 리소스 식별</li>
+<li>[ ] 기본 VPC 사용 최소화 계획</li>
+</ul>
+<h3 id="phase-2-1-2">Phase 2: 단기 개선 (1-2개월)</h3>
+<ul>
+<li>[ ] Reserved Instance 구매 계획 수립</li>
+<li>[ ] EKS 클러스터 최적화 (Auto Scaling, HPA)</li>
+<li>[ ] 성능 모니터링 대시보드 구축</li>
+</ul>
+<h3 id="phase-3-3-6">Phase 3: 중장기 발전 (3-6개월)</h3>
+<ul>
+<li>[ ] 컨테이너화 전략 확대</li>
+<li>[ ] 서버리스 아키텍처 도입</li>
+<li>[ ] 멀티 리전 배포 준비</li>
+</ul>
+<hr />
+<h2 id="_22">📋 컴퓨팅 체크리스트</h2>
+<h3 id="_23">성능 체크리스트</h3>
+<ul>
+<li>[ ] 모든 인스턴스 사용률 모니터링 설정</li>
+<li>[ ] EKS 클러스터 리소스 최적화</li>
+<li>[ ] 로드밸런서 성능 튜닝</li>
+<li>[ ] 애플리케이션 성능 프로파일링</li>
+</ul>
+<h3 id="_24">비용 체크리스트</h3>
+<ul>
+<li>[ ] 인스턴스 사이징 최적화</li>
+<li>[ ] Reserved Instance 구매 계획</li>
+<li>[ ] Spot Instance 활용 검토</li>
+<li>[ ] 자동 스케일링 정책 최적화</li>
+</ul>
+<h3 id="_25">보안 체크리스트</h3>
+<ul>
+<li>[ ] 인스턴스 보안 패치 상태 확인</li>
+<li>[ ] IAM 역할 및 정책 검토</li>
+<li>[ ] 보안 그룹 규칙 감사</li>
+<li>[ ] 암호화 설정 확인</li>
+</ul>
+<h3 id="_26">운영 체크리스트</h3>
+<ul>
+<li>[ ] 백업 정책 수립 및 테스트</li>
+<li>[ ] 모니터링 및 알람 설정</li>
+<li>[ ] 자동화 스크립트 구현</li>
+<li>[ ] 문서화 및 런북 작성</li>
+</ul>
+<hr />
+<h2 id="_27">🎯 종합 평가</h2>
+<h3 id="7610">컴퓨팅 아키텍처 점수: <strong>7.6/10</strong> (양호)</h3>
+<p><strong>주요 강점</strong>:
+- 체계적인 Multi-VPC 인스턴스 배치
+- 현대적 컨테이너 오케스트레이션 (EKS)
+- 적절한 인스턴스 타입 선택
+- 고가용성을 고려한 설계</p>
+<p><strong>개선 영역</strong>:
+- 비용 최적화 (사용률 기반 최적화)
+- 운영 자동화 강화
+- 성능 모니터링 체계 구축</p>
+<p><strong>권장 우선순위</strong>:
+1. 사용률 모니터링 및 비용 최적화
+2. EKS 클러스터 최적화
+3. 운영 자동화 구현</p>
+<hr />
+<p><em>컴퓨팅 분석 완료. 다음 단계로 스토리지 분석을 진행합니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>

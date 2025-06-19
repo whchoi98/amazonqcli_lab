@@ -13,7 +13,7 @@ echo "======================================================"
 echo "📋 배포 정보:"
 echo "   - 리전: ${AWS_REGION}"
 echo "   - 스택 이름: DMZVPC-OpenSearch"
-echo "   - 템플릿: ~/amazonqcli_lab/opensearch-stack.yml"
+echo "   - 템플릿: ~/amazonqcli_lab/LabSetup/opensearch-stack.yml"
 echo "   - 도메인 이름: dmzvpc-opensearch"
 echo "   - 버전: OpenSearch 2.11"
 echo "   - 인스턴스 타입: r5.large.elasticsearch"
@@ -75,7 +75,7 @@ echo "   ⚠️  배포 중에는 중단하지 마세요!"
 
 aws cloudformation deploy \
   --stack-name DMZVPC-OpenSearch \
-  --template-file "~/amazonqcli_lab/opensearch-stack.yml" \
+  --template-file "~/amazonqcli_lab/LabSetup/opensearch-stack.yml" \
   --parameter-overrides \
     DMZVPCStackName=DMZVPC \
     OpenSearchDomainName=dmzvpc-opensearch \

@@ -13,7 +13,7 @@ echo "======================================================"
 echo "📋 배포 정보:"
 echo "   - 리전: ${AWS_REGION}"
 echo "   - 스택 이름: VPC01-Aurora-MySQL"
-echo "   - 템플릿: ~/amazonqcli_lab/aurora-mysql-stack.yml"
+echo "   - 템플릿: ~/amazonqcli_lab/LabSetup/aurora-mysql-stack.yml"
 echo "   - 데이터베이스: ${DB_NAME:-mydb}"
 echo "   - 사용자명: ${DB_USERNAME:-admin}"
 echo "   - 인스턴스 클래스: db.t4g.medium"
@@ -79,7 +79,7 @@ echo "   ⚠️  배포 중에는 중단하지 마세요!"
 
 aws cloudformation deploy \
   --stack-name VPC01-Aurora-MySQL \
-  --template-file "~/amazonqcli_lab/aurora-mysql-stack.yml" \
+  --template-file "~/amazonqcli_lab/LabSetup/aurora-mysql-stack.yml" \
   --parameter-overrides \
     VPC01StackName=VPC01 \
     DBName=$DB_NAME \

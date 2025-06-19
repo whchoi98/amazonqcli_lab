@@ -28,7 +28,7 @@ echo "🔄 [1/3] DMZVPC 배포 시작..."
     aws cloudformation deploy \
       --region ${AWS_REGION} \
       --stack-name DMZVPC \
-      --template-file ~/amazonqcli_lab/1.DMZVPC.yml \
+      --template-file ~/amazonqcli_lab/LabSetup/LabSetup/1.DMZVPC.yml \
       --s3-bucket ${BUCKET_NAME} \
       --capabilities CAPABILITY_NAMED_IAM
     
@@ -45,7 +45,7 @@ echo "🔄 [2/3] VPC01 배포 시작..."
 {
     aws cloudformation deploy --region ${AWS_REGION} \
       --stack-name "VPC01" \
-      --template-file "~/amazonqcli_lab/2.VPC01.yml" \
+      --template-file "~/amazonqcli_lab/LabSetup/2.VPC01.yml" \
       --capabilities CAPABILITY_NAMED_IAM
     
     echo "✅ VPC01 배포 완료"
@@ -58,7 +58,7 @@ echo "🔄 [3/3] VPC02 배포 시작..."
 {
     aws cloudformation deploy --region ${AWS_REGION} \
       --stack-name "VPC02" \
-      --template-file "~/amazonqcli_lab/3.VPC02.yml" \
+      --template-file "~/amazonqcli_lab/LabSetup/3.VPC02.yml" \
       --capabilities CAPABILITY_NAMED_IAM
     
     echo "✅ VPC02 배포 완료"
