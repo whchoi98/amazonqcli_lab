@@ -54,55 +54,22 @@ execute_aws_cli_command() {
     fi
 }
 
-# IaC 파일 분석 함수
-analyze_iac_files() {
+# 분석 보고서 생성 함수
+generate_analysis_report() {
     local description="$1"
-    local file_pattern="$2"
-    local output_file="$3"
+    local input_file="$2"
+    local jq_filter="$3"
+    local output_file="$4"
     
     log_info "분석 중: $description"
     
-    # 출력 파일과 입력 파일이 같은 경우 방지
-    if [[ "$file_pattern" == *"$output_file"* ]]; then
-        log_warning "$description - 출력 파일과 입력 파일이 동일하여 건너뜀"
-        return 1
-    fi
-    
-    if find . -name "$file_pattern" -type f | head -1 | grep -q .; then
-        # 임시 파일 사용하여 안전하게 처리
-        local temp_file="${output_file}.tmp"
-        find . -name "$file_pattern" -type f -exec cat {} \; > "$temp_file" 2>>"$ERROR_LOG"
-        
-        if [ -s "$temp_file" ]; then
-            mv "$temp_file" "$output_file"
+    if [ -f "$input_file" ] && [ -s "$input_file" ]; then
+        if jq -r "$jq_filter" "$input_file" > "$output_file" 2>>"$ERROR_LOG"; then
             local file_size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
             log_success "$description 완료 ($output_file, ${file_size} bytes)"
             return 0
         else
-            rm -f "$temp_file"
-            log_warning "$description - 파일이 비어있음"
-            return 1
-        fi
-    else
-        log_warning "$description - 파일을 찾을 수 없음"
-        return 1
-    fi
-}
-
-# JSON 분석 함수
-analyze_json_data() {
-    local description="$1"
-    local input_file="$2"
-    local jq_query="$3"
-    local output_file="$4"
-    
-    if [ -f "$input_file" ]; then
-        log_info "분석 중: $description"
-        if jq -r "$jq_query" "$input_file" > "$output_file" 2>>"$ERROR_LOG"; then
-            log_success "$description 완료 ($output_file)"
-            return 0
-        else
-            log_error "$description 실패"
+            log_error "$description 실패 - $output_file"
             return 1
         fi
     else
@@ -111,179 +78,192 @@ analyze_json_data() {
     fi
 }
 
-# 메인 실행부
+# 메인 함수
 main() {
-    log_info "🏗️ AWS CLI 및 IaC 분석 기반 리소스 데이터 수집 시작"
+    log_info "🚀 AWS CLI 및 IaC 분석 기반 리소스 데이터 수집 시작"
     log_info "Region: $REGION"
     log_info "Report Directory: $REPORT_DIR"
     
-    # 보고서 디렉토리 생성 및 이동
+    # 디렉토리 생성
     mkdir -p "$REPORT_DIR"
-    cd "$REPORT_DIR" || exit 1
+    cd "$REPORT_DIR"
     
     # 로그 파일 초기화
     > "$LOG_FILE"
     > "$ERROR_LOG"
     
-    # AWS CLI 설치 확인
-    if ! command -v aws &> /dev/null; then
-        log_error "AWS CLI가 설치되지 않았습니다."
-        echo -e "${YELLOW}💡 AWS CLI 설치 방법:${NC}"
-        echo "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'"
-        echo "unzip awscliv2.zip"
-        echo "sudo ./aws/install"
-        exit 1
-    fi
-    
-    # jq 설치 확인
-    if ! command -v jq &> /dev/null; then
-        log_error "jq가 설치되지 않았습니다."
-        echo -e "${YELLOW}💡 jq 설치 방법:${NC}"
-        echo "sudo yum install -y jq  # Amazon Linux"
-        echo "sudo apt-get install -y jq  # Ubuntu/Debian"
-        exit 1
-    fi
-    
-    # AWS 자격 증명 확인
-    if ! aws sts get-caller-identity &>/dev/null; then
-        log_error "AWS 자격 증명이 구성되지 않았습니다."
-        echo -e "${YELLOW}💡 AWS 자격 증명 구성 방법:${NC}"
-        echo "aws configure"
-        exit 1
-    fi
-    
     # 수집 카운터
     local success_count=0
     local total_count=0
     
-    log_info "🔧 AWS CLI 기반 추가 데이터 수집 시작..."
+    log_info "🏗️ Infrastructure as Code 분석 시작..."
     
-    # AWS CLI 명령 배열
+    # AWS CLI 기반 데이터 수집 배열
     declare -a aws_commands=(
+        # CloudFormation
         "CloudFormation 스택 정보|aws cloudformation describe-stacks --region $REGION --output json|iac_cloudformation_stacks.json"
-        "CloudFormation 스택 리소스|echo '[]'|iac_cloudformation_resources.json"
-        "CloudFormation 스택 이벤트|echo '[]'|iac_cloudformation_events.json"
-        "CDK 배포 정보|echo '[]'|iac_cdk_stacks.json"
-        "비용 및 청구 정보|echo '{\"ResultsByTime\":[]}'|iac_cost_analysis.json"
-        "리소스 그룹 정보|echo '{\"Resources\":[]}'|iac_resource_groups.json"
-        "Config 서비스 레코더|echo '{\"ConfigurationRecorders\":[]}'|iac_config_recorders.json"
-        "Config 규칙|echo '{\"ConfigRules\":[]}'|iac_config_rules.json"
+        "CloudFormation 스택 리소스|aws cloudformation list-stack-resources --region $REGION --stack-name \$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[0].StackName' --output text 2>/dev/null || echo 'dummy') --output json 2>/dev/null || echo '[]'|iac_cloudformation_resources.json"
+        "CloudFormation 스택 이벤트|aws cloudformation describe-stack-events --region $REGION --stack-name \$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[0].StackName' --output text 2>/dev/null || echo 'dummy') --output json 2>/dev/null || echo '[]'|iac_cloudformation_events.json"
+        
+        # AWS Config
+        "Config 구성 레코더|aws configservice describe-configuration-recorders --region $REGION --output json|iac_config_recorders.json"
+        "Config 규칙|aws configservice describe-config-rules --region $REGION --output json|iac_config_rules.json"
+        "Config 규정 준수|aws configservice describe-compliance-by-config-rule --region $REGION --output json|iac_config_compliance.json"
+        
+        # CloudTrail
         "CloudTrail 정보|aws cloudtrail describe-trails --region $REGION --output json|iac_cloudtrail_trails.json"
-        "Trusted Advisor 정보|echo '{\"checks\":[]}'|iac_trusted_advisor.json"
-        "Systems Manager 파라미터|echo '{\"Parameters\":[]}'|iac_ssm_parameters.json"
-        "Secrets Manager 비밀|echo '{\"SecretList\":[]}'|iac_secrets_manager.json"
+        "CloudTrail 이벤트 선택기|aws cloudtrail get-event-selectors --region $REGION --trail-name \$(aws cloudtrail describe-trails --region $REGION --query 'trailList[0].Name' --output text 2>/dev/null || echo 'dummy') --output json 2>/dev/null || echo '{}'|iac_cloudtrail_selectors.json"
+        
+        # Systems Manager
+        "SSM 파라미터|aws ssm describe-parameters --region $REGION --output json|iac_ssm_parameters.json"
+        "SSM 문서|aws ssm list-documents --region $REGION --output json|iac_ssm_documents.json"
+        
+        # Lambda (IaC 관련)
         "Lambda 함수 목록|aws lambda list-functions --region $REGION --output json|iac_lambda_functions.json"
-        "API Gateway REST API|echo '{\"items\":[]}'|iac_api_gateway_rest.json"
-        "ECS 클러스터|aws ecs list-clusters --region $REGION --output json|iac_ecs_clusters.json"
-        "EKS 클러스터|aws eks list-clusters --region $REGION --output json|iac_eks_clusters.json"
+        
+        # Cost Explorer (지난 30일)
+        "비용 분석|aws ce get-cost-and-usage --region us-east-1 --time-period Start=\$(date -d '30 days ago' +%Y-%m-%d),End=\$(date +%Y-%m-%d) --granularity MONTHLY --metrics BlendedCost --group-by Type=DIMENSION,Key=SERVICE --output json|iac_cost_analysis.json"
+        
+        # Organizations (조직 정보)
+        "조직 정보|aws organizations describe-organization --region us-east-1 --output json 2>/dev/null || echo '{}'|iac_organization_info.json"
+        "조직 계정|aws organizations list-accounts --region us-east-1 --output json 2>/dev/null || echo '{}'|iac_organization_accounts.json"
+        
+        # Service Catalog
+        "Service Catalog 포트폴리오|aws servicecatalog list-portfolios --region $REGION --output json|iac_servicecatalog_portfolios.json"
+        "Service Catalog 제품|aws servicecatalog search-products --region $REGION --output json|iac_servicecatalog_products.json"
+        
+        # Resource Groups
+        "리소스 그룹|aws resource-groups list-groups --region $REGION --output json|iac_resource_groups.json"
+        
+        # Tags
+        "태그 리소스|aws resourcegroupstaggingapi get-resources --region $REGION --output json|iac_tagged_resources.json"
     )
     
     # AWS CLI 명령 실행
     for command_info in "${aws_commands[@]}"; do
         IFS='|' read -r description command output_file <<< "$command_info"
         ((total_count++))
+        
         if execute_aws_cli_command "$description" "$command" "$output_file"; then
             ((success_count++))
         fi
     done
     
-    log_info "🏗️ IaC 파일 분석 시작..."
+    log_info "📊 데이터 분석 및 요약 생성 시작..."
     
-    # IaC 파일 분석 배열
-    declare -a iac_files=(
-        "Terraform 상태 파일|terraform.tfstate|iac_terraform_state.json"
-        "Terraform 계획 파일|*.tfplan|iac_terraform_plans.txt"
-        "Terraform 구성 파일|*.tf|iac_terraform_configs.tf"
-        "CloudFormation 템플릿|*.yaml|iac_cloudformation_templates.yaml"
-        "CloudFormation JSON 템플릿|template*.json|iac_cloudformation_json_templates.json"
-        "CDK 앱 파일|cdk.json|iac_cdk_app.json"
-        "Serverless 프레임워크|serverless.yml|iac_serverless.yml"
-        "SAM 템플릿|template.yaml|iac_sam_template.yaml"
-        "Docker Compose|docker-compose.yml|iac_docker_compose.yml"
-        "Helm 차트|Chart.yaml|iac_helm_charts.yaml"
-    )
-    
-    # IaC 파일 분석 실행
-    for file_info in "${iac_files[@]}"; do
-        IFS='|' read -r description pattern output_file <<< "$file_info"
-        ((total_count++))
-        if analyze_iac_files "$description" "$pattern" "$output_file"; then
-            ((success_count++))
-        fi
-    done
-    
-    log_info "📊 IaC 배포 내용 분석 시작..."
-    
-    # JSON 분석 배열
-    declare -a json_analyses=(
-        "CloudFormation 스택 요약|iac_cloudformation_stacks.json|.Stacks[] | \"스택명: \\(.StackName), 상태: \\(.StackStatus), 생성일: \\(.CreationTime)\"|iac_analysis_cloudformation_summary.txt"
-        "CloudFormation 리소스 요약|iac_cloudformation_resources.json|.StackResourceSummaries[]? | \"리소스: \\(.ResourceType), 논리ID: \\(.LogicalResourceId), 상태: \\(.ResourceStatus)\"|iac_analysis_cloudformation_resources.txt"
-        "Terraform 리소스 분석|iac_terraform_state.json|.resources[]? | \"리소스: \\(.type), 이름: \\(.name), 모드: \\(.mode)\"|iac_analysis_terraform_resources.txt"
-        "CDK 스택 분석|iac_cdk_stacks.json|.[]? | \"CDK 스택: \\(.StackName), 상태: \\(.StackStatus)\"|iac_analysis_cdk_summary.txt"
+    # 분석 보고서 생성 배열
+    declare -a analysis_reports=(
+        "CloudFormation 스택 요약|iac_cloudformation_stacks.json|.Stacks[]? | \"스택명: \\(.StackName), 상태: \\(.StackStatus), 생성일: \\(.CreationTime)\"|iac_analysis_cloudformation_summary.txt"
+        "CDK 스택 분석|iac_cloudformation_stacks.json|.Stacks[]? | select(.Tags[]?.Key == \"aws:cdk:path\") | \"CDK 스택: \\(.StackName), 상태: \\(.StackStatus)\"|iac_analysis_cdk_summary.txt"
         "비용 분석 요약|iac_cost_analysis.json|.ResultsByTime[]?.Groups[]? | \"서비스: \\(.Keys[0]), 비용: \\(.Metrics.BlendedCost.Amount) \\(.Metrics.BlendedCost.Unit)\"|iac_analysis_cost_summary.txt"
         "Lambda 함수 요약|iac_lambda_functions.json|.Functions[]? | \"함수명: \\(.FunctionName), 런타임: \\(.Runtime), 상태: \\(.State)\"|iac_analysis_lambda_summary.txt"
         "Config 규칙 요약|iac_config_rules.json|.ConfigRules[]? | \"규칙명: \\(.ConfigRuleName), 상태: \\(.ConfigRuleState), 소스: \\(.Source.Owner)\"|iac_analysis_config_rules.txt"
         "CloudTrail 요약|iac_cloudtrail_trails.json|.trailList[]? | \"추적명: \\(.Name), 다중리전: \\(.IsMultiRegionTrail), 로깅: \\(.IsLogging)\"|iac_analysis_cloudtrail_summary.txt"
+        "태그 분석|iac_tagged_resources.json|.ResourceTagMappingList[]? | \"리소스: \\(.ResourceARN), 태그수: \\(.Tags | length)\"|iac_analysis_tags_summary.txt"
+        "조직 분석|iac_organization_info.json|\"조직 ID: \\(.Organization.Id // \"N/A\"), 마스터 계정: \\(.Organization.MasterAccountId // \"N/A\")\"|iac_analysis_organization_summary.txt"
     )
     
-    # JSON 분석 실행
-    for analysis_info in "${json_analyses[@]}"; do
-        IFS='|' read -r description input_file jq_query output_file <<< "$analysis_info"
+    # 분석 보고서 생성
+    for report_info in "${analysis_reports[@]}"; do
+        IFS='|' read -r description input_file jq_filter output_file <<< "$report_info"
         ((total_count++))
-        if analyze_json_data "$description" "$input_file" "$jq_query" "$output_file"; then
+        
+        if generate_analysis_report "$description" "$input_file" "$jq_filter" "$output_file"; then
             ((success_count++))
         fi
     done
     
     # 종합 분석 보고서 생성
     log_info "📋 종합 분석 보고서 생성 중..."
+    ((total_count++))
     
-    cat > iac_comprehensive_analysis_report.md << EOF
-# AWS 인프라 및 IaC 분석 보고서
+    cat > iac_comprehensive_analysis_report.md << 'EOF'
+# AWS Infrastructure as Code 종합 분석 보고서
 
-## 생성 정보
-- 생성 일시: $(date)
-- 분석 리전: $REGION
-- 수집 성공률: $success_count/$total_count
+## 📊 개요
+이 보고서는 AWS CLI 및 IaC 도구를 통해 수집된 데이터를 기반으로 생성되었습니다.
 
-## 1. CloudFormation 스택 분석
-$(if [ -f "iac_analysis_cloudformation_summary.txt" ]; then cat iac_analysis_cloudformation_summary.txt; else echo "데이터 없음"; fi)
-
-## 2. Terraform 리소스 분석
-$(if [ -f "iac_analysis_terraform_resources.txt" ]; then cat iac_analysis_terraform_resources.txt; else echo "데이터 없음"; fi)
-
-## 3. CDK 스택 분석
-$(if [ -f "iac_analysis_cdk_summary.txt" ]; then cat iac_analysis_cdk_summary.txt; else echo "데이터 없음"; fi)
-
-## 4. Lambda 함수 분석
-$(if [ -f "iac_analysis_lambda_summary.txt" ]; then cat iac_analysis_lambda_summary.txt; else echo "데이터 없음"; fi)
-
-## 5. 비용 분석
-$(if [ -f "iac_analysis_cost_summary.txt" ]; then cat iac_analysis_cost_summary.txt; else echo "데이터 없음"; fi)
-
-## 6. Config 규칙 분석
-$(if [ -f "iac_analysis_config_rules.txt" ]; then cat iac_analysis_config_rules.txt; else echo "데이터 없음"; fi)
-
-## 7. CloudTrail 분석
-$(if [ -f "iac_analysis_cloudtrail_summary.txt" ]; then cat iac_analysis_cloudtrail_summary.txt; else echo "데이터 없음"; fi)
-
-## 8. 발견된 IaC 파일들
-$(find . -name "iac_*.tf" -o -name "iac_*.yaml" -o -name "iac_*.yml" -o -name "iac_*.json" | grep -v "iac_.*_.*\.json$" | sort)
-
-## 9. 권장사항
-- IaC 도구 사용 현황을 검토하고 표준화를 고려하세요
-- CloudFormation 스택의 상태를 정기적으로 모니터링하세요
-- 비용 최적화를 위해 사용하지 않는 리소스를 정리하세요
-- Config 규칙을 통해 컴플라이언스를 유지하세요
-- CloudTrail을 통해 API 호출을 모니터링하세요
-
+## 🏗️ CloudFormation 분석
+### 스택 현황
 EOF
     
-    log_success "종합 분석 보고서 생성 완료 (iac_comprehensive_analysis_report.md)"
+    if [ -f "iac_analysis_cloudformation_summary.txt" ]; then
+        echo "```" >> iac_comprehensive_analysis_report.md
+        cat iac_analysis_cloudformation_summary.txt >> iac_comprehensive_analysis_report.md
+        echo "```" >> iac_comprehensive_analysis_report.md
+    fi
+    
+    cat >> iac_comprehensive_analysis_report.md << 'EOF'
+
+## 💰 비용 분석
+### 서비스별 비용 (지난 30일)
+EOF
+    
+    if [ -f "iac_analysis_cost_summary.txt" ]; then
+        echo "```" >> iac_comprehensive_analysis_report.md
+        cat iac_analysis_cost_summary.txt >> iac_comprehensive_analysis_report.md
+        echo "```" >> iac_comprehensive_analysis_report.md
+    fi
+    
+    cat >> iac_comprehensive_analysis_report.md << 'EOF'
+
+## 🔧 Lambda 함수 분석
+### 함수 현황
+EOF
+    
+    if [ -f "iac_analysis_lambda_summary.txt" ]; then
+        echo "```" >> iac_comprehensive_analysis_report.md
+        cat iac_analysis_lambda_summary.txt >> iac_comprehensive_analysis_report.md
+        echo "```" >> iac_comprehensive_analysis_report.md
+    fi
+    
+    cat >> iac_comprehensive_analysis_report.md << 'EOF'
+
+## 📋 Config 규칙 분석
+### 규정 준수 현황
+EOF
+    
+    if [ -f "iac_analysis_config_rules.txt" ]; then
+        echo "```" >> iac_comprehensive_analysis_report.md
+        cat iac_analysis_config_rules.txt >> iac_comprehensive_analysis_report.md
+        echo "```" >> iac_comprehensive_analysis_report.md
+    fi
+    
+    echo "" >> iac_comprehensive_analysis_report.md
+    echo "---" >> iac_comprehensive_analysis_report.md
+    echo "**생성 일시:** $(date)" >> iac_comprehensive_analysis_report.md
+    echo "**분석 리전:** $REGION" >> iac_comprehensive_analysis_report.md
+    
+    if [ -f "iac_comprehensive_analysis_report.md" ]; then
+        local file_size=$(stat -f%z "iac_comprehensive_analysis_report.md" 2>/dev/null || stat -c%s "iac_comprehensive_analysis_report.md" 2>/dev/null)
+        log_success "종합 분석 보고서 생성 완료 (iac_comprehensive_analysis_report.md, ${file_size} bytes)"
+        ((success_count++))
+    else
+        log_error "종합 분석 보고서 생성 실패"
+    fi
     
     # 결과 요약
     log_success "AWS CLI 및 IaC 분석 데이터 수집 완료!"
     log_info "성공: $success_count/$total_count"
+    
+    # 파일 목록 및 크기 표시
+    echo -e "\n${BLUE}📁 생성된 파일 목록:${NC}"
+    for file in iac_*.json iac_*.txt iac_*.md; do
+        if [ -f "$file" ]; then
+            size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+            if [ "$size" -gt 100 ]; then
+                echo -e "${GREEN}✓ $file (${size} bytes)${NC}"
+            else
+                echo -e "${YELLOW}⚠ $file (${size} bytes) - 데이터 없음${NC}"
+            fi
+        fi
+    done
+    
+    # 수집 통계
+    echo -e "\n${BLUE}📊 수집 통계:${NC}"
+    echo "총 쿼리 수: $total_count"
+    echo "성공한 쿼리: $success_count"
+    echo "실패한 쿼리: $((total_count - success_count))"
     
     # 오류 로그 확인
     if [ -s "$ERROR_LOG" ]; then
@@ -292,40 +272,17 @@ EOF
         tail -5 "$ERROR_LOG"
     fi
     
+    # 다음 단계 안내
+    echo -e "\n${YELLOW}💡 다음 단계:${NC}"
+    echo "1. 수집된 IaC 데이터를 바탕으로 인프라 거버넌스 분석 진행"
+    echo "2. CloudFormation 스택 최적화 및 표준화 검토"
+    echo "3. AWS Config 규칙 및 규정 준수 상태 분석"
+    echo "4. 비용 최적화 및 리소스 태깅 전략 수립"
+    echo "5. 조직 수준 정책 및 거버넌스 강화 방안 검토"
+    
     log_info "🎉 AWS CLI 및 IaC 분석 데이터 수집이 완료되었습니다!"
     log_info "📋 종합 보고서: iac_comprehensive_analysis_report.md"
 }
-
-# 명령행 인수 처리
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -r|--region)
-            REGION="$2"
-            shift 2
-            ;;
-        -d|--dir)
-            REPORT_DIR="$2"
-            shift 2
-            ;;
-        -h|--help)
-            echo "사용법: $0 [옵션]"
-            echo "  -r, --region REGION    AWS 리전 설정"
-            echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정"
-            echo "  -h, --help            도움말 표시"
-            echo ""
-            echo "이 스크립트는 다음을 수행합니다:"
-            echo "  1. AWS CLI를 통한 인프라 정보 수집"
-            echo "  2. IaC 파일 (Terraform, CloudFormation, CDK 등) 분석"
-            echo "  3. 비용 및 컴플라이언스 정보 수집"
-            echo "  4. 종합 분석 보고서 생성"
-            exit 0
-            ;;
-        *)
-            echo "알 수 없는 옵션: $1"
-            exit 1
-            ;;
-    esac
-done
 
 # 스크립트 실행
 main "$@"

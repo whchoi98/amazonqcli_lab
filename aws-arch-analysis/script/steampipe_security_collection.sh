@@ -50,7 +50,6 @@ execute_steampipe_query() {
             return 1
         fi
     else
-        # 일반 Steampipe 쿼리 실행
         if steampipe query "$query" --output json > "$output_file" 2>>"$ERROR_LOG"; then
             local file_size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
             if [ "$file_size" -gt 50 ]; then
@@ -67,15 +66,15 @@ execute_steampipe_query() {
     fi
 }
 
-# 메인 실행부
+# 메인 함수
 main() {
-    log_info "🔐 Steampipe 기반 보안 리소스 데이터 수집 시작"
+    log_info "🚀 Steampipe 기반 보안 리소스 데이터 수집 시작"
     log_info "Region: $REGION"
     log_info "Report Directory: $REPORT_DIR"
     
-    # 보고서 디렉토리 생성 및 이동
+    # 디렉토리 생성
     mkdir -p "$REPORT_DIR"
-    cd "$REPORT_DIR" || exit 1
+    cd "$REPORT_DIR"
     
     # 로그 파일 초기화
     > "$LOG_FILE"
@@ -103,7 +102,7 @@ main() {
     
     log_info "🔐 보안 리소스 수집 시작..."
     
-    # 보안 리소스 수집 배열
+    # 보안 리소스 수집 배열 (원본 스크립트의 성공한 쿼리들 기반)
     declare -a queries=(
         "IAM 사용자 상세 정보|select name, user_id, arn, path, create_date, password_last_used, mfa_enabled, login_profile, attached_policy_arns, inline_policies, groups, permissions_boundary_arn, permissions_boundary_type, tags from aws_iam_user|security_iam_users.json"
         "IAM 역할 상세 정보|select name, role_id, arn, path, create_date, assume_role_policy_document, assume_role_policy_std, description, max_session_duration, permissions_boundary_arn, permissions_boundary_type, role_last_used_date, role_last_used_region, attached_policy_arns, inline_policies, instance_profile_arns, tags from aws_iam_role|security_iam_roles.json"
@@ -120,7 +119,6 @@ main() {
         "KMS 권한 부여|echo '[]'|security_kms_grants.json"
         "Secrets Manager 비밀|select name, arn, description, kms_key_id, rotation_enabled, rotation_lambda_arn, rotation_rules, last_rotated_date, last_changed_date, last_accessed_date, deleted_date, created_date, primary_region, owning_service, tags from aws_secretsmanager_secret where region = '$REGION'|security_secrets_manager.json"
         "Systems Manager Parameter Store|select name, type, value, version, last_modified_date, last_modified_user, allowed_pattern, data_type, policies, tier from aws_ssm_parameter where region = '$REGION'|security_ssm_parameters.json"
-        "Certificate Manager 인증서|select certificate_arn, domain_name, subject_alternative_names, domain_validation_options, status, type, key_algorithm, extended_key_usages, certificate_transparency_logging_preference, created_at, issued_at, imported_at, not_before, not_after, renewal_eligibility, serial, subject, issuer, signature_algorithm, in_use_by, failure_reason, options, tags from aws_acm_certificate where region = '$REGION'|security_acm_certificates.json"
         "AWS Config 구성 레코더|select name, role_arn, recording_group, status from aws_config_configuration_recorder where region = '$REGION'|security_config_recorders.json"
         "AWS Config 규칙|select name, arn, rule_id, description, source, input_parameters, created_by, config_rule_state, tags from aws_config_rule where region = '$REGION'|security_config_rules.json"
         "CloudTrail 추적|select name, arn, s3_bucket_name, s3_key_prefix, include_global_service_events, is_multi_region_trail, enable_log_file_validation, cloud_watch_logs_log_group_arn, cloud_watch_logs_role_arn, kms_key_id, has_custom_event_selectors, has_insight_selectors, is_organization_trail, home_region, trail_arn, log_file_validation_enabled, event_selectors, insight_selectors, tags from aws_cloudtrail_trail where region = '$REGION'|security_cloudtrail_trails.json"
@@ -131,6 +129,7 @@ main() {
         "WAF v2 웹 ACL|select name, id, arn, scope, default_action, description, capacity, managed_by_firewall_manager, label_namespace, custom_response_bodies, rules, visibility_config, tags from aws_wafv2_web_acl where region = '$REGION'|security_wafv2_web_acls.json"
         "Network Firewall|select name, arn, id, vpc_id, subnet_mappings, policy_arn, policy_change_protection, subnet_change_protection, delete_protection, description, encryption_configuration, tags from aws_networkfirewall_firewall where region = '$REGION'|security_network_firewall.json"
         "AWS Shield Advanced 보호|select id, name, resource_arn, health_check_ids from aws_shield_protection where region = '$REGION'|security_shield_protections.json"
+        "Inspector 평가 템플릿|select arn, name, assessment_target_arn, duration_in_seconds, rules_package_arns, user_attributes_for_findings, last_assessment_run_arn, assessment_run_count, created_at, tags from aws_inspector_assessment_template where region = '$REGION'|security_inspector_templates.json"
         "Trusted Advisor 검사 결과|echo '[]'|security_trusted_advisor.json"
     )
     
@@ -147,6 +146,25 @@ main() {
     log_success "보안 리소스 데이터 수집 완료!"
     log_info "성공: $success_count/$total_count"
     
+    # 파일 목록 및 크기 표시
+    echo -e "\n${BLUE}📁 생성된 파일 목록:${NC}"
+    for file in security_*.json; do
+        if [ -f "$file" ]; then
+            size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+            if [ "$size" -gt 100 ]; then
+                echo -e "${GREEN}✓ $file (${size} bytes)${NC}"
+            else
+                echo -e "${YELLOW}⚠ $file (${size} bytes) - 데이터 없음${NC}"
+            fi
+        fi
+    done
+    
+    # 수집 통계
+    echo -e "\n${BLUE}📊 수집 통계:${NC}"
+    echo "총 쿼리 수: $total_count"
+    echo "성공한 쿼리: $success_count"
+    echo "실패한 쿼리: $((total_count - success_count))"
+    
     # 오류 로그 확인
     if [ -s "$ERROR_LOG" ]; then
         log_warning "오류가 발생했습니다. $ERROR_LOG 파일을 확인하세요."
@@ -154,33 +172,16 @@ main() {
         tail -5 "$ERROR_LOG"
     fi
     
+    # 다음 단계 안내
+    echo -e "\n${YELLOW}💡 다음 단계:${NC}"
+    echo "1. 수집된 보안 데이터를 바탕으로 보안 태세 분석 진행"
+    echo "2. IAM 권한 및 액세스 키 보안 검토"
+    echo "3. 암호화 키 관리 및 Secrets Manager 활용 분석"
+    echo "4. 보안 모니터링 도구 (GuardDuty, Security Hub) 구성 검토"
+    echo "5. 네트워크 보안 및 방화벽 정책 최적화"
+    
     log_info "🎉 보안 리소스 데이터 수집이 완료되었습니다!"
 }
-
-# 명령행 인수 처리
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -r|--region)
-            REGION="$2"
-            shift 2
-            ;;
-        -d|--dir)
-            REPORT_DIR="$2"
-            shift 2
-            ;;
-        -h|--help)
-            echo "사용법: $0 [옵션]"
-            echo "  -r, --region REGION    AWS 리전 설정"
-            echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정"
-            echo "  -h, --help            도움말 표시"
-            exit 0
-            ;;
-        *)
-            echo "알 수 없는 옵션: $1"
-            exit 1
-            ;;
-    esac
-done
 
 # 스크립트 실행
 main "$@"

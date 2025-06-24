@@ -2,13 +2,7 @@
 
 ## 🔧 계정 분석 실행 방법
 
-### 방법 1: 전체 자동화 실행 (권장)
-```bash
-# 전체 프로세스 자동 실행 (데이터 수집 → 보고서 생성 → HTML 변환)
-cd ~/amazonqcli_lab/aws-arch-analysis/script
-chmod +x *.sh *.py
-./run-complete-analysis.sh
-```
+### 방법 1: 전체 자동화 실행 
 
 **실행 단계**:
 1. **데이터 수집**: 모든 Steampipe 수집 스크립트 실행

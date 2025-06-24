@@ -54,28 +54,19 @@ execute_steampipe_query() {
     fi
 }
 
-# 메인 실행부
+# 메인 함수
 main() {
-    log_info "🌐 Steampipe 기반 API 및 애플리케이션 서비스 리소스 데이터 수집 시작"
+    log_info "🚀 Steampipe 기반 API 및 애플리케이션 서비스 리소스 데이터 수집 시작"
     log_info "Region: $REGION"
     log_info "Report Directory: $REPORT_DIR"
     
-    # 보고서 디렉토리 생성 및 이동
+    # 디렉토리 생성
     mkdir -p "$REPORT_DIR"
-    cd "$REPORT_DIR" || exit 1
+    cd "$REPORT_DIR"
     
     # 로그 파일 초기화
     > "$LOG_FILE"
     > "$ERROR_LOG"
-    
-    # Steampipe 설치 확인
-    if ! command -v steampipe &> /dev/null; then
-        log_error "Steampipe가 설치되지 않았습니다."
-        echo -e "${YELLOW}💡 Steampipe 설치 방법:${NC}"
-        echo "sudo /bin/sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/turbot/steampipe/main/install.sh)\""
-        echo "steampipe plugin install aws"
-        exit 1
-    fi
     
     # AWS 플러그인 확인
     log_info "Steampipe AWS 플러그인 확인 중..."
@@ -90,40 +81,49 @@ main() {
     
     log_info "🌐 API 및 애플리케이션 서비스 수집 시작..."
     
-    # API 및 애플리케이션 서비스 리소스 수집 배열
+    # API 및 애플리케이션 서비스 수집 배열
     declare -a queries=(
-        "API Gateway REST API 상세 정보|select api_id, name, description, created_date, version, warnings, binary_media_types, minimum_compression_size, api_key_source, endpoint_configuration_types, policy, tags from aws_api_gateway_rest_api where region = '$REGION'|application_api_gateway_rest_apis.json"
-        "API Gateway HTTP API (v2)|select api_id, name, description, created_date, version, warnings, api_endpoint, api_gateway_managed, api_key_selection_expression, cors_configuration, disable_execute_api_endpoint, disable_schema_validation, import_info, protocol_type, route_selection_expression, tags from aws_apigatewayv2_api where region = '$REGION'|application_api_gateway_v2_apis.json"
-        "API Gateway 스테이지 (REST API)|select rest_api_id, name, deployment_id, description, created_date, last_updated_date, cache_cluster_enabled, cache_cluster_size, cache_cluster_status, method_settings, variables, documentation_version, access_log_settings, canary_settings, web_acl_arn, tags from aws_api_gateway_stage where region = '$REGION'|application_api_gateway_stages.json"
+        # API Gateway
+        "API Gateway REST API|select id, name, description, created_date, version, warnings, binary_media_types, minimum_compression_size, api_key_source, endpoint_configuration, policy, tags from aws_api_gateway_rest_api where region = '$REGION'|application_api_gateway_rest_apis.json"
+        "API Gateway 스테이지|select rest_api_id, stage_name, deployment_id, description, created_date, last_updated_date, cache_cluster_enabled, cache_cluster_size, cache_cluster_status, method_settings, variables, documentation_version, access_log_settings, canary_settings, tracing_config, web_acl_arn, tags from aws_api_gateway_stage where region = '$REGION'|application_api_gateway_stages.json"
         "API Gateway 도메인 이름|select domain_name, certificate_name, certificate_arn, certificate_upload_date, regional_domain_name, regional_hosted_zone_id, regional_certificate_name, regional_certificate_arn, distribution_domain_name, distribution_hosted_zone_id, endpoint_configuration, domain_name_status, domain_name_status_message, security_policy, tags from aws_api_gateway_domain_name where region = '$REGION'|application_api_gateway_domain_names.json"
         "API Gateway 사용 계획|select id, name, description, api_stages, throttle, quota, product_code, tags from aws_api_gateway_usage_plan where region = '$REGION'|application_api_gateway_usage_plans.json"
         "API Gateway API 키|select id, name, description, enabled, created_date, last_updated_date, stage_keys, tags from aws_api_gateway_api_key where region = '$REGION'|application_api_gateway_api_keys.json"
-        "SNS 토픽 상세 정보|select topic_arn, display_name, owner, policy, policy_std, delivery_policy, effective_delivery_policy, subscriptions_confirmed, subscriptions_deleted, subscriptions_pending, kms_master_key_id, tags from aws_sns_topic where region = '$REGION'|application_sns_topics.json"
-        "SNS 구독|select subscription_arn, topic_arn, owner, protocol, endpoint, confirmation_was_authenticated, pending_confirmation, raw_message_delivery, filter_policy, delivery_policy, effective_delivery_policy, redrive_policy from aws_sns_topic_subscription where region = '$REGION'|application_sns_subscriptions.json"
-        "SQS 큐 상세 정보|select queue_url, queue_arn, fifo_queue, delay_seconds, max_message_size, message_retention_seconds, receive_wait_time_seconds, visibility_timeout_seconds, policy, policy_std, redrive_policy, content_based_deduplication, deduplication_scope, fifo_throughput_limit, kms_master_key_id, tags from aws_sqs_queue where region = '$REGION'|application_sqs_queues.json"
-        "EventBridge 규칙|select name, arn, description, event_pattern, schedule_expression, state, managed_by, event_bus_name, role_arn, targets, tags from aws_eventbridge_rule where region = '$REGION'|application_eventbridge_rules.json"
-        "EventBridge 사용자 정의 버스|select name, arn, policy, tags from aws_eventbridge_bus where region = '$REGION'|application_eventbridge_buses.json"
-        "Step Functions 상태 머신|select name, arn, status, type, role_arn, definition, creation_date, logging_configuration, tracing_configuration, tags from aws_sfn_state_machine where region = '$REGION'|application_stepfunctions_state_machines.json"
-        "Step Functions 활동|select activity_arn, name, creation_date from aws_sfn_activity where region = '$REGION'|application_stepfunctions_activities.json"
-        "AppSync GraphQL API|select api_id, name, authentication_type, log_config, open_id_connect_config, user_pool_config, lambda_authorizer_config, additional_authentication_providers, xray_enabled, waf_web_acl_arn, dns, api_type, merged_api_execution_role_arn, owner, owner_contact, introspection_config, query_depth_limit, resolver_count_limit, tags from aws_appsync_graphql_api where region = '$REGION'|application_appsync_apis.json"
-        "Kinesis 스트림 상세 정보|select stream_name, stream_arn, stream_status, stream_mode_details, open_shard_count, has_more_shards, retention_period_hours, stream_creation_timestamp, encryption_type, key_id, tags from aws_kinesis_stream where region = '$REGION'|application_kinesis_streams.json"
-        "Kinesis Data Firehose 전송 스트림|select delivery_stream_name, arn, delivery_stream_type, delivery_stream_status, version_id, create_timestamp, last_update_timestamp, source, destinations, has_more_destinations, failure_description, tags from aws_kinesis_firehose_delivery_stream where region = '$REGION'|application_kinesis_firehose_streams.json"
-        "Kinesis Analytics 애플리케이션|select application_name, application_arn, application_description, application_status, create_timestamp, last_update_timestamp, application_code, application_version_id from aws_kinesisanalyticsv2_application where region = '$REGION'|application_kinesis_analytics.json"
-        "CloudFront 배포|select id, arn, caller_reference, comment, default_root_object, domain_name, enabled, http_version, is_ipv6_enabled, last_modified_time, price_class, status, web_acl_id, tags from aws_cloudfront_distribution|application_cloudfront_distributions.json"
-        "CloudFront Origin Access Identity|select id, s3_canonical_user_id, caller_reference, comment from aws_cloudfront_origin_access_identity|application_cloudfront_oai.json"
-        "OpenSearch 도메인 상세 정보|select domain_name, domain_id, arn, created, deleted, endpoint, endpoints, processing, upgrade_processing, engine_version, cluster_config, ebs_options, access_policies, snapshot_options, vpc_options, cognito_options, encryption_at_rest_options, node_to_node_encryption_options, advanced_options, log_publishing_options, service_software_options, domain_endpoint_options, advanced_security_options, auto_tune_options, change_progress_details, tags from aws_opensearch_domain where region = '$REGION'|application_opensearch_domains.json"
-        "SES 구성 세트|select name, creation_date, delivery_options, reputation_tracking_enabled, sending_enabled from aws_ses_configuration_set where region = '$REGION'|application_ses_configuration_sets.json"
-        "SES 자격 증명|select identity, verification_status, verification_token, dkim_enabled, dkim_verification_status, bounce_topic, complaint_topic, delivery_topic, forwarding_enabled, headers_in_bounce_notifications_enabled, headers_in_complaint_notifications_enabled, headers_in_delivery_notifications_enabled from aws_ses_email_identity where region = '$REGION'|application_ses_identities.json"
-        "Pinpoint 애플리케이션|select id, arn, name, settings, tags from aws_pinpoint_app where region = '$REGION'|application_pinpoint_apps.json"
-        "WorkSpaces|select workspace_id, directory_id, user_name, ip_address, state, bundle_id, subnet_id, error_message, error_code, volume_encryption_key, user_volume_encryption_enabled, root_volume_encryption_enabled, workspace_properties, modification_states, related_workspaces, data_replication_settings, standby_workspaces_properties from aws_workspaces_workspace where region = '$REGION'|application_workspaces.json"
-        "App Runner 서비스|select service_name, service_id, service_arn, service_url, created_at, updated_at, deleted_at, status, source_configuration, instance_configuration, encryption_configuration, health_check_configuration, auto_scaling_configuration_arn, network_configuration, observability_configuration, tags from aws_apprunner_service where region = '$REGION'|application_apprunner_services.json"
-        "Amplify 앱|select app_id, arn, name, description, repository, platform, create_time, update_time, iam_service_role_arn, environment_variables, default_domain, enable_branch_auto_build, enable_branch_auto_deletion, enable_basic_auth, basic_auth_credentials, custom_rules, production_branch, build_spec, custom_headers, enable_auto_branch_creation, auto_branch_creation_patterns, auto_branch_creation_config, tags from aws_amplify_app where region = '$REGION'|application_amplify_apps.json"
+        
+        # SNS
+        "SNS 토픽|select topic_arn, name, display_name, owner, subscriptions_confirmed, subscriptions_deleted, subscriptions_pending, policy, delivery_policy, effective_delivery_policy, kms_master_key_id, fifo_topic, content_based_deduplication, tags from aws_sns_topic where region = '$REGION'|application_sns_topics.json"
+        "SNS 구독|select subscription_arn, topic_arn, owner, protocol, endpoint, confirmation_was_authenticated, delivery_policy, effective_delivery_policy, filter_policy, pending_confirmation, raw_message_delivery, redrive_policy, subscription_role_arn from aws_sns_topic_subscription where region = '$REGION'|application_sns_subscriptions.json"
+        
+        # SQS
+        "SQS 큐|select queue_url, name, attributes, tags from aws_sqs_queue where region = '$REGION'|application_sqs_queues.json"
+        
+        # EventBridge
+        "EventBridge 규칙|select name, arn, description, event_pattern, schedule_expression, state, targets, managed_by, event_bus_name, role_arn, tags from aws_eventbridge_rule where region = '$REGION'|application_eventbridge_rules.json"
+        "EventBridge 이벤트 버스|select name, arn, policy, tags from aws_eventbridge_bus where region = '$REGION'|application_eventbridge_buses.json"
+        
+        # Step Functions
+        "Step Functions 상태 머신|select state_machine_arn, name, status, type, definition, role_arn, creation_date, logging_configuration, tags from aws_sfn_state_machine where region = '$REGION'|application_stepfunctions_state_machines.json"
+        
+        # AppSync
+        "AppSync API|select api_id, name, authentication_type, log_config, open_id_connect_config, user_pool_config, lambda_authorizer_config, additional_authentication_providers, xray_enabled, waf_web_acl_arn, tags from aws_appsync_graphql_api where region = '$REGION'|application_appsync_apis.json"
+        
+        # Kinesis
+        "Kinesis 스트림|select stream_name, stream_arn, stream_status, stream_mode_details, shard_count, retention_period, encryption_type, key_id, stream_creation_timestamp, tags from aws_kinesis_stream where region = '$REGION'|application_kinesis_streams.json"
+        "Kinesis Firehose 스트림|select delivery_stream_name, delivery_stream_arn, delivery_stream_status, delivery_stream_type, version_id, create_timestamp, last_update_timestamp, source, destinations, has_more_destinations, tags from aws_kinesis_firehose_delivery_stream where region = '$REGION'|application_kinesis_firehose_streams.json"
+        
+        # CloudFront
+        "CloudFront 배포|select id, arn, status, last_modified_time, domain_name, comment, default_cache_behavior, cache_behaviors, custom_error_responses, logging, enabled, price_class, http_version, is_ipv6_enabled, web_acl_id, tags from aws_cloudfront_distribution|application_cloudfront_distributions.json"
+        "CloudFront Origin Access Identity|select id, s3_canonical_user_id, comment from aws_cloudfront_origin_access_identity|application_cloudfront_oai.json"
+        
+        # Amplify
+        "Amplify 앱|select app_id, app_arn, name, description, repository, platform, create_time, update_time, iam_service_role_arn, environment_variables, default_domain, enable_branch_auto_build, enable_branch_auto_deletion, enable_basic_auth, basic_auth_credentials, custom_rules, production_branch, build_spec, custom_headers, enable_auto_branch_creation, auto_branch_creation_patterns, auto_branch_creation_config, tags from aws_amplify_app where region = '$REGION'|application_amplify_apps.json"
     )
     
     # 쿼리 실행
     for query_info in "${queries[@]}"; do
         IFS='|' read -r description query output_file <<< "$query_info"
         ((total_count++))
+        
         if execute_steampipe_query "$description" "$query" "$output_file"; then
             ((success_count++))
         fi
@@ -133,6 +133,25 @@ main() {
     log_success "API 및 애플리케이션 서비스 리소스 데이터 수집 완료!"
     log_info "성공: $success_count/$total_count"
     
+    # 파일 목록 및 크기 표시
+    echo -e "\n${BLUE}📁 생성된 파일 목록:${NC}"
+    for file in application_*.json; do
+        if [ -f "$file" ]; then
+            size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+            if [ "$size" -gt 100 ]; then
+                echo -e "${GREEN}✓ $file (${size} bytes)${NC}"
+            else
+                echo -e "${YELLOW}⚠ $file (${size} bytes) - 데이터 없음${NC}"
+            fi
+        fi
+    done
+    
+    # 수집 통계
+    echo -e "\n${BLUE}📊 수집 통계:${NC}"
+    echo "총 쿼리 수: $total_count"
+    echo "성공한 쿼리: $success_count"
+    echo "실패한 쿼리: $((total_count - success_count))"
+    
     # 오류 로그 확인
     if [ -s "$ERROR_LOG" ]; then
         log_warning "오류가 발생했습니다. $ERROR_LOG 파일을 확인하세요."
@@ -140,33 +159,16 @@ main() {
         tail -5 "$ERROR_LOG"
     fi
     
+    # 다음 단계 안내
+    echo -e "\n${YELLOW}💡 다음 단계:${NC}"
+    echo "1. 수집된 애플리케이션 데이터를 바탕으로 Phase 1 인프라 분석 진행"
+    echo "2. API Gateway 및 서버리스 아키텍처 최적화 검토"
+    echo "3. 메시징 서비스 (SNS/SQS) 구성 분석"
+    echo "4. 이벤트 기반 아키텍처 패턴 분석"
+    echo "5. CDN 및 콘텐츠 전송 최적화 분석"
+    
     log_info "🎉 API 및 애플리케이션 서비스 리소스 데이터 수집이 완료되었습니다!"
 }
-
-# 명령행 인수 처리
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -r|--region)
-            REGION="$2"
-            shift 2
-            ;;
-        -d|--dir)
-            REPORT_DIR="$2"
-            shift 2
-            ;;
-        -h|--help)
-            echo "사용법: $0 [옵션]"
-            echo "  -r, --region REGION    AWS 리전 설정"
-            echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정"
-            echo "  -h, --help            도움말 표시"
-            exit 0
-            ;;
-        *)
-            echo "알 수 없는 옵션: $1"
-            exit 1
-            ;;
-    esac
-done
 
 # 스크립트 실행
 main "$@"

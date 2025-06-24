@@ -1,11 +1,11 @@
 #!/bin/bash
-# Steampipe 기반 모니터링 및 로깅 리소스 데이터 수집 스크립트 (강화 버전)
+# Steampipe 기반 네트워킹 리소스 데이터 수집 스크립트 (최종 버전)
 
 # 설정 변수
 REGION="${AWS_REGION:-ap-northeast-2}"
 REPORT_DIR="${REPORT_DIR:-/home/ec2-user/amazonqcli_lab/report}"
-LOG_FILE="steampipe_monitoring_collection.log"
-ERROR_LOG="steampipe_monitoring_errors.log"
+LOG_FILE="steampipe_networking_collection.log"
+ERROR_LOG="steampipe_networking_errors.log"
 
 # 색상 정의
 RED='\033[0;31m'
@@ -39,56 +39,34 @@ execute_steampipe_query() {
     
     log_info "수집 중: $description"
     
-    # echo 명령인 경우 직접 실행
-    if [[ "$query" == echo* ]]; then
-        if eval "$query" > "$output_file" 2>>"$ERROR_LOG"; then
-            local file_size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
-            log_warning "$description - 서비스 미지원 ($output_file, ${file_size} bytes)"
-            return 1
+    if steampipe query "$query" --output json > "$output_file" 2>>"$ERROR_LOG"; then
+        local file_size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
+        if [ "$file_size" -gt 50 ]; then
+            log_success "$description 완료 ($output_file, ${file_size} bytes)"
+            return 0
         else
-            log_error "$description 실패 - $output_file"
+            log_warning "$description - 데이터 없음 ($output_file, ${file_size} bytes)"
             return 1
         fi
     else
-        # 일반 Steampipe 쿼리 실행
-        if steampipe query "$query" --output json > "$output_file" 2>>"$ERROR_LOG"; then
-            local file_size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
-            if [ "$file_size" -gt 50 ]; then
-                log_success "$description 완료 ($output_file, ${file_size} bytes)"
-                return 0
-            else
-                log_warning "$description - 데이터 없음 ($output_file, ${file_size} bytes)"
-                return 1
-            fi
-        else
-            log_error "$description 실패 - $output_file"
-            return 1
-        fi
+        log_error "$description 실패 - $output_file"
+        return 1
     fi
 }
 
-# 메인 실행부
+# 메인 함수
 main() {
-    log_info "📊 Steampipe 기반 모니터링 및 로깅 리소스 데이터 수집 시작"
+    log_info "🚀 Steampipe 기반 네트워킹 리소스 데이터 수집 시작"
     log_info "Region: $REGION"
     log_info "Report Directory: $REPORT_DIR"
     
-    # 보고서 디렉토리 생성 및 이동
+    # 디렉토리 생성
     mkdir -p "$REPORT_DIR"
-    cd "$REPORT_DIR" || exit 1
+    cd "$REPORT_DIR"
     
     # 로그 파일 초기화
     > "$LOG_FILE"
     > "$ERROR_LOG"
-    
-    # Steampipe 설치 확인
-    if ! command -v steampipe &> /dev/null; then
-        log_error "Steampipe가 설치되지 않았습니다."
-        echo -e "${YELLOW}💡 Steampipe 설치 방법:${NC}"
-        echo "sudo /bin/sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/turbot/steampipe/main/install.sh)\""
-        echo "steampipe plugin install aws"
-        exit 1
-    fi
     
     # AWS 플러그인 확인
     log_info "Steampipe AWS 플러그인 확인 중..."
@@ -101,50 +79,62 @@ main() {
     local success_count=0
     local total_count=0
     
-    log_info "📊 모니터링 및 로깅 리소스 수집 시작..."
+    log_info "📡 네트워킹 리소스 수집 시작..."
     
-    # 모니터링 및 로깅 리소스 수집 배열
+    # 완전한 네트워킹 리소스 수집 배열
     declare -a queries=(
-        "CloudWatch 알람 상세 정보|select name, arn, alarm_description, alarm_configuration_updated_timestamp, actions_enabled, ok_actions, alarm_actions, insufficient_data_actions, state_value, state_reason, state_reason_data, state_updated_timestamp, metric_name, namespace, statistic, extended_statistic, dimensions, period, evaluation_periods, datapoints_to_alarm, threshold, comparison_operator, treat_missing_data, evaluate_low_sample_count_percentile, metrics, tags from aws_cloudwatch_alarm where region = '$REGION'|monitoring_cloudwatch_alarms.json"
-        "CloudWatch 로그 그룹 상세 정보|select name, arn, creation_time, retention_in_days, metric_filter_count, stored_bytes, kms_key_id, tags from aws_cloudwatch_log_group where region = '$REGION'|monitoring_cloudwatch_log_groups.json"
-        "CloudWatch 로그 스트림|select arn, log_group_name, name, creation_time, first_event_timestamp, last_event_timestamp, last_ingestion_time, upload_sequence_token from aws_cloudwatch_log_stream where region = '$REGION'|monitoring_cloudwatch_log_streams.json"
-        "CloudWatch 메트릭 필터|select name, log_group_name, filter_pattern, metric_transformation_name, metric_transformation_namespace, metric_transformation_value, creation_time from aws_cloudwatch_log_metric_filter where region = '$REGION'|monitoring_cloudwatch_metric_filters.json"
-        "CloudWatch 대시보드|echo '[]'|monitoring_cloudwatch_dashboards.json"
-        "CloudWatch Insights 쿼리|echo '[]'|monitoring_cloudwatch_insights_queries.json"
-        "CloudWatch 복합 알람|echo '[]'|monitoring_cloudwatch_composite_alarms.json"
-        "X-Ray 추적 구성|echo '[]'|monitoring_xray_tracing_config.json"
-        "X-Ray 서비스 맵|echo '[]'|monitoring_xray_services.json"
-        "X-Ray 암호화 구성|echo '[]'|monitoring_xray_encryption_config.json"
-        "CloudWatch Application Insights 애플리케이션|echo '[]'|monitoring_application_insights.json"
-        "CloudWatch Container Insights|echo '[]'|monitoring_container_insights.json"
-        "CloudWatch Synthetics Canary|echo '[]'|monitoring_synthetics_canaries.json"
-        "CloudWatch RUM 앱 모니터|echo '[]'|monitoring_rum_app_monitors.json"
-        "CloudWatch Evidently 프로젝트|echo '[]'|monitoring_evidently_projects.json"
-        "AWS Systems Manager OpsCenter OpsItems|echo '[]'|monitoring_ssm_ops_items.json"
-        "AWS Personal Health Dashboard 이벤트|select arn, service, event_type_code, event_type_category, region, availability_zone, start_time, end_time, last_updated_time, status_code, event_scope_code from aws_health_event where region = '$REGION'|monitoring_health_events.json"
-        "AWS Cost and Usage Reports|echo '[]'|monitoring_cost_usage_reports.json"
-        "AWS Budgets|echo '[]'|monitoring_budgets.json"
-        "AWS Cost Explorer 비용 카테고리|echo '[]'|monitoring_cost_categories.json"
-        "AWS Resource Groups|echo '[]'|monitoring_resource_groups.json"
-        "AWS Systems Manager Compliance|echo '[]'|monitoring_ssm_compliance.json"
-        "AWS Config 적합성 팩|select name, arn, conformance_pack_id, delivery_s3_bucket, delivery_s3_key_prefix, input_parameters, last_update_requested_time, created_by from aws_config_conformance_pack where region = '$REGION'|monitoring_config_conformance_packs.json"
-        "AWS Well-Architected 워크로드|select workload_id, workload_arn, workload_name, description, environment, account_ids, aws_regions, non_aws_regions, architectural_design, review_owner, industry_type, industry, notes, improvement_status, risk_counts, pillar_priorities, lenses, owner, share_invitation_id, tags from aws_wellarchitected_workload where region = '$REGION'|monitoring_wellarchitected_workloads.json"
-        "AWS Service Catalog 포트폴리오|select id, arn, display_name, description, provider_name, created_time, tags from aws_servicecatalog_portfolio where region = '$REGION'|monitoring_servicecatalog_portfolios.json"
-        "AWS License Manager 라이선스 구성|echo '[]'|monitoring_license_manager_configs.json"
+        "VPC 정보|select vpc_id, cidr_block, state, is_default, dhcp_options_id, instance_tenancy, owner_id, tags from aws_vpc where region = '$REGION'|networking_vpc.json"
+        "서브넷 정보|select subnet_id, vpc_id, cidr_block, availability_zone, availability_zone_id, state, available_ip_address_count, map_public_ip_on_launch, assign_ipv6_address_on_creation, default_for_az, tags from aws_vpc_subnet where region = '$REGION'|networking_subnets.json"
+        "보안 그룹 정보|select group_id, group_name, description, vpc_id, owner_id, ip_permissions, ip_permissions_egress, tags from aws_vpc_security_group where region = '$REGION'|security_groups.json"
+        "보안 그룹 인바운드 규칙|select security_group_rule_id, group_id, is_egress, type, ip_protocol, from_port, to_port, cidr_ipv4, cidr_ipv6, description from aws_vpc_security_group_rule where region = '$REGION' and is_egress = false|security_groups_ingress_rules.json"
+        "보안 그룹 아웃바운드 규칙|select security_group_rule_id, group_id, is_egress, type, ip_protocol, from_port, to_port, cidr_ipv4, cidr_ipv6, description from aws_vpc_security_group_rule where region = '$REGION' and is_egress = true|security_groups_egress_rules.json"
+        "라우팅 테이블 정보|select route_table_id, vpc_id, routes, associations, propagating_vgws, owner_id, tags from aws_vpc_route_table where region = '$REGION'|networking_route_tables.json"
+        "인터넷 게이트웨이 정보|select internet_gateway_id, attachments, owner_id, tags from aws_vpc_internet_gateway where region = '$REGION'|networking_igw.json"
+        "NAT 게이트웨이 정보|select nat_gateway_id, vpc_id, subnet_id, state, failure_code, failure_message, nat_gateway_addresses, create_time, delete_time, tags from aws_vpc_nat_gateway where region = '$REGION'|networking_nat.json"
+        "VPC 엔드포인트 정보|select vpc_endpoint_id, vpc_id, service_name, vpc_endpoint_type, state, route_table_ids, subnet_ids, groups, private_dns_enabled, requester_managed, dns_entries, creation_timestamp, tags from aws_vpc_endpoint where region = '$REGION'|networking_vpc_endpoints.json"
+        "VPC 피어링 연결 정보|select id, status_code, accepter_vpc_id, requester_vpc_id, accepter_owner_id, requester_owner_id, accepter_region, requester_region, accepter_cidr_block, requester_cidr_block, expiration_time, status_message, tags from aws_vpc_peering_connection where region = '$REGION'|networking_vpc_peering.json"
+        "Elastic IP 정보|select allocation_id, public_ip, public_ipv4_pool, domain, instance_id, network_interface_id, network_interface_owner_id, private_ip_address, association_id, customer_owned_ip, customer_owned_ipv4_pool, carrier_ip, tags from aws_vpc_eip where region = '$REGION'|networking_eip.json"
+        "네트워크 인터페이스 정보|select network_interface_id, subnet_id, vpc_id, availability_zone, description, groups, interface_type, mac_address, owner_id, private_dns_name, private_ip_address, private_ip_addresses, requester_id, requester_managed, source_dest_check, status, attachment, association, ipv6_addresses, tags from aws_ec2_network_interface where region = '$REGION'|networking_interfaces.json"
+        "네트워크 ACL 정보|select network_acl_id, vpc_id, is_default, entries, associations, owner_id, tags from aws_vpc_network_acl where region = '$REGION'|networking_acl.json"
+        "VPC Flow Logs 정보|select flow_log_id, resource_id, traffic_type, log_destination_type, log_destination, log_format, log_group_name, deliver_logs_status, deliver_logs_error_message, creation_time, tags from aws_vpc_flow_log where region = '$REGION'|networking_flow_logs.json"
+        "Transit Gateway 정보|select transit_gateway_id, state, description, default_route_table_association, default_route_table_propagation, dns_support, vpn_ecmp_support, auto_accept_shared_attachments, amazon_side_asn, creation_time, owner_id, tags from aws_ec2_transit_gateway where region = '$REGION'|networking_transit_gateway.json"
+        "Customer Gateway 정보|select customer_gateway_id, state, type, ip_address, bgp_asn, device_name, certificate_arn, tags from aws_vpc_customer_gateway where region = '$REGION'|networking_customer_gateways.json"
+        "VPN Gateway 정보|select vpn_gateway_id, state, type, availability_zone, vpc_attachments, amazon_side_asn, tags from aws_vpc_vpn_gateway where region = '$REGION'|networking_vpn_gateways.json"
+        "DHCP Options 정보|select dhcp_options_id, owner_id, tags from aws_vpc_dhcp_options where region = '$REGION'|networking_dhcp_options.json"
     )
     
     # 쿼리 실행
     for query_info in "${queries[@]}"; do
         IFS='|' read -r description query output_file <<< "$query_info"
         ((total_count++))
+        
         if execute_steampipe_query "$description" "$query" "$output_file"; then
             ((success_count++))
         fi
     done
     
     # 결과 요약
-    log_success "모니터링 및 로깅 리소스 데이터 수집 완료!"
+    log_success "네트워킹 리소스 데이터 수집 완료!"
     log_info "성공: $success_count/$total_count"
+    
+    # 파일 목록 및 크기 표시
+    echo -e "\n${BLUE}📁 생성된 파일 목록:${NC}"
+    for file in networking_*.json security_groups*.json; do
+        if [ -f "$file" ]; then
+            size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+            if [ "$size" -gt 100 ]; then
+                echo -e "${GREEN}✓ $file (${size} bytes)${NC}"
+            else
+                echo -e "${YELLOW}⚠ $file (${size} bytes) - 데이터 없음${NC}"
+            fi
+        fi
+    done
+    
+    # 수집 통계
+    echo -e "\n${BLUE}📊 수집 통계:${NC}"
+    echo "총 쿼리 수: $total_count"
+    echo "성공한 쿼리: $success_count"
+    echo "실패한 쿼리: $((total_count - success_count))"
     
     # 오류 로그 확인
     if [ -s "$ERROR_LOG" ]; then
@@ -153,33 +143,16 @@ main() {
         tail -5 "$ERROR_LOG"
     fi
     
-    log_info "🎉 모니터링 및 로깅 리소스 데이터 수집이 완료되었습니다!"
+    # 다음 단계 안내
+    echo -e "\n${YELLOW}💡 다음 단계:${NC}"
+    echo "1. 수집된 네트워킹 데이터를 바탕으로 Phase 1 인프라 분석 진행"
+    echo "2. VPC 및 서브넷 구성 최적화 검토"
+    echo "3. 보안 그룹 및 네트워크 ACL 규칙 분석"
+    echo "4. VPC 피어링 및 네트워크 연결성 분석"
+    echo "5. 네트워크 성능 및 비용 최적화 분석"
+    
+    log_info "🎉 네트워킹 리소스 데이터 수집이 완료되었습니다!"
 }
-
-# 명령행 인수 처리
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -r|--region)
-            REGION="$2"
-            shift 2
-            ;;
-        -d|--dir)
-            REPORT_DIR="$2"
-            shift 2
-            ;;
-        -h|--help)
-            echo "사용법: $0 [옵션]"
-            echo "  -r, --region REGION    AWS 리전 설정"
-            echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정"
-            echo "  -h, --help            도움말 표시"
-            exit 0
-            ;;
-        *)
-            echo "알 수 없는 옵션: $1"
-            exit 1
-            ;;
-    esac
-done
 
 # 스크립트 실행
 main "$@"
