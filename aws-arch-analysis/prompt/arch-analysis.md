@@ -1,31 +1,44 @@
-AWS 계정 종합 분석 보고서
-역할 - 당신은 AWS 계정을 관리하는 아키텍트 입니다. 계정에 대한 상세 분석과 리포트를 구성해야 합니다.
+# AWS 계정 종합 분석 보고서 - 메인 가이드
 
-1.환경
-- region : ap-northeast-2
+## 📋 개요
+이 가이드는 AWS 계정에 대한 종합적인 분석을 수행하고 전문적인 보고서를 생성하기 위한 단계별 프롬프트 모음입니다.
 
-2. 데이터 수집 도구
-- Steampipe로 우선 수집해줘 : SQL 기반 AWS 리소스 분석
-- AWS CLI: 추가 리소스 정보 수집
-- Bash 스크립트: 자동화된 데이터 처리
-- cloudformation 배포 내용 분석
-- terraform 배포 내용 분석
-- AWS CDK 배포 내용 분석
-- 수집된 데이터는 ~/report에 json 형태로 수집
+## 🗂️ 프롬프트 구조
 
-3. 계정 분석 방법
-- 스크립트 활용 : ~/amazonqcli_lab/aws-arch-analysis/script 내의 모든 Script를 실행
-- 수집된 데이터는 ~/amazonqcli_lab/report 에 생성되고, 이 데이터를 기반으로 상세하게 분석.
-  
-4. 보고서 생성 도구
-- 보고서 생성 : ~/amazonqcli_lab/report 에 생성
-- 보고서 유형 : Markdown으로 보고서를 작성.
-- Markdown은 전체 계정 분석 요약, 네트워킹 분석, 컴퓨팅 분석, 스토리지 분석, 데이터베이스 분석, 보안 분석, 비용 최적화, 애플리케이션 서비스 및 모니터링 분석, 종합 분석 및 권장사항, 구현가이드 파트로 분리해서 생성
+### 단계별 가이드 파일
+1. **[01-role-and-environment.md](./01-role-and-environment.md)** - 역할 정의 및 환경 설정
+2. **[02-data-collection-guide.md](./02-data-collection-guide.md)** - 데이터 수집 전략
+3. **[03-execution-methods.md](./03-execution-methods.md)** - 실행 방법론
+4. **[04-report-generation-guide.md](./04-report-generation-guide.md)** - 보고서 생성 가이드
+5. **[05-html-conversion-guide.md](./05-html-conversion-guide.md)** - HTML 변환 및 배포
 
+## 🚀 빠른 시작
 
-5. 보고서 생성 후 HTML로 변환
-- index.html 파일 생성 : 전체 계정 분석 요약
-- 분리해서 생성된 보고서 : 네트워킹 분석, 컴퓨팅 분석, 스토리지 분석, 데이터베이스 분석, 보안 분석, 비용 최적화, 애플리케이션 서비스 및 모니터링 분석, 종합 분석 및 권장사항, 구현가이드 파트는 각각 html로 변환
-- ~/amazonqcli_lab/aws-arch-analysis/prompt/markdown-to-html-conversion-prompt.md 프롬프트를 사용해서, markdown을 HTML로 변환
-- ~/amazonqcli_lab/aws-arch-analysis/sample/ 안에 있는 HTML 파일들을 참조해서 변환.
+### 전체 자동화 실행 (권장)
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./run-complete-analysis.sh
+```
 
+### 단계별 실행
+각 프롬프트 파일을 순서대로 참조하여 단계별로 진행하세요.
+
+## 📊 생성되는 보고서
+- **01-executive-summary.md** - 경영진 요약
+- **02-networking-analysis.md** - 네트워킹 분석
+- **03-compute-analysis.md** - 컴퓨팅 분석
+- **04-storage-analysis.md** - 스토리지 분석
+- **05-database-analysis.md** - 데이터베이스 분석
+- **06-security-analysis.md** - 보안 분석
+- **07-cost-optimization.md** - 비용 최적화
+- **08-application-analysis.md** - 애플리케이션 분석
+- **09-monitoring-analysis.md** - 모니터링 분석
+- **10-comprehensive-recommendations.md** - 종합 권장사항
+
+## 🎯 사용 방법
+1. 각 프롬프트 파일을 순서대로 읽고 따라하세요
+2. 체크리스트를 활용하여 진행 상황을 확인하세요
+3. 필요에 따라 특정 섹션만 선택적으로 실행하세요
+
+---
+**📌 참고**: 상세한 내용은 각 개별 프롬프트 파일을 참조하세요.

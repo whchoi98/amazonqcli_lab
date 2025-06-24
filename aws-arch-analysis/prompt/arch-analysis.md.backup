@@ -1,0 +1,774 @@
+# AWS 계정 종합 분석 보고서 생성 가이드
+
+## 🎯 역할 정의
+당신은 AWS 계정을 관리하는 **시니어 클라우드 아키텍트**입니다. 계정에 대한 종합적이고 상세한 분석을 수행하고, 실행 가능한 권장사항이 포함된 전문적인 보고서를 작성해야 합니다.
+
+## 🌍 분석 환경 설정
+
+### 기본 환경
+- **Primary Region**: `ap-northeast-2` (Seoul)
+- **Analysis Scope**: 전체 AWS 계정 리소스
+- **Report Language**: 한국어 (기술 용어는 영어 병기)
+- **Output Format**: Markdown → HTML 변환
+
+### 디렉토리 구조
+```
+~/amazonqcli_lab/
+├── aws-arch-analysis/
+│   ├── script/          # 데이터 수집 스크립트
+│   ├── prompt/          # 분석 프롬프트
+│   └── sample/          # HTML 템플릿 샘플
+└── report/              # 수집된 데이터 및 생성된 보고서
+```
+
+## 📊 데이터 수집 전략
+
+### 기존 스크립트 기반 데이터 수집
+**위치**: `~/amazonqcli_lab/aws-arch-analysis/script/`
+
+#### 1. Steampipe 기반 데이터 수집 스크립트
+다음 스크립트들을 **순차적으로** 실행하여 AWS 리소스 데이터를 수집합니다:
+
+##### 1.1 네트워킹 데이터 수집
+```bash
+# 실행 스크립트: steampipe_networking_collection.sh
+# 수집 데이터:
+# - VPC, 서브넷, 라우팅 테이블
+# - 보안 그룹, NACL
+# - 인터넷 게이트웨이, NAT 게이트웨이
+# - VPC 엔드포인트, 피어링 연결
+```
+
+##### 1.2 컴퓨팅 데이터 수집
+```bash
+# 실행 스크립트: steampipe_compute_collection.sh
+# 수집 데이터:
+# - EC2 인스턴스 (상태, 타입, 메트릭)
+# - Auto Scaling 그룹
+# - Elastic Load Balancer (ALB, NLB, CLB)
+# - Target Groups
+```
+
+##### 1.3 컨테이너 서비스 데이터 수집
+```bash
+# 실행 스크립트: steampipe_container_collection.sh
+# 수집 데이터:
+# - ECS 클러스터, 서비스, 태스크
+# - EKS 클러스터, 노드 그룹
+# - ECR 리포지토리
+# - Fargate 서비스
+```
+
+##### 1.4 데이터베이스 데이터 수집
+```bash
+# 실행 스크립트: steampipe_database_collection.sh
+# 수집 데이터:
+# - RDS 인스턴스, 클러스터
+# - DynamoDB 테이블
+# - ElastiCache 클러스터
+# - DocumentDB, Neptune
+```
+
+##### 1.5 스토리지 데이터 수집
+```bash
+# 실행 스크립트: steampipe_storage_collection.sh
+# 수집 데이터:
+# - S3 버킷 (설정, 정책, 메트릭)
+# - EBS 볼륨, 스냅샷
+# - EFS 파일 시스템
+# - FSx 파일 시스템
+```
+
+##### 1.6 보안 데이터 수집
+```bash
+# 실행 스크립트: steampipe_security_collection.sh
+# 수집 데이터:
+# - IAM 사용자, 역할, 정책
+# - KMS 키, 암호화 상태
+# - CloudTrail, Config 설정
+# - GuardDuty, Security Hub 결과
+```
+
+##### 1.7 애플리케이션 서비스 데이터 수집
+```bash
+# 실행 스크립트: steampipe_application_collection.sh
+# 수집 데이터:
+# - API Gateway (REST, HTTP API)
+# - Lambda 함수
+# - SNS 토픽, SQS 큐
+# - EventBridge 규칙
+```
+
+##### 1.8 모니터링 데이터 수집
+```bash
+# 실행 스크립트: steampipe_monitoring_collection.sh
+# 수집 데이터:
+# - CloudWatch 로그 그룹, 메트릭
+# - X-Ray 서비스 맵
+# - Systems Manager 파라미터
+# - CloudFormation 스택
+```
+
+##### 1.9 Infrastructure as Code 분석
+```bash
+# 실행 스크립트: steampipe_iac_analysis_collection.sh
+# 수집 데이터:
+# - CloudFormation 스택, 템플릿
+# - Terraform 상태 분석
+# - CDK 구성 분석
+# - 리소스 태깅 현황
+```
+
+#### 2. 종합 데이터 수집 실행
+```bash
+# 메인 수집 스크립트: aws-comprehensive-analysis.sh
+# 모든 개별 수집 스크립트를 순차 실행
+# 진행률 표시 및 오류 처리 포함
+# 수집 완료 후 데이터 검증 수행
+```
+
+### 데이터 수집 결과물
+모든 수집된 데이터는 `~/amazonqcli_lab/report/` 디렉토리에 JSON 형태로 저장됩니다:
+
+#### 네트워킹 관련 파일
+- `networking_vpc.json` - VPC 정보
+- `networking_subnets.json` - 서브넷 정보
+- `security_groups.json` - 보안 그룹 정보
+- `networking_route_tables.json` - 라우팅 테이블
+
+#### 컴퓨팅 관련 파일
+- `compute_ec2_instances.json` - EC2 인스턴스
+- `compute_asg_detailed.json` - Auto Scaling 그룹
+- `compute_alb_detailed.json` - Application Load Balancer
+- `compute_target_groups.json` - Target Groups
+
+#### 데이터베이스 관련 파일
+- `database_rds_instances.json` - RDS 인스턴스
+- `database_dynamodb_tables.json` - DynamoDB 테이블
+- `database_elasticache_clusters.json` - ElastiCache
+
+#### 스토리지 관련 파일
+- `storage_s3_buckets.json` - S3 버킷
+- `storage_ebs_volumes.json` - EBS 볼륨
+- `storage_efs_filesystems.json` - EFS 파일 시스템
+
+#### 보안 관련 파일
+- `security_iam_users.json` - IAM 사용자
+- `security_iam_roles.json` - IAM 역할
+- `security_kms_keys.json` - KMS 키
+
+#### 애플리케이션 관련 파일
+- `application_api_gateway_rest_apis.json` - API Gateway
+- `iac_lambda_functions.json` - Lambda 함수
+- `application_sns_topics.json` - SNS 토픽
+
+## 🔧 계정 분석 실행 방법
+
+### 방법 1: 전체 자동화 실행 (권장)
+```bash
+# 전체 프로세스 자동 실행 (데이터 수집 → 보고서 생성 → HTML 변환)
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+chmod +x *.sh *.py
+./run-complete-analysis.sh
+```
+
+**실행 단계**:
+1. **데이터 수집**: 모든 Steampipe 수집 스크립트 실행
+2. **Markdown 보고서 생성**: 10개 섹션 보고서 자동 생성
+3. **HTML 변환**: 웹 기반 보고서 생성
+
+### 방법 2: 단계별 수동 실행
+
+#### Step 1: 데이터 수집 실행
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+
+# 메인 데이터 수집 스크립트 실행
+./aws-comprehensive-analysis.sh
+
+# 또는 개별 수집 스크립트 실행
+./steampipe_networking_collection.sh      # 네트워킹 데이터
+./steampipe_compute_collection.sh         # 컴퓨팅 데이터
+./steampipe_container_collection.sh       # 컨테이너 데이터
+./steampipe_database_collection.sh        # 데이터베이스 데이터
+./steampipe_storage_collection.sh         # 스토리지 데이터
+./steampipe_security_collection.sh        # 보안 데이터
+./steampipe_application_collection.sh     # 애플리케이션 데이터
+./steampipe_monitoring_collection.sh      # 모니터링 데이터
+./steampipe_iac_analysis_collection.sh    # IaC 분석 데이터
+```
+
+#### Step 2: 보고서 생성 실행
+```bash
+# 모든 보고서 일괄 생성
+./generate-all-reports.sh
+
+# 또는 개별 보고서 생성
+./generate-executive-summary.sh           # 경영진 요약
+./generate-networking-report.sh           # 네트워킹 분석
+./generate-compute-report.py              # 컴퓨팅 분석 (Python)
+./generate-storage-report.sh              # 스토리지 분석
+./generate-database-report.sh             # 데이터베이스 분석
+./generate-security-report.sh             # 보안 분석
+./generate-cost-report.py                 # 비용 최적화 (Python)
+./generate-application-report.py          # 애플리케이션 분석 (Python)
+./generate-monitoring-report.sh           # 모니터링 분석
+./generate-recommendations.sh             # 종합 권장사항
+```
+
+#### Step 3: HTML 변환 실행
+```bash
+# HTML 보고서 생성
+./generate-html-reports.sh
+
+# 또는 Python 변환기 직접 실행
+python3 markdown-to-html-converter.py \
+  --input ~/amazonqcli_lab/report/ \
+  --output ~/amazonqcli_lab/html-report/ \
+  --template ~/amazonqcli_lab/aws-arch-analysis/sample/
+```
+
+### 방법 3: 특정 영역만 분석
+```bash
+# 네트워킹만 분석
+./steampipe_networking_collection.sh
+./generate-networking-report.sh
+
+# 비용 최적화만 분석
+./steampipe_compute_collection.sh
+./steampipe_database_collection.sh
+./steampipe_storage_collection.sh
+./generate-cost-report.py
+
+# 보안만 분석
+./steampipe_security_collection.sh
+./generate-security-report.sh
+```
+
+### 실행 전 사전 준비사항
+```bash
+# 1. 스크립트 실행 권한 부여
+chmod +x ~/amazonqcli_lab/aws-arch-analysis/script/*.sh
+chmod +x ~/amazonqcli_lab/aws-arch-analysis/script/*.py
+
+# 2. 필요한 디렉토리 생성
+mkdir -p ~/amazonqcli_lab/report
+mkdir -p ~/amazonqcli_lab/html-report
+
+# 3. AWS 자격 증명 확인
+aws sts get-caller-identity
+
+# 4. Steampipe 설치 및 AWS 플러그인 확인
+steampipe plugin list
+steampipe query "select account_id from aws_caller_identity"
+```
+
+### 실행 결과 확인
+```bash
+# 수집된 JSON 데이터 확인
+ls -la ~/amazonqcli_lab/report/*.json
+
+# 생성된 Markdown 보고서 확인
+ls -la ~/amazonqcli_lab/report/*.md
+
+# HTML 보고서 확인
+ls -la ~/amazonqcli_lab/html-report/*.html
+
+# 데이터 품질 검증
+jq . ~/amazonqcli_lab/report/compute_ec2_instances.json | head -20
+```
+
+### 오류 발생 시 대응 방법
+```bash
+# 로그 파일 확인
+tail -f ~/amazonqcli_lab/report/analysis.log
+
+# 개별 스크립트 디버그 실행
+bash -x ./steampipe_compute_collection.sh
+
+# 데이터 수집 상태 확인
+./aws-comprehensive-analysis.sh --check-only
+
+# 부분 재실행 (특정 서비스만)
+./steampipe_compute_collection.sh --service ec2
+```
+
+## 📋 보고서 생성 상세 가이드
+
+## 📋 보고서 생성 상세 가이드
+
+### 보고서 생성 스크립트 매핑
+
+#### 1. 📊 전체 계정 분석 요약 (`01-executive-summary.md`)
+**생성 스크립트**: `generate-executive-summary.sh`
+**목적**: C-Level 임원진을 위한 고수준 요약
+**내용**:
+- 계정 개요 및 주요 지표
+- 비용 현황 및 트렌드 (월간/분기별)
+- 주요 발견사항 (Top 5)
+- 즉시 조치 필요 항목
+- ROI 기반 우선순위 권장사항
+
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-executive-summary.sh
+```
+
+#### 2. 🌐 네트워킹 분석 (`02-networking-analysis.md`)
+**생성 스크립트**: `generate-networking-report.sh`
+**목적**: 네트워크 아키텍처 및 보안 분석
+**내용**:
+- VPC 구성 및 서브넷 설계 분석
+- 보안 그룹 및 NACL 규칙 검토
+- 라우팅 테이블 및 게이트웨이 구성
+- 네트워크 성능 및 비용 최적화
+- 보안 취약점 및 개선 방안
+
+**실행 방법**:
+```bash
+./generate-networking-report.sh
+```
+
+#### 3. 💻 컴퓨팅 분석 (`03-compute-analysis.md`)
+**생성 스크립트**: `generate-compute-report.py` (Python 버전)
+**목적**: 컴퓨팅 리소스 효율성 및 최적화
+**내용**:
+- EC2 인스턴스 사용률 및 타입 분석
+- Auto Scaling 및 Load Balancer 구성
+- 서버리스 서비스 (Lambda, Fargate) 활용도
+- 컨테이너 서비스 (ECS, EKS) 현황
+- 성능 최적화 및 비용 절감 방안
+
+**실행 방법**:
+```bash
+./generate-compute-report.py
+# 또는 기존 bash 버전
+./generate-compute-report.sh
+```
+
+#### 4. 💾 스토리지 분석 (`04-storage-analysis.md`)
+**생성 스크립트**: `generate-storage-report.sh`
+**목적**: 스토리지 전략 및 데이터 관리 최적화
+**내용**:
+- S3 버킷 구성 및 스토리지 클래스 분석
+- EBS 볼륨 타입 및 사용률 검토
+- 백업 및 스냅샷 정책 평가
+- 데이터 라이프사이클 관리 현황
+- 스토리지 비용 최적화 전략
+
+**실행 방법**:
+```bash
+./generate-storage-report.sh
+```
+
+#### 5. 🗄️ 데이터베이스 분석 (`05-database-analysis.md`)
+**생성 스크립트**: `generate-database-report.sh`
+**목적**: 데이터베이스 성능 및 가용성 분석
+**내용**:
+- RDS 인스턴스 구성 및 성능 메트릭
+- DynamoDB 테이블 설계 및 처리량 분석
+- 백업 및 복구 전략 검토
+- 데이터베이스 보안 및 암호화 상태
+- 성능 튜닝 및 비용 최적화
+
+**실행 방법**:
+```bash
+./generate-database-report.sh
+```
+
+#### 6. 🔒 보안 분석 (`06-security-analysis.md`)
+**생성 스크립트**: `generate-security-report.sh`
+**목적**: 보안 태세 및 컴플라이언스 평가
+**내용**:
+- IAM 정책 및 역할 최소 권한 원칙 검토
+- 암호화 상태 (전송 중/저장 중) 분석
+- 로깅 및 모니터링 구성 평가
+- 보안 취약점 및 위험도 평가
+- 컴플라이언스 요구사항 준수 현황
+
+**실행 방법**:
+```bash
+./generate-security-report.sh
+```
+
+#### 7. 💰 비용 최적화 (`07-cost-optimization.md`)
+**생성 스크립트**: `generate-cost-report.py` (Python 버전)
+**목적**: 비용 효율성 및 최적화 기회 식별
+**내용**:
+- 서비스별 비용 분석 및 트렌드
+- 예약 인스턴스 및 Savings Plans 활용도
+- 미사용 리소스 및 오버프로비저닝 식별
+- 비용 최적화 우선순위 및 예상 절감액
+- 비용 모니터링 및 알림 설정 권장사항
+
+**실행 방법**:
+```bash
+./generate-cost-report.py
+# 또는 기존 bash 버전
+./generate-cost-report.sh
+```
+
+#### 8. 🌐 애플리케이션 서비스 분석 (`08-application-analysis.md`)
+**생성 스크립트**: `generate-application-report.py` (Python 버전)
+**목적**: 애플리케이션 아키텍처 및 운영 효율성
+**내용**:
+- API Gateway, SNS, SQS 등 애플리케이션 서비스
+- Lambda 함수 성능 및 비용 분석
+- EventBridge, Step Functions 활용도
+- 애플리케이션 최적화 권장사항
+
+**실행 방법**:
+```bash
+./generate-application-report.py
+# 또는 기존 bash 버전
+./generate-application-report.sh
+```
+
+#### 9. 📈 모니터링 분석 (`09-monitoring-analysis.md`)
+**생성 스크립트**: `generate-monitoring-report.sh`
+**목적**: 모니터링 및 운영 효율성 분석
+**내용**:
+- CloudWatch, X-Ray 등 모니터링 도구 활용도
+- 로그 관리 및 분석 현황
+- 성능 모니터링 및 알림 구성
+- 운영 자동화 및 개선 방안
+
+**실행 방법**:
+```bash
+./generate-monitoring-report.sh
+```
+
+#### 10. 🛠️ 종합 권장사항 (`10-comprehensive-recommendations.md`)
+**생성 스크립트**: `generate-recommendations.sh`
+**목적**: 통합적 관점의 전략적 권장사항
+**내용**:
+- 아키텍처 개선 로드맵 (단기/중기/장기)
+- 우선순위별 실행 계획
+- 예상 투자 비용 및 ROI 분석
+- 위험 관리 및 마이그레이션 전략
+- 거버넌스 및 운영 프로세스 개선
+
+**실행 방법**:
+```bash
+./generate-recommendations.sh
+```
+
+### 보고서 일괄 생성
+```bash
+# 모든 보고서를 한 번에 생성
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-all-reports.sh
+
+# 생성된 보고서 확인
+ls -la ~/amazonqcli_lab/report/*.md
+```
+
+### 보고서 생성 순서 (의존성 고려)
+1. **데이터 수집 완료 확인** (모든 JSON 파일 존재)
+2. **개별 분석 보고서 생성** (02-09번)
+3. **경영진 요약 보고서 생성** (01번) - 다른 보고서 참조
+4. **종합 권장사항 생성** (10번) - 모든 분석 결과 통합
+
+### 보고서 품질 검증
+```bash
+# Markdown 문법 검증
+markdownlint ~/amazonqcli_lab/report/*.md
+
+# 보고서 완성도 확인
+for file in ~/amazonqcli_lab/report/*.md; do
+    echo "=== $file ==="
+    wc -l "$file"
+    grep -c "^#" "$file"
+    echo ""
+done
+```
+
+### 보고서 작성 품질 기준
+
+#### 📝 내용 품질
+- **정확성**: 수집된 데이터 기반 정확한 분석
+- **완전성**: 모든 주요 영역 포괄적 검토
+- **실용성**: 실행 가능한 구체적 권장사항
+- **우선순위**: 비즈니스 영향도 기반 우선순위 제시
+
+#### 📊 시각화 요구사항
+- 표와 차트를 활용한 데이터 시각화
+- 비교 분석 및 트렌드 표시
+- 색상 코딩을 통한 우선순위 표시
+- 아키텍처 다이어그램 포함 (필요시)
+
+#### 🎯 권장사항 형식
+```markdown
+### 🔴 높은 우선순위 (즉시 실행)
+1. **권장사항 제목**: 구체적 설명
+   - **예상 효과**: 정량적 지표
+   - **구현 난이도**: 쉬움/보통/어려움
+   - **예상 기간**: X주/X개월
+   - **필요 리소스**: 인력/예산
+
+### 🟡 중간 우선순위 (1-3개월)
+### 🟢 낮은 우선순위 (3-6개월)
+```
+
+## 🔄 HTML 변환 프로세스
+
+### HTML 변환 스크립트 활용
+
+#### 자동 HTML 변환 실행
+```bash
+# 메인 HTML 변환 스크립트 실행
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-html-reports.sh
+```
+
+**변환 과정**:
+1. **Markdown 파일 검증**: 문법 및 구조 확인
+2. **템플릿 적용**: `~/amazonqcli_lab/aws-arch-analysis/sample/` 참조
+3. **HTML 파일 생성**: `~/amazonqcli_lab/html-report/` 디렉토리에 생성
+4. **네비게이션 구성**: 보고서 간 연결 및 목차 생성
+
+#### Python 변환기 직접 활용
+```bash
+# 고급 변환 옵션 사용
+python3 markdown-to-html-converter.py \
+  --input ~/amazonqcli_lab/report/ \
+  --output ~/amazonqcli_lab/html-report/ \
+  --template ~/amazonqcli_lab/aws-arch-analysis/sample/ \
+  --style professional \
+  --include-toc \
+  --responsive
+```
+
+**변환기 옵션**:
+- `--input`: Markdown 파일 입력 디렉토리
+- `--output`: HTML 파일 출력 디렉토리  
+- `--template`: HTML 템플릿 디렉토리
+- `--style`: 스타일 테마 (professional, modern, classic)
+- `--include-toc`: 목차 자동 생성
+- `--responsive`: 반응형 디자인 적용
+
+### HTML 템플릿 참조
+**템플릿 위치**: `~/amazonqcli_lab/aws-arch-analysis/sample/`
+
+#### 사용 가능한 템플릿
+- `index.html` - 메인 대시보드 템플릿
+- `report-template.html` - 개별 보고서 템플릿
+- `executive-summary.html` - 경영진 요약 템플릿
+- `technical-report.html` - 기술 분석 템플릿
+
+#### 템플릿 구성 요소
+```html
+<!-- 공통 헤더 -->
+<header class="report-header">
+  <nav class="report-navigation">
+    <!-- 보고서 간 네비게이션 -->
+  </nav>
+</header>
+
+<!-- 메인 콘텐츠 -->
+<main class="report-content">
+  <!-- Markdown 변환 내용 -->
+</main>
+
+<!-- 사이드바 (목차) -->
+<aside class="report-sidebar">
+  <!-- 자동 생성 목차 -->
+</aside>
+
+<!-- 푸터 -->
+<footer class="report-footer">
+  <!-- 생성 정보 및 링크 -->
+</footer>
+```
+
+### 변환 결과물 구조
+```
+~/amazonqcli_lab/html-report/
+├── index.html                          # 메인 대시보드
+├── 01-executive-summary.html           # 경영진 요약
+├── 02-networking-analysis.html         # 네트워킹 분석
+├── 03-compute-analysis.html            # 컴퓨팅 분석
+├── 04-storage-analysis.html            # 스토리지 분석
+├── 05-database-analysis.html           # 데이터베이스 분석
+├── 06-security-analysis.html           # 보안 분석
+├── 07-cost-optimization.html           # 비용 최적화
+├── 08-application-analysis.html        # 애플리케이션 분석
+├── 09-monitoring-analysis.html         # 모니터링 분석
+├── 10-comprehensive-recommendations.html # 종합 권장사항
+├── assets/                             # CSS, JS, 이미지
+│   ├── css/
+│   │   ├── main.css
+│   │   └── responsive.css
+│   ├── js/
+│   │   ├── navigation.js
+│   │   └── charts.js
+│   └── images/
+└── data/                               # JSON 데이터 (차트용)
+    ├── cost-data.json
+    ├── resource-counts.json
+    └── recommendations.json
+```
+
+### HTML 품질 검증 및 최적화
+
+#### Step 1: 자동 검증
+```bash
+# HTML 문법 검증
+html5validator ~/amazonqcli_lab/html-report/*.html
+
+# 링크 검증
+linkchecker ~/amazonqcli_lab/html-report/index.html
+
+# 접근성 검증
+axe ~/amazonqcli_lab/html-report/index.html
+```
+
+#### Step 2: 성능 최적화
+```bash
+# CSS/JS 압축
+./optimize-html-assets.sh
+
+# 이미지 최적화
+./optimize-images.sh
+
+# 캐시 설정 확인
+./check-cache-headers.sh
+```
+
+#### Step 3: 브라우저 호환성 테스트
+- **Chrome/Edge**: 최신 버전 지원
+- **Firefox**: 최신 버전 지원  
+- **Safari**: 최신 버전 지원
+- **모바일**: 반응형 디자인 확인
+
+### 고급 HTML 기능
+
+#### 대화형 차트 및 그래프
+```javascript
+// 비용 트렌드 차트
+const costChart = new Chart(ctx, {
+    type: 'line',
+    data: costData,
+    options: chartOptions
+});
+
+// 리소스 분포 파이 차트
+const resourceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: resourceData,
+    options: pieOptions
+});
+```
+
+#### 검색 및 필터링 기능
+```javascript
+// 보고서 내 검색
+function searchReports(query) {
+    // 전체 보고서에서 키워드 검색
+}
+
+// 권장사항 필터링
+function filterRecommendations(priority, category) {
+    // 우선순위 및 카테고리별 필터링
+}
+```
+
+#### 인쇄 최적화
+```css
+@media print {
+    .report-navigation { display: none; }
+    .report-content { margin: 0; }
+    .page-break { page-break-before: always; }
+}
+```
+
+### 배포 및 공유
+
+#### 로컬 웹 서버 실행
+```bash
+# Python 웹 서버
+cd ~/amazonqcli_lab/html-report
+python3 -m http.server 8080
+
+# 브라우저에서 확인
+# http://localhost:8080
+```
+
+#### 정적 웹사이트 배포 (선택사항)
+```bash
+# S3 정적 웹사이트 배포
+aws s3 sync ~/amazonqcli_lab/html-report/ s3://your-report-bucket/ --delete
+aws s3 website s3://your-report-bucket --index-document index.html
+
+# CloudFront 배포 (선택사항)
+aws cloudfront create-distribution --distribution-config file://distribution-config.json
+```
+
+### 변환 프로세스 자동화
+```bash
+# 전체 프로세스 자동화 스크립트
+#!/bin/bash
+# auto-generate-reports.sh
+
+# 1. 데이터 수집
+./aws-comprehensive-analysis.sh
+
+# 2. Markdown 보고서 생성  
+./generate-all-reports.sh
+
+# 3. HTML 변환
+./generate-html-reports.sh
+
+# 4. 품질 검증
+./validate-html-reports.sh
+
+# 5. 배포 (선택사항)
+# ./deploy-reports.sh
+
+echo "✅ 전체 보고서 생성 프로세스 완료"
+echo "🌐 HTML 보고서: file://$(pwd)/html-report/index.html"
+```
+
+## 📋 체크리스트
+
+### 데이터 수집 완료 확인
+- [ ] 모든 스크립트 정상 실행 완료
+- [ ] JSON 파일 생성 및 데이터 무결성 확인
+- [ ] 누락된 데이터 식별 및 보완
+- [ ] 데이터 품질 검증 완료
+
+### 보고서 작성 완료 확인
+- [ ] 10개 섹션 모든 보고서 작성 완료
+- [ ] 권장사항 우선순위 및 ROI 분석 포함
+- [ ] 시각화 및 표 적절히 활용
+- [ ] 실행 가능한 구체적 가이드 제공
+
+### HTML 변환 완료 확인
+- [ ] 모든 Markdown 파일 HTML 변환 완료
+- [ ] 네비게이션 및 스타일 적용 확인
+- [ ] 반응형 디자인 및 접근성 검증
+- [ ] 최종 품질 검토 완료
+
+## 🎯 성공 기준
+
+### 정량적 지표
+- **데이터 커버리지**: 95% 이상 리소스 수집
+- **권장사항 실행률**: 80% 이상 실행 가능
+- **비용 절감 잠재력**: 최소 20% 이상
+- **보안 개선 항목**: 10개 이상 식별
+
+### 정성적 지표
+- 경영진 의사결정 지원 가능한 수준
+- 기술팀 실행 가능한 구체적 가이드
+- 단계적 구현 로드맵 제공
+- 지속적 개선 프로세스 포함
+
+---
+
+**📌 중요 참고사항**
+- 모든 분석은 실제 수집된 데이터를 기반으로 수행
+- 추정치 사용 시 명확한 가정 및 근거 제시
+- 보안 관련 정보는 적절한 수준에서 마스킹
+- 정기적 업데이트 및 모니터링 방안 포함
+
