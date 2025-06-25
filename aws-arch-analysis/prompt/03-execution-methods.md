@@ -14,68 +14,40 @@
 #### Step 1: 데이터 수집 실행
 ```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-
-# 메인 데이터 수집 스크립트 실행
-./aws-comprehensive-analysis.sh
-
-# 또는 개별 수집 스크립트 실행
-./steampipe_networking_collection.sh      # 네트워킹 데이터
-./steampipe_compute_collection.sh         # 컴퓨팅 데이터
-./steampipe_container_collection.sh       # 컨테이너 데이터
-./steampipe_database_collection.sh        # 데이터베이스 데이터
-./steampipe_storage_collection.sh         # 스토리지 데이터
-./steampipe_security_collection.sh        # 보안 데이터
-./steampipe_application_collection.sh     # 애플리케이션 데이터
-./steampipe_monitoring_collection.sh      # 모니터링 데이터
-./steampipe_iac_analysis_collection.sh    # IaC 분석 데이터
+# 개별 수집 스크립트 실행 - python
+./steampipe_networking_collection.py      # 네트워킹 데이터
+./steampipe_compute_collection.py         # 컴퓨팅 데이터
+./steampipe_container_collection.py       # 컨테이너 데이터
+./steampipe_database_collection.py        # 데이터베이스 데이터
+./steampipe_storage_collection.py         # 스토리지 데이터
+./steampipe_security_collection.py        # 보안 데이터
+./steampipe_application_collection.py     # 애플리케이션 데이터
+./steampipe_monitoring_collection.py      # 모니터링 데이터
+./steampipe_iac_analysis_collection.py    # IaC 분석 데이터
 ```
 
 #### Step 2: 보고서 생성 실행
 ```bash
-# 모든 보고서 일괄 생성
-./generate-all-reports.sh
-
-# 또는 개별 보고서 생성
-./generate-executive-summary.sh           # 경영진 요약
-./generate-networking-report.sh           # 네트워킹 분석
-./generate-compute-report.py              # 컴퓨팅 분석 (Python)
-./generate-storage-report.sh              # 스토리지 분석
-./generate-database-report.sh             # 데이터베이스 분석
-./generate-security-report.sh             # 보안 분석
-./generate-cost-report.py                 # 비용 최적화 (Python)
-./generate-application-report.py          # 애플리케이션 분석 (Python)
-./generate-monitoring-report.sh           # 모니터링 분석
-./generate-recommendations.sh             # 종합 권장사항
+# 개별 보고서 생성
+./generate-executive-summary.py           # 경영진 요약
+./generate-networking-report.py           # 네트워킹 분석
+./generate-compute-report.py              # 컴퓨팅/컨테이너 분석 
+./generate-storage-report.py              # 스토리지 분석
+./generate-database-report.py             # 데이터베이스 분석
+./generate-security-report.py             # 보안 분석
+./generate-cost-report.py                 # 비용 최적화 
+./generate-application-report.py          # 애플리케이션 분석
+./generate-monitoring-report.py           # 모니터링 분석
+./generate-recommendations.py             # 종합 권장사항
 ```
 
 #### Step 3: HTML 변환 실행
-```bash
-# HTML 보고서 생성
-./generate-html-reports.sh
-
-# 또는 Python 변환기 직접 실행
+# Python 변환기 직접 실행
 python3 markdown-to-html-converter.py \
   --input ~/amazonqcli_lab/report/ \
   --output ~/amazonqcli_lab/html-report/ \
-  --template ~/amazonqcli_lab/aws-arch-analysis/sample/
-```
+  --template ~/amazonqcli_lab/aws-arch-analysis/sample/``
 
-### 방법 3: 특정 영역만 분석
-```bash
-# 네트워킹만 분석
-./steampipe_networking_collection.sh
-./generate-networking-report.sh
-
-# 비용 최적화만 분석
-./steampipe_compute_collection.sh
-./steampipe_database_collection.sh
-./steampipe_storage_collection.sh
-./generate-cost-report.py
-
-# 보안만 분석
-./steampipe_security_collection.sh
-./generate-security-report.sh
-```
 
 ### 실행 전 사전 준비사항
 ```bash
@@ -106,21 +78,10 @@ ls -la ~/amazonqcli_lab/report/*.md
 # HTML 보고서 확인
 ls -la ~/amazonqcli_lab/html-report/*.html
 
-# 데이터 품질 검증
-jq . ~/amazonqcli_lab/report/compute_ec2_instances.json | head -20
 ```
 
 ### 오류 발생 시 대응 방법
 ```bash
 # 로그 파일 확인
 tail -f ~/amazonqcli_lab/report/analysis.log
-
-# 개별 스크립트 디버그 실행
-bash -x ./steampipe_compute_collection.sh
-
-# 데이터 수집 상태 확인
-./aws-comprehensive-analysis.sh --check-only
-
-# 부분 재실행 (특정 서비스만)
-./steampipe_compute_collection.sh --service ec2
 ```

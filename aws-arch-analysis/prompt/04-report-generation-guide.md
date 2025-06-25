@@ -5,7 +5,7 @@
 ### 보고서 생성 스크립트 매핑
 
 #### 1. 📊 전체 계정 분석 요약 (`01-executive-summary.md`)
-**생성 스크립트**: `generate-executive-summary.sh`
+**생성 스크립트**: `generate-executive-summary.py`
 **목적**: C-Level 임원진을 위한 고수준 요약
 **내용**:
 - 계정 개요 및 주요 지표
@@ -15,13 +15,13 @@
 - ROI 기반 우선순위 권장사항
 
 **실행 방법**:
-```bash
+```
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-executive-summary.sh
+./generate-executive-summary.py
 ```
 
 #### 2. 🌐 네트워킹 분석 (`02-networking-analysis.md`)
-**생성 스크립트**: `generate-networking-report.sh`
+**생성 스크립트**: `generate-networking-report.py`
 **목적**: 네트워크 아키텍처 및 보안 분석
 **내용**:
 - VPC 구성 및 서브넷 설계 분석
@@ -30,9 +30,9 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 네트워크 성능 및 비용 최적화
 - 보안 취약점 및 개선 방안
 
-**실행 방법**:
-```bash
-./generate-networking-report.sh
+**실행 방법**
+```
+./generate-networking-report.py
 ```
 
 #### 3. 💻 컴퓨팅 분석 (`03-compute-analysis.md`)
@@ -46,14 +46,15 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 성능 최적화 및 비용 절감 방안
 
 **실행 방법**:
-```bash
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
 ./generate-compute-report.py
-# 또는 기존 bash 버전
-./generate-compute-report.sh
+# 또는 기존 bapy 버전
+./generate-compute-report.py
 ```
 
 #### 4. 💾 스토리지 분석 (`04-storage-analysis.md`)
-**생성 스크립트**: `generate-storage-report.sh`
+**생성 스크립트**: `generate-storage-report.py`
 **목적**: 스토리지 전략 및 데이터 관리 최적화
 **내용**:
 - S3 버킷 구성 및 스토리지 클래스 분석
@@ -63,12 +64,13 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 스토리지 비용 최적화 전략
 
 **실행 방법**:
-```bash
-./generate-storage-report.sh
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-storage-report.py
 ```
 
 #### 5. 🗄️ 데이터베이스 분석 (`05-database-analysis.md`)
-**생성 스크립트**: `generate-database-report.sh`
+**생성 스크립트**: `generate-database-report.py`
 **목적**: 데이터베이스 성능 및 가용성 분석
 **내용**:
 - RDS 인스턴스 구성 및 성능 메트릭
@@ -78,12 +80,13 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 성능 튜닝 및 비용 최적화
 
 **실행 방법**:
-```bash
-./generate-database-report.sh
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-database-report.py
 ```
 
 #### 6. 🔒 보안 분석 (`06-security-analysis.md`)
-**생성 스크립트**: `generate-security-report.sh`
+**생성 스크립트**: `generate-security-report.py`
 **목적**: 보안 태세 및 컴플라이언스 평가
 **내용**:
 - IAM 정책 및 역할 최소 권한 원칙 검토
@@ -93,8 +96,9 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 컴플라이언스 요구사항 준수 현황
 
 **실행 방법**:
-```bash
-./generate-security-report.sh
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-security-report.py
 ```
 
 #### 7. 💰 비용 최적화 (`07-cost-optimization.md`)
@@ -108,10 +112,9 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 비용 모니터링 및 알림 설정 권장사항
 
 **실행 방법**:
-```bash
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
 ./generate-cost-report.py
-# 또는 기존 bash 버전
-./generate-cost-report.sh
 ```
 
 #### 8. 🌐 애플리케이션 서비스 분석 (`08-application-analysis.md`)
@@ -124,14 +127,13 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 애플리케이션 최적화 권장사항
 
 **실행 방법**:
-```bash
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
 ./generate-application-report.py
-# 또는 기존 bash 버전
-./generate-application-report.sh
 ```
 
 #### 9. 📈 모니터링 분석 (`09-monitoring-analysis.md`)
-**생성 스크립트**: `generate-monitoring-report.sh`
+**생성 스크립트**: `generate-monitoring-report.py`
 **목적**: 모니터링 및 운영 효율성 분석
 **내용**:
 - CloudWatch, X-Ray 등 모니터링 도구 활용도
@@ -140,12 +142,13 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 운영 자동화 및 개선 방안
 
 **실행 방법**:
-```bash
-./generate-monitoring-report.sh
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-monitoring-report.py
 ```
 
 #### 10. 🛠️ 종합 권장사항 (`10-comprehensive-recommendations.md`)
-**생성 스크립트**: `generate-recommendations.sh`
+**생성 스크립트**: `generate-recommendations.py`
 **목적**: 통합적 관점의 전략적 권장사항
 **내용**:
 - 아키텍처 개선 로드맵 (단기/중기/장기)
@@ -155,16 +158,16 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - 거버넌스 및 운영 프로세스 개선
 
 **실행 방법**:
-```bash
-./generate-recommendations.sh
+```
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+./generate-recommendations.py
 ```
 
 ### 보고서 일괄 생성
-```bash
+```
 # 모든 보고서를 한 번에 생성
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-all-reports.sh
-
+./generate-all-reports.py
 # 생성된 보고서 확인
 ls -la ~/amazonqcli_lab/report/*.md
 ```
@@ -176,7 +179,7 @@ ls -la ~/amazonqcli_lab/report/*.md
 4. **종합 권장사항 생성** (10번) - 모든 분석 결과 통합
 
 ### 보고서 품질 검증
-```bash
+```
 # Markdown 문법 검증
 markdownlint ~/amazonqcli_lab/report/*.md
 
