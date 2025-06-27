@@ -1,8 +1,0 @@
-
-Query failed: select arn, service, event_type_code, event_type_category, region, availability_zone, start_time, end_time, last_updated_time, status_code, event_scope_code from aws_health_event where region = 'ap-northeast-2'
-Error: Error: aws: operation error Health: DescribeEvents, https response error StatusCode: 400, RequestID: 2e5349cb-166d-433d-b8c1-83ee47406845, api error SubscriptionRequiredException: UnknownError (SQLSTATE HV000)
-
-
-Query failed: select arn, service, event_type_code, event_type_category, region, availability_zone, start_time, end_time, last_updated_time, status_code, event_scope_code from aws_health_event where region = 'ap-northeast-2'
-Error: Error: aws: operation error Health: DescribeEvents, https response error StatusCode: 400, RequestID: 144b47a7-f077-4f11-8f7c-783e1c4cc519, api error SubscriptionRequiredException: UnknownError (SQLSTATE HV000)
-
