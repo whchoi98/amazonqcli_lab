@@ -1,0 +1,44 @@
+[
+  {
+    "vpc_endpoint_id": "vpce-0a9a98ff360ad1969",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "service_name": "com.amazonaws.ap-northeast-2.s3",
+    "vpc_endpoint_type": "Gateway",
+    "state": "available",
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "S3GWEP"
+      }
+    ]
+  },
+  {
+    "vpc_endpoint_id": "vpce-0f0204d8c83d6e69e",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "service_name": "com.amazonaws.ap-northeast-2.s3",
+    "vpc_endpoint_type": "Interface",
+    "state": "available",
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "S3GWINT"
+      }
+    ]
+  },
+  {
+    "vpc_endpoint_id": "vpce-043f385edf61d419e",
+    "vpc_id": "vpc-00579e610c295d891",
+    "service_name": "com.amazonaws.ap-northeast-2.ssm",
+    "vpc_endpoint_type": "Interface",
+    "state": "available",
+    "tags": []
+  },
+  {
+    "vpc_endpoint_id": "vpce-0b9021b711a990cbd",
+    "vpc_id": "vpc-00579e610c295d891",
+    "service_name": "com.amazonaws.ap-northeast-2.ssmmessages",
+    "vpc_endpoint_type": "Interface",
+    "state": "available",
+    "tags": []
+  }
+]

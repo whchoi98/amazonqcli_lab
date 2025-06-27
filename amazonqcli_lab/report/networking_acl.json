@@ -1,0 +1,302 @@
+[
+  {
+    "network_acl_id": "acl-0a17da49add5d6abc",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "is_default": true,
+    "entries": [
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      }
+    ],
+    "associations": [
+      {
+        "NetworkAclAssociationId": "aclassoc-0384665681d4a33e7",
+        "NetworkAclId": "acl-0a17da49add5d6abc",
+        "SubnetId": "subnet-0dfc0920025c13cf2"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-09f4c9befba1f9dc7",
+        "NetworkAclId": "acl-0a17da49add5d6abc",
+        "SubnetId": "subnet-0cd3ba56cbee4dcef"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-06a7d2c541c13c9de",
+        "NetworkAclId": "acl-0a17da49add5d6abc",
+        "SubnetId": "subnet-01162fa46719f3637"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-09d5c794596cde2af",
+        "NetworkAclId": "acl-0a17da49add5d6abc",
+        "SubnetId": "subnet-06a726bc1ac94cda5"
+      }
+    ],
+    "tags": []
+  },
+  {
+    "network_acl_id": "acl-09aecc865a434e7c3",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "is_default": true,
+    "entries": [
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      }
+    ],
+    "associations": [
+      {
+        "NetworkAclAssociationId": "aclassoc-02a6d950c4694efe1",
+        "NetworkAclId": "acl-09aecc865a434e7c3",
+        "SubnetId": "subnet-02186d1e7eed209a8"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-06e15e09fd7f740bc",
+        "NetworkAclId": "acl-09aecc865a434e7c3",
+        "SubnetId": "subnet-08d9014100ee1ae9c"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-0f57418c1fdd56646",
+        "NetworkAclId": "acl-09aecc865a434e7c3",
+        "SubnetId": "subnet-0c5e2b3160efdebf4"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-07bbfb3ba56c4f4e4",
+        "NetworkAclId": "acl-09aecc865a434e7c3",
+        "SubnetId": "subnet-058275051624ce85f"
+      }
+    ],
+    "tags": []
+  },
+  {
+    "network_acl_id": "acl-07c9c42d6adc8df95",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "is_default": true,
+    "entries": [
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      }
+    ],
+    "associations": [
+      {
+        "NetworkAclAssociationId": "aclassoc-02c2eb7440ef1a8ed",
+        "NetworkAclId": "acl-07c9c42d6adc8df95",
+        "SubnetId": "subnet-0baafd9e171467f2e"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-0eed23f44cd18b4eb",
+        "NetworkAclId": "acl-07c9c42d6adc8df95",
+        "SubnetId": "subnet-03cc8d0da0121f2a1"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-07ef9b111543160a9",
+        "NetworkAclId": "acl-07c9c42d6adc8df95",
+        "SubnetId": "subnet-03052a182f6b3ab47"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-088a294e1fde09ff3",
+        "NetworkAclId": "acl-07c9c42d6adc8df95",
+        "SubnetId": "subnet-0869ae804148803da"
+      }
+    ],
+    "tags": []
+  },
+  {
+    "network_acl_id": "acl-317ded5a",
+    "vpc_id": "vpc-9509aefe",
+    "is_default": true,
+    "entries": [
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      }
+    ],
+    "associations": [
+      {
+        "NetworkAclAssociationId": "aclassoc-b5e1f3d8",
+        "NetworkAclId": "acl-317ded5a",
+        "SubnetId": "subnet-c1b060aa"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-fbfe4b97",
+        "NetworkAclId": "acl-317ded5a",
+        "SubnetId": "subnet-3c571760"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-b7e1f3da",
+        "NetworkAclId": "acl-317ded5a",
+        "SubnetId": "subnet-38717574"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-b4e1f3d9",
+        "NetworkAclId": "acl-317ded5a",
+        "SubnetId": "subnet-d7961bac"
+      }
+    ],
+    "tags": []
+  },
+  {
+    "network_acl_id": "acl-0a774fe8e10d6f837",
+    "vpc_id": "vpc-00579e610c295d891",
+    "is_default": true,
+    "entries": [
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      },
+      {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false,
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": 32767
+      }
+    ],
+    "associations": [
+      {
+        "NetworkAclAssociationId": "aclassoc-01ca88597e03d1adb",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-01e4e7c952a31634a"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-09f52c67c9817d7cf",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-02a752d1b7044afc3"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-084b5380cfb95668e",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-0c5f02ddd258e529e"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-0bdd5ea7756e5ea82",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-050496276ee499a8c"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-0233a10f942049f4e",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-09e7a430396f1e719"
+      },
+      {
+        "NetworkAclAssociationId": "aclassoc-09c26775d1085c4a9",
+        "NetworkAclId": "acl-0a774fe8e10d6f837",
+        "SubnetId": "subnet-041a269dce079a62d"
+      }
+    ],
+    "tags": []
+  }
+]

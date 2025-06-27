@@ -1,0 +1,89 @@
+[
+  {
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.0.0/16",
+    "state": "available",
+    "is_default": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "VPC"
+      },
+      {
+        "Key": "project",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      }
+    ]
+  },
+  {
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "cidr_block": "10.0.0.0/16",
+    "state": "available",
+    "is_default": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/myvpc/79d6c100-9c40-11ec-878c-025983fee6b4"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "myvpc"
+      },
+      {
+        "Key": "Name",
+        "Value": "myvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "VPC"
+      },
+      {
+        "Key": "project",
+        "Value": "myvpc"
+      }
+    ]
+  },
+  {
+    "vpc_id": "vpc-9509aefe",
+    "cidr_block": "172.31.0.0/16",
+    "state": "available",
+    "is_default": true,
+    "tags": null
+  },
+  {
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "cidr_block": "10.0.0.0/16",
+    "state": "available",
+    "is_default": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "NLB-TEST"
+      }
+    ]
+  },
+  {
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "cidr_block": "192.168.0.0/16",
+    "state": "available",
+    "is_default": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "SD-WAN-Mgmt"
+      }
+    ]
+  }
+]
