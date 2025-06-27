@@ -1,0 +1,494 @@
+[
+  {
+    "route_table_id": "rtb-0c7f1407a6d755ffd",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "routes": [
+      {
+        "DestinationCidrBlock": "192.168.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": "igw-048333a2d0297a42e",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0d11be03a274c6ca8",
+        "RouteTableId": "rtb-0c7f1407a6d755ffd",
+        "SubnetId": "subnet-0baafd9e171467f2e",
+        "AssociationState": {
+          "State": "associated"
+        }
+      },
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-00d91a35585f0406c",
+        "RouteTableId": "rtb-0c7f1407a6d755ffd",
+        "SubnetId": "subnet-03052a182f6b3ab47",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-0c4506522a55e7b21",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-0b680f99edb3b4602",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-04511e105ac3a2160",
+        "RouteTableId": "rtb-0c4506522a55e7b21",
+        "SubnetId": "subnet-050496276ee499a8c",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetARouteTable"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-Private-Subnet-A-RT"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-030935533b8f85a61",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.0.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": true,
+        "RouteTableAssociationId": "rtbassoc-0786e86e78f6d6e30",
+        "RouteTableId": "rtb-030935533b8f85a61",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-0a5c197868fa75802",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.0.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": "igw-025127c637733f146",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0db18d870bf7c1ecb",
+        "RouteTableId": "rtb-0a5c197868fa75802",
+        "SubnetId": "subnet-058275051624ce85f",
+        "AssociationState": {
+          "State": "associated"
+        }
+      },
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0605f7cca4821a978",
+        "RouteTableId": "rtb-0a5c197868fa75802",
+        "SubnetId": "subnet-0c5e2b3160efdebf4",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "PublicRT"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-02bf6e871d9028975",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-089d27a6446f03b95",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0835fcdb9fda00f07",
+        "RouteTableId": "rtb-02bf6e871d9028975",
+        "SubnetId": "subnet-02a752d1b7044afc3",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetBRouteTable"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-Private-Subnet-B-RT"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-05c3c3bc8d96d3848",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "routes": [
+      {
+        "DestinationCidrBlock": "192.168.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": true,
+        "RouteTableAssociationId": "rtbassoc-0722b8268bfea6782",
+        "RouteTableId": "rtb-05c3c3bc8d96d3848",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-025ce6269c16ffa5a",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.0.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": true,
+        "RouteTableAssociationId": "rtbassoc-0cc5c2e676a97b5ae",
+        "RouteTableId": "rtb-025ce6269c16ffa5a",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-0402a839c1a8d2f7b",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": "igw-05f41f6280605016f",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-067cf79d10c98481b",
+        "RouteTableId": "rtb-0402a839c1a8d2f7b",
+        "SubnetId": "subnet-01e4e7c952a31634a",
+        "AssociationState": {
+          "State": "associated"
+        }
+      },
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0d3db98288809538e",
+        "RouteTableId": "rtb-0402a839c1a8d2f7b",
+        "SubnetId": "subnet-041a269dce079a62d",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PublicSubnetRouteTable"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-PublicRT"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-18cca073",
+    "vpc_id": "vpc-9509aefe",
+    "routes": [
+      {
+        "DestinationCidrBlock": "172.31.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": "igw-8721abef",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": true,
+        "RouteTableAssociationId": "rtbassoc-fbfb5191",
+        "RouteTableId": "rtb-18cca073",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-0644af919caf95aa2",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.0.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-03f9f09a1ab8de5fa",
+        "Origin": "CreateRoute",
+        "State": "blackhole"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-05e21c0b9498348ca",
+        "RouteTableId": "rtb-0644af919caf95aa2",
+        "SubnetId": "subnet-02186d1e7eed209a8",
+        "AssociationState": {
+          "State": "associated"
+        }
+      },
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0d395f1cd2a30357c",
+        "RouteTableId": "rtb-0644af919caf95aa2",
+        "SubnetId": "subnet-08d9014100ee1ae9c",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "PrivateRT"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-0137c36463c3dea71",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": true,
+        "RouteTableAssociationId": "rtbassoc-0494ca70f8c135631",
+        "RouteTableId": "rtb-0137c36463c3dea71",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "route_table_id": "rtb-0598ab0ea65a27898",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-0b680f99edb3b4602",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-02cdb9aa01eb7f842",
+        "RouteTableId": "rtb-0598ab0ea65a27898",
+        "SubnetId": "subnet-09e7a430396f1e719",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpcAttachSubnet-A-RT"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "AttachSubnetARouteTable"
+      }
+    ]
+  },
+  {
+    "route_table_id": "rtb-0e740dae88addd691",
+    "vpc_id": "vpc-00579e610c295d891",
+    "routes": [
+      {
+        "DestinationCidrBlock": "10.254.0.0/16",
+        "GatewayId": "local",
+        "Origin": "CreateRouteTable",
+        "State": "active"
+      },
+      {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": "nat-0b680f99edb3b4602",
+        "Origin": "CreateRoute",
+        "State": "active"
+      }
+    ],
+    "associations": [
+      {
+        "Main": false,
+        "RouteTableAssociationId": "rtbassoc-0eed1a476b2e35544",
+        "RouteTableId": "rtb-0e740dae88addd691",
+        "SubnetId": "subnet-0c5f02ddd258e529e",
+        "AssociationState": {
+          "State": "associated"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "mgmtvpcAttachSubnet-B-RT"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "AttachSubnetBRouteTable"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      }
+    ]
+  }
+]

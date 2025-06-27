@@ -1,0 +1,100 @@
+[
+  {
+    "public_ip": "3.35.39.1",
+    "allocation_id": "eipalloc-0d10d19cb81ff1e34",
+    "association_id": "eipassoc-0cf999b210b35c721",
+    "domain": "vpc",
+    "instance_id": null,
+    "network_interface_id": "eni-0052fe4c97fbdff8e",
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-NATGW-B-EIP"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "NatGatewayBEIP"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      }
+    ]
+  },
+  {
+    "public_ip": "3.36.254.112",
+    "allocation_id": "eipalloc-052b75322d2e87868",
+    "association_id": "eipassoc-0df5090f3317b1115",
+    "domain": "vpc",
+    "instance_id": null,
+    "network_interface_id": "eni-038643cad888af7ab",
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-NATGW-A-EIP"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "NatGatewayAEIP"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      }
+    ]
+  },
+  {
+    "public_ip": "3.39.5.161",
+    "allocation_id": "eipalloc-078b152cd05f8a6a3",
+    "association_id": null,
+    "domain": "vpc",
+    "instance_id": null,
+    "network_interface_id": null,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "k8s.whchoi.net"
+      }
+    ]
+  },
+  {
+    "public_ip": "3.39.51.47",
+    "allocation_id": "eipalloc-0b8dd1a2651994c97",
+    "association_id": null,
+    "domain": "vpc",
+    "instance_id": null,
+    "network_interface_id": null,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "locust1.whchoi.net"
+      }
+    ]
+  },
+  {
+    "public_ip": "52.79.50.119",
+    "allocation_id": "eipalloc-022d4e6138e68f2d5",
+    "association_id": null,
+    "domain": "vpc",
+    "instance_id": null,
+    "network_interface_id": null,
+    "tags": [
+      {
+        "Key": "name",
+        "Value": "amzlnx2.whchoi.net"
+      },
+      {
+        "Key": "Name",
+        "Value": "amzlnx2.whchoi.net"
+      }
+    ]
+  }
+]

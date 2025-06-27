@@ -1,0 +1,37 @@
+[0;34m[INFO][0m AWS CLI 연결 확인 중...
+[0;34m[INFO][0m 📡 네트워킹 리소스 수집 시작...
+[0;34m[INFO][0m 수집 중: VPC 정보
+[0;32m[SUCCESS][0m VPC 정보 완료 (networking_vpc.json, 1886 bytes)
+[0;34m[INFO][0m 수집 중: 서브넷 정보
+[0;32m[SUCCESS][0m 서브넷 정보 완료 (networking_subnets.json, 10993 bytes)
+[0;34m[INFO][0m 수집 중: 보안 그룹 정보
+[0;32m[SUCCESS][0m 보안 그룹 정보 완료 (security_groups.json, 22597 bytes)
+[0;34m[INFO][0m 수집 중: 라우팅 테이블 정보
+[0;32m[SUCCESS][0m 라우팅 테이블 정보 완료 (networking_route_tables.json, 12550 bytes)
+[0;34m[INFO][0m 수집 중: 인터넷 게이트웨이 정보
+[0;32m[SUCCESS][0m 인터넷 게이트웨이 정보 완료 (networking_igw.json, 1347 bytes)
+[0;34m[INFO][0m 수집 중: NAT 게이트웨이 정보
+[0;32m[SUCCESS][0m NAT 게이트웨이 정보 완료 (networking_nat.json, 1962 bytes)
+[0;34m[INFO][0m 수집 중: VPC 엔드포인트 정보
+[0;32m[SUCCESS][0m VPC 엔드포인트 정보 완료 (networking_vpc_endpoints.json, 1076 bytes)
+[0;34m[INFO][0m 수집 중: VPC 피어링 연결 정보
+[1;33m[WARNING][0m VPC 피어링 연결 정보 - 데이터 없음 (networking_vpc_peering.json, 3 bytes)
+[0;34m[INFO][0m 수집 중: Elastic IP 정보
+[0;32m[SUCCESS][0m Elastic IP 정보 완료 (networking_eip.json, 2398 bytes)
+[0;34m[INFO][0m 수집 중: 네트워크 인터페이스 정보
+[0;32m[SUCCESS][0m 네트워크 인터페이스 정보 완료 (networking_interfaces.json, 7270 bytes)
+[0;34m[INFO][0m 수집 중: 네트워크 ACL 정보
+[0;32m[SUCCESS][0m 네트워크 ACL 정보 완료 (networking_acl.json, 7898 bytes)
+[0;34m[INFO][0m 수집 중: VPC Flow Logs 정보
+[1;33m[WARNING][0m VPC Flow Logs 정보 - 데이터 없음 (networking_flow_logs.json, 3 bytes)
+[0;34m[INFO][0m 수집 중: Transit Gateway 정보
+[1;33m[WARNING][0m Transit Gateway 정보 - 데이터 없음 (networking_transit_gateway.json, 3 bytes)
+[0;34m[INFO][0m 수집 중: Transit Gateway 연결 정보
+[1;33m[WARNING][0m Transit Gateway 연결 정보 - 데이터 없음 (networking_transit_gateway_attachments.json, 3 bytes)
+[0;34m[INFO][0m 수집 중: Customer Gateway 정보
+[1;33m[WARNING][0m Customer Gateway 정보 - 데이터 없음 (networking_customer_gateways.json, 3 bytes)
+[0;34m[INFO][0m 수집 중: VPN Gateway 정보
+[1;33m[WARNING][0m VPN Gateway 정보 - 데이터 없음 (networking_vpn_gateways.json, 3 bytes)
+[0;32m[SUCCESS][0m 네트워킹 리소스 데이터 수집 완료!
+[0;34m[INFO][0m 성공: 10/16
+[1;33m[WARNING][0m 일부 오류가 발생했습니다. /home/ec2-user/amazonqcli_lab/report/aws_cli_errors.log 파일을 확인하세요.

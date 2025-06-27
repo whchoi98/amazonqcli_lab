@@ -1,0 +1,426 @@
+[
+  {
+    "subnet_id": "subnet-058275051624ce85f",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "cidr_block": "10.0.1.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "Public-A"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-03cc8d0da0121f2a1",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "cidr_block": "192.168.202.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "vContainer subnet 2"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-09e7a430396f1e719",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.251.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "AttachSubnetA"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-AttachSubnetA"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-02a752d1b7044afc3",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.22.0/24",
+    "availability_zone": "ap-northeast-2b",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "kubernetes.io/role/internal-elb",
+        "Value": "1"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-PrivateSubnetB"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetB"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-d7961bac",
+    "vpc_id": "vpc-9509aefe",
+    "cidr_block": "172.31.16.0/20",
+    "availability_zone": "ap-northeast-2b",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": null
+  },
+  {
+    "subnet_id": "subnet-03052a182f6b3ab47",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "cidr_block": "192.168.201.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "vContainer subnet 1"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-041a269dce079a62d",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.11.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": [
+      {
+        "Key": "kubernetes.io/role/elb",
+        "Value": "1"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-PublicSubnetA"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PublicSubnetA"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-3c571760",
+    "vpc_id": "vpc-9509aefe",
+    "cidr_block": "172.31.48.0/20",
+    "availability_zone": "ap-northeast-2d",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": null
+  },
+  {
+    "subnet_id": "subnet-0c5f02ddd258e529e",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.252.0/24",
+    "availability_zone": "ap-northeast-2b",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-AttachSubnetB"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "AttachSubnetB"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-0c5e2b3160efdebf4",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "cidr_block": "10.0.2.0/24",
+    "availability_zone": "ap-northeast-2c",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "Public-B"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-0869ae804148803da",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "cidr_block": "192.168.203.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "vContainer subnet 3"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-0dfc0920025c13cf2",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "cidr_block": "10.0.23.0/24",
+    "availability_zone": "ap-northeast-2c",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetC"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/myvpc/79d6c100-9c40-11ec-878c-025983fee6b4"
+      },
+      {
+        "Key": "Name",
+        "Value": "myvpc-PrivateSubnetC"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "myvpc"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-0baafd9e171467f2e",
+    "vpc_id": "vpc-0ed0c7881442e4041",
+    "cidr_block": "192.168.200.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "Public subnet"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-08d9014100ee1ae9c",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "cidr_block": "10.0.11.0/24",
+    "availability_zone": "ap-northeast-2c",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "Private-A"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-01162fa46719f3637",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "cidr_block": "10.0.22.0/24",
+    "availability_zone": "ap-northeast-2b",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "myvpc"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetB"
+      },
+      {
+        "Key": "Name",
+        "Value": "myvpc-PrivateSubnetB"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/myvpc/79d6c100-9c40-11ec-878c-025983fee6b4"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-02186d1e7eed209a8",
+    "vpc_id": "vpc-0754d88a442a9d530",
+    "cidr_block": "10.0.21.0/24",
+    "availability_zone": "ap-northeast-2c",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "Name",
+        "Value": "Private-B"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-050496276ee499a8c",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.21.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetA"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-PrivateSubnetA"
+      },
+      {
+        "Key": "kubernetes.io/role/internal-elb",
+        "Value": "1"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-0cd3ba56cbee4dcef",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "cidr_block": "10.0.21.0/24",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": false,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/myvpc/79d6c100-9c40-11ec-878c-025983fee6b4"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PrivateSubnetA"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "myvpc"
+      },
+      {
+        "Key": "Name",
+        "Value": "myvpc-PrivateSubnetA"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-c1b060aa",
+    "vpc_id": "vpc-9509aefe",
+    "cidr_block": "172.31.0.0/20",
+    "availability_zone": "ap-northeast-2a",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": null
+  },
+  {
+    "subnet_id": "subnet-06a726bc1ac94cda5",
+    "vpc_id": "vpc-080509b67bb0a2a02",
+    "cidr_block": "10.0.14.0/24",
+    "availability_zone": "ap-northeast-2d",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PublicSubnetD"
+      },
+      {
+        "Key": "Name",
+        "Value": "myvpc-PublicSubnetD"
+      },
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/myvpc/79d6c100-9c40-11ec-878c-025983fee6b4"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "myvpc"
+      }
+    ]
+  },
+  {
+    "subnet_id": "subnet-38717574",
+    "vpc_id": "vpc-9509aefe",
+    "cidr_block": "172.31.32.0/20",
+    "availability_zone": "ap-northeast-2c",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": null
+  },
+  {
+    "subnet_id": "subnet-01e4e7c952a31634a",
+    "vpc_id": "vpc-00579e610c295d891",
+    "cidr_block": "10.254.12.0/24",
+    "availability_zone": "ap-northeast-2b",
+    "state": "available",
+    "map_public_ip_on_launch": true,
+    "tags": [
+      {
+        "Key": "aws:cloudformation:stack-id",
+        "Value": "arn:aws:cloudformation:ap-northeast-2:507115347197:stack/mgmtvpc/88e2bb50-285f-11f0-ae3a-0605008e8acf"
+      },
+      {
+        "Key": "aws:cloudformation:stack-name",
+        "Value": "mgmtvpc"
+      },
+      {
+        "Key": "kubernetes.io/role/elb",
+        "Value": "1"
+      },
+      {
+        "Key": "aws:cloudformation:logical-id",
+        "Value": "PublicSubnetB"
+      },
+      {
+        "Key": "Name",
+        "Value": "mgmtvpc-PublicSubnetB"
+      }
+    ]
+  }
+]
