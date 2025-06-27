@@ -1,313 +1,226 @@
 #!/usr/bin/env python3
 """
-AWS 모니터링 및 로깅 리소스 데이터 수집 스크립트
-Shell 스크립트와 동일한 쿼리 구조 사용
+AWS 모니터링 및 리소스 관리 서비스 데이터 수집 스크립트
+CloudWatch, X-Ray, Config, Organizations, Service Catalog 등 포괄적 수집
+
+작성자: Amazon Q CLI Lab
+버전: 1.0
+생성일: 2025-06-27
 """
 
 import subprocess
 import json
 import os
 import sys
-from pathlib import Path
-from typing import List, Tuple
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+import time
 
-class SteampipeMonitoringCollector:
-    def __init__(self, region: str = "ap-northeast-2"):
-        self.region = region
+class MonitoringDataCollector:
+    def __init__(self):
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
-        self.report_dir.mkdir(parents=True, exist_ok=True)
-        self.total_count = 0
-        self.success_count = 0
-        self.error_log = self.report_dir / "monitoring_collection_errors.log"
+        self.create_output_directory()
         
-        # 색상 코드
-        self.GREEN = '\033[0;32m'
-        self.BLUE = '\033[0;34m'
-        self.YELLOW = '\033[1;33m'
-        self.RED = '\033[0;31m'
-        self.NC = '\033[0m'  # No Color
-        
-    def log_info(self, message: str):
-        print(f"{self.BLUE}ℹ️ {message}{self.NC}")
-        
-    def log_success(self, message: str):
-        print(f"{self.GREEN}✅ {message}{self.NC}")
-        
-    def log_warning(self, message: str):
-        print(f"{self.YELLOW}⚠️ {message}{self.NC}")
-        
-    def log_error(self, message: str):
-        print(f"{self.RED}❌ {message}{self.NC}")
-
-    def check_steampipe_plugin(self):
-        """Steampipe AWS 플러그인 확인"""
-        self.log_info("Steampipe AWS 플러그인 확인 중...")
+    def create_output_directory(self):
+        """출력 디렉토리 생성"""
         try:
+            self.report_dir.mkdir(parents=True, exist_ok=True)
+            print(f"✅ 출력 디렉토리 생성: {self.report_dir}")
+        except Exception as e:
+            print(f"❌ 디렉토리 생성 실패: {e}")
+            sys.exit(1)
+
+    def run_steampipe_query(self, service_name, query):
+        """Steampipe 쿼리 실행 및 결과 저장"""
+        try:
+            print(f"🔍 {service_name} 데이터 수집 중...")
+            
+            # Steampipe 쿼리 실행
             result = subprocess.run(
-                ["steampipe", "plugin", "list"],
+                ['steampipe', 'query', query, '--output', 'json'],
                 capture_output=True,
                 text=True,
-                check=True
+                timeout=60
             )
-            if "aws" not in result.stdout:
-                self.log_warning("AWS 플러그인이 설치되지 않았습니다. 설치 중...")
-                subprocess.run(["steampipe", "plugin", "install", "aws"], check=True)
-        except subprocess.CalledProcessError:
-            self.log_warning("Steampipe 플러그인 확인 중 오류 발생")
-
-    def execute_steampipe_query(self, description: str, query: str, output_file: str) -> bool:
-        self.log_info(f"수집 중: {description}")
-        self.total_count += 1
-        
-        try:
-            # 작업 디렉토리를 report_dir로 변경
-            os.chdir(self.report_dir)
             
-            # echo 명령어 처리 (빈 배열 반환용)
-            if query.startswith("echo"):
-                result_stdout = "[]"
+            if result.returncode == 0 and result.stdout.strip():
+                # JSON 파싱 시도
+                try:
+                    data = json.loads(result.stdout)
+                    if data and len(data) > 0:
+                        # 파일에 저장
+                        filename = self.report_dir / f"monitoring_{service_name.lower().replace(' ', '_')}.json"
+                        with open(filename, 'w', encoding='utf-8') as f:
+                            json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+                        
+                        print(f"✅ {service_name}: {len(data)}개 항목 수집 완료")
+                        return True, len(data)
+                    else:
+                        print(f"⚠️  {service_name}: 데이터 없음")
+                        return False, 0
+                except json.JSONDecodeError as e:
+                    print(f"❌ {service_name}: JSON 파싱 오류 - {e}")
+                    return False, 0
             else:
-                result = subprocess.run(
-                    ["steampipe", "query", query, "--output", "json"],
-                    capture_output=True,
-                    text=True,
-                    check=True
-                )
-                result_stdout = result.stdout
-            
-            output_path = self.report_dir / output_file
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(result_stdout)
-            
-            file_size = output_path.stat().st_size
-            if file_size > 100:
-                self.log_success(f"{description} 완료 ({output_file}, {file_size} bytes)")
-                self.success_count += 1
-                return True
-            else:
-                self.log_warning(f"{description} - 데이터 없음 ({output_file}, {file_size} bytes)")
-                return False
+                error_msg = result.stderr.strip() if result.stderr else "알 수 없는 오류"
+                print(f"❌ {service_name}: 쿼리 실행 실패 - {error_msg}")
+                return False, 0
                 
-        except subprocess.CalledProcessError as e:
-            # 오류 메시지를 error_log에 기록
-            error_msg = f"{description} 실패 - {output_file}"
-            if e.stderr:
-                error_msg += f": {e.stderr.strip()}"
-            self.log_error(error_msg)
-            
-            # 오류 로그에 추가 정보 기록
-            with open(self.error_log, 'a') as f:
-                f.write(f"\nQuery failed: {query}\n")
-                f.write(f"Error: {e.stderr}\n")
-            
-            return False
+        except subprocess.TimeoutExpired:
+            print(f"⏰ {service_name}: 쿼리 타임아웃 (60초)")
+            return False, 0
+        except Exception as e:
+            print(f"❌ {service_name}: 예외 발생 - {e}")
+            return False, 0
 
-    def get_monitoring_queries(self) -> List[Tuple[str, str, str]]:
-        """Shell 스크립트와 동일한 쿼리 구조 사용"""
-        return [
-            # CloudWatch 알람 상세 정보
-            (
-                "CloudWatch 알람 상세 정보",
-                f"select name, arn, alarm_description, alarm_configuration_updated_timestamp, actions_enabled, ok_actions, alarm_actions, insufficient_data_actions, state_value, state_reason, state_reason_data, state_updated_timestamp, metric_name, namespace, statistic, extended_statistic, dimensions, period, evaluation_periods, datapoints_to_alarm, threshold, comparison_operator, treat_missing_data, evaluate_low_sample_count_percentile, metrics, tags from aws_cloudwatch_alarm where region = '{self.region}'",
-                "monitoring_cloudwatch_alarms.json"
-            ),
+    def get_monitoring_queries(self):
+        """모니터링 및 리소스 관리 서비스 쿼리 정의 (실제 사용 가능한 테이블 기반)"""
+        return {
+            # CloudWatch 알람 (실제 테이블명: aws_cloudwatch_alarm)
+            "CloudWatch Alarms": "select name, arn, alarm_description, state_value, metric_name, namespace, statistic, threshold, comparison_operator, evaluation_periods, datapoints_to_alarm, treat_missing_data, alarm_actions, ok_actions, insufficient_data_actions, region, account_id from aws_cloudwatch_alarm;",
             
-            # CloudWatch 로그 그룹 상세 정보
-            (
-                "CloudWatch 로그 그룹 상세 정보",
-                f"select name, arn, creation_time, retention_in_days, metric_filter_count, stored_bytes, kms_key_id, tags from aws_cloudwatch_log_group where region = '{self.region}'",
-                "monitoring_cloudwatch_log_groups.json"
-            ),
+            # CloudWatch 이벤트 규칙 (EventBridge)
+            "CloudWatch Event Rules": "select name, arn, description, event_pattern, schedule_expression, state, role_arn, managed_by, event_bus_name, targets, tags, region, account_id from aws_cloudwatch_event_rule;",
             
-            # CloudWatch 로그 스트림
-            (
-                "CloudWatch 로그 스트림",
-                f"select arn, log_group_name, name, creation_time, first_event_timestamp, last_event_timestamp, last_ingestion_time, upload_sequence_token from aws_cloudwatch_log_stream where region = '{self.region}'",
-                "monitoring_cloudwatch_log_streams.json"
-            ),
+            # CloudWatch Logs
+            "CloudWatch Log Groups": "select name, arn, creation_time, retention_in_days, stored_bytes, metric_filter_count, kms_key_id, tags, region, account_id from aws_cloudwatch_log_group;",
             
-            # CloudWatch 메트릭 필터
-            (
-                "CloudWatch 메트릭 필터",
-                f"select name, log_group_name, filter_pattern, metric_transformation_name, metric_transformation_namespace, metric_transformation_value, creation_time from aws_cloudwatch_log_metric_filter where region = '{self.region}'",
-                "monitoring_cloudwatch_metric_filters.json"
-            ),
+            "CloudWatch Log Streams": "select log_group_name, name, arn, creation_time, first_event_time, last_event_time, last_ingestion_time, upload_sequence_token, stored_bytes, region, account_id from aws_cloudwatch_log_stream;",
             
-            # CloudWatch 대시보드 - 빈 배열 반환
-            (
-                "CloudWatch 대시보드",
-                "echo '[]'",
-                "monitoring_cloudwatch_dashboards.json"
-            ),
+            "CloudWatch Log Metric Filters": "select name, log_group_name, filter_pattern, metric_transformations, creation_time, region, account_id from aws_cloudwatch_log_metric_filter;",
             
-            # CloudWatch Insights 쿼리 - 빈 배열 반환
-            (
-                "CloudWatch Insights 쿼리",
-                "echo '[]'",
-                "monitoring_cloudwatch_insights_queries.json"
-            ),
+            "CloudWatch Log Subscription Filters": "select name, log_group_name, filter_pattern, destination_arn, role_arn, distribution, creation_time, region, account_id from aws_cloudwatch_log_subscription_filter;",
             
-            # CloudWatch 복합 알람 - 빈 배열 반환
-            (
-                "CloudWatch 복합 알람",
-                "echo '[]'",
-                "monitoring_cloudwatch_composite_alarms.json"
-            ),
+            "CloudWatch Log Destinations": "select destination_name, arn, role_arn, target_arn, access_policy, creation_time, region, account_id from aws_cloudwatch_log_destination;",
             
-            # X-Ray 추적 구성 - 빈 배열 반환
-            (
-                "X-Ray 추적 구성",
-                "echo '[]'",
-                "monitoring_xray_tracing_config.json"
-            ),
+            "CloudWatch Log Resource Policies": "select policy_name, policy_document, last_updated_time, region, account_id from aws_cloudwatch_log_resource_policy;",
             
-            # X-Ray 서비스 맵 - 빈 배열 반환
-            (
-                "X-Ray 서비스 맵",
-                "echo '[]'",
-                "monitoring_xray_services.json"
-            ),
+            # CloudWatch 메트릭
+            "CloudWatch Metrics": "select metric_name, namespace, dimensions, region, account_id from aws_cloudwatch_metric;",
             
-            # X-Ray 암호화 구성 - 빈 배열 반환
-            (
-                "X-Ray 암호화 구성",
-                "echo '[]'",
-                "monitoring_xray_encryption_config.json"
-            ),
+            # CloudTrail
+            "CloudTrail Trails": "select name, arn, s3_bucket_name, s3_key_prefix, include_global_service_events, is_multi_region_trail, home_region, trail_arn, log_file_validation_enabled, cloud_watch_logs_log_group_arn, cloud_watch_logs_role_arn, kms_key_id, has_custom_event_selectors, has_insight_selectors, is_organization_trail, is_logging, latest_delivery_time, latest_notification_time, start_logging_time, stop_logging_time, tags, region, account_id from aws_cloudtrail_trail;",
             
-            # CloudWatch Application Insights 애플리케이션 - 빈 배열 반환
-            (
-                "CloudWatch Application Insights 애플리케이션",
-                "echo '[]'",
-                "monitoring_application_insights.json"
-            ),
+            "CloudTrail Event Data Stores": "select arn, name, status, advanced_event_selectors, multi_region_enabled, organization_enabled, retention_period, termination_protection_enabled, kms_key_id, created_timestamp, updated_timestamp, region, account_id from aws_cloudtrail_event_data_store;",
             
-            # CloudWatch Container Insights - 빈 배열 반환
-            (
-                "CloudWatch Container Insights",
-                "echo '[]'",
-                "monitoring_container_insights.json"
-            ),
+            "CloudTrail Channels": "select arn, name, source, destinations, region, account_id from aws_cloudtrail_channel;",
             
-            # CloudWatch Synthetics Canary - 빈 배열 반환
-            (
-                "CloudWatch Synthetics Canary",
-                "echo '[]'",
-                "monitoring_synthetics_canaries.json"
-            ),
+            # Config
+            "Config Configuration Recorders": "select name, role_arn, recording_group, status, region, account_id from aws_config_configuration_recorder;",
             
-            # CloudWatch RUM 앱 모니터 - 빈 배열 반환
-            (
-                "CloudWatch RUM 앱 모니터",
-                "echo '[]'",
-                "monitoring_rum_app_monitors.json"
-            ),
+            "Config Delivery Channels": "select name, s3_bucket_name, s3_key_prefix, sns_topic_arn, region, account_id from aws_config_delivery_channel;",
             
-            # CloudWatch Evidently 프로젝트 - 빈 배열 반환
-            (
-                "CloudWatch Evidently 프로젝트",
-                "echo '[]'",
-                "monitoring_evidently_projects.json"
-            ),
+            "Config Rules": "select name, arn, rule_id, description, source, input_parameters, maximum_execution_frequency, state, created_by, region, account_id from aws_config_rule;",
             
-            # AWS Systems Manager OpsCenter OpsItems - 빈 배열 반환
-            (
-                "AWS Systems Manager OpsCenter OpsItems",
-                "echo '[]'",
-                "monitoring_ssm_ops_items.json"
-            ),
+            "Config Conformance Packs": "select name, arn, conformance_pack_id, delivery_s3_bucket, delivery_s3_key_prefix, conformance_pack_input_parameters, last_update_requested_time, created_by, region, account_id from aws_config_conformance_pack;",
             
-            # AWS Personal Health Dashboard 이벤트
-            (
-                "AWS Personal Health Dashboard 이벤트",
-                f"select arn, service, event_type_code, event_type_category, region, availability_zone, start_time, end_time, last_updated_time, status_code, event_scope_code from aws_health_event where region = '{self.region}'",
-                "monitoring_health_events.json"
-            ),
+            "Config Aggregate Authorizations": "select authorized_account_id, authorized_aws_region, creation_time, region, account_id from aws_config_aggregate_authorization;",
             
-            # AWS Cost and Usage Reports - 빈 배열 반환
-            (
-                "AWS Cost and Usage Reports",
-                "echo '[]'",
-                "monitoring_cost_usage_reports.json"
-            ),
+            "Config Retention Configurations": "select name, retention_period_in_days, region, account_id from aws_config_retention_configuration;",
             
-            # AWS Budgets - 빈 배열 반환
-            (
-                "AWS Budgets",
-                "echo '[]'",
-                "monitoring_budgets.json"
-            ),
+            # Service Catalog
+            "Service Catalog Portfolios": "select id, arn, display_name, description, provider_name, created_time, tags, region, account_id from aws_servicecatalog_portfolio;",
             
-            # AWS Cost Explorer 비용 카테고리 - 빈 배열 반환
-            (
-                "AWS Cost Explorer 비용 카테고리",
-                "echo '[]'",
-                "monitoring_cost_categories.json"
-            ),
+            "Service Catalog Products": "select product_id, name, owner, short_description, type, distributor, has_default_path, support_description, support_email, support_url, created_time, tags, region, account_id from aws_servicecatalog_product;",
             
-            # AWS Resource Groups - 빈 배열 반환
-            (
-                "AWS Resource Groups",
-                "echo '[]'",
-                "monitoring_resource_groups.json"
-            ),
+            "Service Catalog Provisioned Products": "select name, arn, id, type, provisioning_artifact_id, product_id, user_arn, user_arn_session, status, status_message, created_time, last_updated_time, last_record_id, last_provisioning_record_id, last_successful_provisioning_record_id, tags, region, account_id from aws_servicecatalog_provisioned_product;",
             
-            # AWS Systems Manager Compliance - 빈 배열 반환
-            (
-                "AWS Systems Manager Compliance",
-                "echo '[]'",
-                "monitoring_ssm_compliance.json"
-            ),
+            # Organizations (권한 필요)
+            "Organizations Accounts": "select id, arn, email, name, status, joined_method, joined_timestamp, region, account_id from aws_organizations_account;",
             
-            # AWS Config 적합성 팩
-            (
-                "AWS Config 적합성 팩",
-                f"select name, arn, conformance_pack_id, delivery_s3_bucket, delivery_s3_key_prefix, input_parameters, last_update_requested_time, created_by from aws_config_conformance_pack where region = '{self.region}'",
-                "monitoring_config_conformance_packs.json"
-            )
-        ]
+            "Organizations Organizational Units": "select id, arn, name, parent_id, region, account_id from aws_organizations_organizational_unit;",
+            
+            "Organizations Policies": "select id, arn, name, description, type, aws_managed, content, region, account_id from aws_organizations_policy;",
+            
+            "Organizations Policy Targets": "select policy_id, target_id, target_type, region, account_id from aws_organizations_policy_target;",
+            
+            "Organizations Delegated Administrators": "select account_id, service_principal, delegation_enabled_date, region from aws_organizations_delegated_administrator;",
+            
+            "Organizations Root": "select id, arn, name, policy_types, region, account_id from aws_organizations_root;"
+        }
 
-    def collect_data(self):
-        """데이터 수집 실행"""
-        self.log_info("📊 모니터링 및 로깅 리소스 수집 시작...")
-        
-        # Steampipe 플러그인 확인
-        self.check_steampipe_plugin()
-        
-        # 쿼리 실행
+    def collect_all_data(self):
+        """모든 모니터링 데이터 병렬 수집"""
         queries = self.get_monitoring_queries()
-        for description, query, output_file in queries:
-            self.execute_steampipe_query(description, query, output_file)
+        successful_collections = 0
+        total_items = 0
         
-        # 결과 요약
-        self.log_success("모니터링 및 로깅 리소스 데이터 수집 완료!")
-        self.log_info(f"성공: {self.success_count}/{self.total_count}")
+        print(f"🚀 모니터링 및 리소스 관리 데이터 수집 시작 ({len(queries)}개 서비스)")
+        print("=" * 80)
         
-        # 파일 목록 및 크기 표시
-        print(f"\n{self.BLUE}📁 생성된 파일 목록:{self.NC}")
-        for file_path in sorted(self.report_dir.glob("monitoring_*.json")):
-            file_size = file_path.stat().st_size
-            if file_size > 100:
-                print(f"{self.GREEN}✓ {file_path.name} ({file_size} bytes){self.NC}")
-            else:
-                print(f"{self.YELLOW}⚠ {file_path.name} ({file_size} bytes) - 데이터 없음{self.NC}")
+        start_time = time.time()
         
-        # 수집 통계
-        print(f"\n{self.BLUE}📊 수집 통계:{self.NC}")
-        print(f"총 쿼리 수: {self.total_count}")
-        print(f"성공한 쿼리: {self.success_count}")
-        print(f"실패한 쿼리: {self.total_count - self.success_count}")
-        print(f"성공률: {(self.success_count/self.total_count*100):.1f}%")
+        # 병렬 처리로 성능 향상
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            future_to_service = {
+                executor.submit(self.run_steampipe_query, service, query): service 
+                for service, query in queries.items()
+            }
+            
+            for future in as_completed(future_to_service):
+                service = future_to_service[future]
+                try:
+                    success, count = future.result()
+                    if success:
+                        successful_collections += 1
+                        total_items += count
+                except Exception as e:
+                    print(f"❌ {service}: 처리 중 오류 - {e}")
         
-        if self.error_log.exists():
-            print(f"\n{self.YELLOW}⚠️ 오류 로그: {self.error_log}{self.NC}")
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
+        # 수집 결과 요약
+        print("\n" + "=" * 80)
+        print("📊 모니터링 데이터 수집 완료!")
+        print(f"✅ 성공한 수집: {successful_collections}/{len(queries)} ({successful_collections/len(queries)*100:.1f}%)")
+        print(f"📦 총 수집 항목: {total_items:,}개")
+        print(f"⏱️  실행 시간: {execution_time:.1f}초")
+        print(f"📁 출력 디렉토리: {self.report_dir}")
+        
+        # 수집된 파일 목록
+        if successful_collections > 0:
+            print(f"\n📋 수집된 데이터 파일:")
+            try:
+                files = sorted([f for f in self.report_dir.glob("monitoring_*.json")])
+                for file_path in files:
+                    file_size = file_path.stat().st_size
+                    print(f"   • {file_path.name} ({file_size:,} bytes)")
+            except Exception as e:
+                print(f"   파일 목록 조회 실패: {e}")
+        
+        return successful_collections, total_items
 
 def main():
-    """메인 함수"""
-    region = os.environ.get('AWS_DEFAULT_REGION', 'ap-northeast-2')
-    collector = SteampipeMonitoringCollector(region)
-    collector.collect_data()
+    """메인 실행 함수"""
+    print("🔍 AWS 모니터링 및 리소스 관리 서비스 데이터 수집기")
+    print("=" * 80)
+    
+    # Steampipe 설치 확인
+    try:
+        result = subprocess.run(['steampipe', '--version'], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("❌ Steampipe가 설치되지 않았거나 실행할 수 없습니다.")
+            print("   설치 방법: https://steampipe.io/downloads")
+            sys.exit(1)
+        print(f"✅ Steampipe 버전: {result.stdout.strip()}")
+    except FileNotFoundError:
+        print("❌ Steampipe를 찾을 수 없습니다. PATH에 추가되었는지 확인하세요.")
+        sys.exit(1)
+    
+    # 데이터 수집 실행
+    collector = MonitoringDataCollector()
+    successful_collections, total_items = collector.collect_all_data()
+    
+    if successful_collections == 0:
+        print("\n⚠️  수집된 데이터가 없습니다. AWS 자격 증명과 권한을 확인하세요.")
+        sys.exit(1)
+    
+    print(f"\n🎉 모니터링 데이터 수집이 완료되었습니다!")
+    print(f"   다음 명령어로 리포트를 생성할 수 있습니다:")
+    print(f"   python3 generate-monitoring-report.py")
 
 if __name__ == "__main__":
     main()

@@ -1,343 +1,347 @@
 #!/usr/bin/env python3
 """
-Application Analysis 보고서 생성 스크립트
+AWS 애플리케이션 서비스 상세 분석 리포트 생성 스크립트
+수집된 데이터를 기반으로 포괄적인 애플리케이션 아키텍처 분석 리포트 생성
+컴퓨팅 리포트 스타일에 맞춘 상세 테이블 형식
 """
 
 import json
 import os
 import sys
 from pathlib import Path
+from datetime import datetime
 from typing import Dict, List, Any, Optional
+from collections import Counter, defaultdict
 
-def load_json_file(file_path: str) -> Optional[Dict[str, Any]]:
-    """JSON 파일을 로드하고 파싱합니다."""
-    try:
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-    except (json.JSONDecodeError, IOError) as e:
-        print(f"Warning: Failed to load {file_path}: {e}")
-    return None
-
-def write_api_gateway_analysis(report_file, api_gateway_data: Optional[Dict]) -> None:
-    """API Gateway 분석 섹션을 작성합니다."""
-    report_file.write("## 🌐 API Gateway 현황\n")
-    
-    if not api_gateway_data:
-        report_file.write("API Gateway 데이터를 찾을 수 없습니다.\n\n")
-        return
-    
-    # API Gateway 데이터가 리스트인 경우와 딕셔너리인 경우 모두 처리
-    if isinstance(api_gateway_data, list):
-        api_count = len(api_gateway_data)
-        apis = api_gateway_data
-    elif isinstance(api_gateway_data, dict):
-        if 'items' in api_gateway_data:
-            apis = api_gateway_data['items']
-            api_count = len(apis)
-        else:
-            # 딕셔너리 자체가 API 정보인 경우
-            apis = [api_gateway_data]
-            api_count = 1
-    else:
-        report_file.write("API Gateway 데이터 형식을 인식할 수 없습니다.\n\n")
-        return
-    
-    report_file.write(f"**총 API Gateway:** {api_count}개\n\n")
-    
-    if api_count > 0:
-        report_file.write("### API Gateway 상세 정보\n")
-        report_file.write("| API 이름 | API ID | 생성일 | 설명 | 엔드포인트 타입 |\n")
-        report_file.write("|----------|--------|--------|------|----------------|\n")
+class ApplicationReportGenerator:
+    def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+        self.report_dir = Path(report_dir)
+        self.output_file = self.report_dir / f"application_analysis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         
-        for api in apis:
-            name = api.get('name', 'N/A')
-            api_id = api.get('id', 'N/A')
-            created_date = api.get('createdDate', 'N/A')
-            description = api.get('description', 'N/A')
-            endpoint_config = api.get('endpointConfiguration', {})
-            endpoint_types = endpoint_config.get('types', ['N/A']) if endpoint_config else ['N/A']
-            endpoint_type = ', '.join(endpoint_types) if endpoint_types else 'N/A'
-            
-            # 날짜 형식 정리 (ISO 형식인 경우)
-            if isinstance(created_date, str) and 'T' in created_date:
-                created_date = created_date.split('T')[0]
-            
-            report_file.write(f"| {name} | {api_id} | {created_date} | {description} | {endpoint_type} |\n")
+        # 색상 코드
+        self.GREEN = '\033[0;32m'
+        self.BLUE = '\033[0;34m'
+        self.YELLOW = '\033[1;33m'
+        self.RED = '\033[0;31m'
+        self.NC = '\033[0m'
         
-        report_file.write("\n")
+        # 수집된 데이터 저장
+        self.collected_data = {}
+        
+    def log_info(self, message: str):
+        print(f"{self.BLUE}[INFO]{self.NC} {message}")
+        
+    def log_success(self, message: str):
+        print(f"{self.GREEN}[SUCCESS]{self.NC} {message}")
+        
+    def log_warning(self, message: str):
+        print(f"{self.YELLOW}[WARNING]{self.NC} {message}")
+        
+    def log_error(self, message: str):
+        print(f"{self.RED}[ERROR]{self.NC} {message}")
 
-def write_messaging_analysis(report_file, sns_data: Optional[Dict], sqs_data: Optional[Dict] = None) -> None:
-    """메시징 서비스 분석 섹션을 작성합니다."""
-    report_file.write("## 📨 메시징 서비스 현황\n\n")
-    
-    # SNS 토픽 분석
-    report_file.write("### SNS 토픽\n")
-    if not sns_data:
-        report_file.write("SNS 토픽 데이터를 찾을 수 없습니다.\n\n")
-    else:
-        # SNS 데이터가 리스트인 경우와 딕셔너리인 경우 모두 처리
-        if isinstance(sns_data, list):
-            sns_count = len(sns_data)
-            topics = sns_data
-        elif isinstance(sns_data, dict):
-            if 'Topics' in sns_data:
-                topics = sns_data['Topics']
-                sns_count = len(topics)
+    def load_json_file(self, filename: str) -> Optional[List[Dict[str, Any]]]:
+        """JSON 파일을 로드합니다."""
+        file_path = self.report_dir / filename
+        try:
+            if file_path.exists() and file_path.stat().st_size > 0:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and 'rows' in data:
+                        return data['rows']
+                    elif isinstance(data, list):
+                        return data
+                    return []
+        except (json.JSONDecodeError, IOError) as e:
+            self.log_warning(f"파일 로드 실패: {filename} - {str(e)}")
+        return None
+
+    def collect_all_data(self):
+        """모든 애플리케이션 데이터 수집"""
+        self.log_info("📊 애플리케이션 서비스 데이터 로드 중...")
+        
+        # 성공적으로 수집된 파일들
+        data_files = {
+            'api_gateway_api_keys': 'application_api_gateway_api_keys.json',
+            'api_gateway_domain_names': 'application_api_gateway_domain_names.json',
+            'api_gateway_methods': 'application_api_gateway_methods.json',
+            'api_gateway_usage_plans': 'application_api_gateway_usage_plans.json',
+            'appsync_apis': 'application_appsync_apis.json',
+            'cloudfront_distributions': 'application_cloudfront_distributions.json',
+            'cloudfront_oai': 'application_cloudfront_oai.json',
+            'codebuild_projects': 'application_codebuild_projects.json',
+            'codedeploy_deployment_configs': 'application_codedeploy_deployment_configs.json',
+            'eventbridge_buses': 'application_eventbridge_buses.json',
+            'eventbridge_rules': 'application_eventbridge_rules.json',
+            'ssm_documents': 'application_ssm_documents.json',
+            'ssm_maintenance_windows': 'application_ssm_maintenance_windows.json',
+            'ssm_patch_baselines': 'application_ssm_patch_baselines.json'
+        }
+        
+        loaded_count = 0
+        for key, filename in data_files.items():
+            data = self.load_json_file(filename)
+            if data is not None:
+                self.collected_data[key] = data
+                loaded_count += 1
+                self.log_success(f"✓ {filename} 로드 완료 ({len(data) if isinstance(data, list) else 1}개 항목)")
             else:
-                # 딕셔너리 자체가 토픽 정보인 경우
-                topics = [sns_data]
-                sns_count = 1
-        else:
-            report_file.write("SNS 토픽 데이터 형식을 인식할 수 없습니다.\n\n")
-            return
+                self.log_warning(f"✗ {filename} 로드 실패")
         
-        report_file.write(f"**총 SNS 토픽:** {sns_count}개\n\n")
-        
-        if sns_count > 0:
-            report_file.write("| 토픽 ARN | 토픽 이름 | 구독자 수 |\n")
-            report_file.write("|----------|-----------|----------|\n")
-            
-            for topic in topics:
-                if isinstance(topic, str):
-                    # ARN만 있는 경우
-                    topic_arn = topic
-                    topic_name = topic_arn.split(':')[-1] if ':' in topic_arn else topic_arn
-                    subscribers = 'N/A'
-                else:
-                    # 딕셔너리 형태의 토픽 정보
-                    topic_arn = topic.get('TopicArn', topic.get('arn', 'N/A'))
-                    topic_name = topic.get('Name', topic_arn.split(':')[-1] if ':' in topic_arn else 'N/A')
-                    subscribers = topic.get('SubscriptionsConfirmed', 'N/A')
-                
-                report_file.write(f"| {topic_arn} | {topic_name} | {subscribers} |\n")
-            
-            report_file.write("\n")
-    
-    # SQS 큐 분석 (데이터가 있는 경우)
-    if sqs_data:
-        report_file.write("### SQS 큐\n")
-        if isinstance(sqs_data, list):
-            sqs_count = len(sqs_data)
-            queues = sqs_data
-        elif isinstance(sqs_data, dict):
-            if 'QueueUrls' in sqs_data:
-                queues = sqs_data['QueueUrls']
-                sqs_count = len(queues)
-            else:
-                queues = [sqs_data]
-                sqs_count = 1
-        else:
-            queues = []
-            sqs_count = 0
-        
-        report_file.write(f"**총 SQS 큐:** {sqs_count}개\n\n")
-        
-        if sqs_count > 0:
-            report_file.write("| 큐 URL | 큐 이름 |\n")
-            report_file.write("|--------|--------|\n")
-            
-            for queue in queues:
-                if isinstance(queue, str):
-                    queue_url = queue
-                    queue_name = queue_url.split('/')[-1] if '/' in queue_url else queue_url
-                else:
-                    queue_url = queue.get('QueueUrl', queue.get('url', 'N/A'))
-                    queue_name = queue.get('QueueName', queue_url.split('/')[-1] if '/' in queue_url else 'N/A')
-                
-                report_file.write(f"| {queue_url} | {queue_name} |\n")
-            
-            report_file.write("\n")
+        self.log_info(f"📈 총 {loaded_count}/{len(data_files)}개 데이터 파일 로드 완료")
+        return loaded_count > 0
 
-def write_eventbridge_analysis(report_file, eventbridge_data: Optional[Dict]) -> None:
-    """EventBridge 분석 섹션을 작성합니다."""
-    if not eventbridge_data:
-        return
-    
-    report_file.write("### EventBridge 이벤트 버스\n")
-    
-    if isinstance(eventbridge_data, list):
-        bus_count = len(eventbridge_data)
-        buses = eventbridge_data
-    elif isinstance(eventbridge_data, dict):
-        if 'EventBuses' in eventbridge_data:
-            buses = eventbridge_data['EventBuses']
-            bus_count = len(buses)
-        else:
-            buses = [eventbridge_data]
-            bus_count = 1
-    else:
-        report_file.write("EventBridge 데이터 형식을 인식할 수 없습니다.\n\n")
-        return
-    
-    report_file.write(f"**총 EventBridge 버스:** {bus_count}개\n\n")
-    
-    if bus_count > 0:
-        report_file.write("| 버스 이름 | ARN | 정책 |\n")
-        report_file.write("|-----------|-----|------|\n")
+    def write_api_gateway_analysis(self, report_file) -> None:
+        """API Gateway 분석 섹션을 작성합니다."""
+        report_file.write("## 🌐 API Gateway 현황\n\n")
         
-        for bus in buses:
-            name = bus.get('Name', 'N/A')
-            arn = bus.get('Arn', 'N/A')
-            policy = 'Yes' if bus.get('Policy') else 'No'
+        # API 키 분석
+        api_keys = self.collected_data.get('api_gateway_api_keys', [])
+        domain_names = self.collected_data.get('api_gateway_domain_names', [])
+        methods = self.collected_data.get('api_gateway_methods', [])
+        usage_plans = self.collected_data.get('api_gateway_usage_plans', [])
+        
+        report_file.write("### API Gateway 개요\n")
+        report_file.write(f"**총 API 키:** {len(api_keys)}개\n")
+        report_file.write(f"**총 도메인 이름:** {len(domain_names)}개\n")
+        report_file.write(f"**총 메서드:** {len(methods)}개\n")
+        report_file.write(f"**총 사용 계획:** {len(usage_plans)}개\n\n")
+        
+        # API 키 상세 목록
+        if api_keys:
+            report_file.write("### API 키 상세 목록\n")
+            report_file.write("| API 키 ID | 이름 | 상태 | 생성일 | 설명 |\n")
+            report_file.write("|-----------|------|------|--------|------|\n")
             
-            report_file.write(f"| {name} | {arn} | {policy} |\n")
+            for key in api_keys[:10]:  # 최대 10개만 표시
+                key_id = key.get('id', 'N/A')
+                name = key.get('name', 'N/A')
+                enabled = '활성' if key.get('enabled', False) else '비활성'
+                created_date = key.get('created_date', 'N/A')
+                description = key.get('description', 'N/A')[:50] + '...' if len(key.get('description', '')) > 50 else key.get('description', 'N/A')
+                
+                report_file.write(f"| {key_id} | {name} | {enabled} | {created_date} | {description} |\n")
+        else:
+            report_file.write("### API 키\nAPI 키 데이터를 찾을 수 없습니다.\n")
+        
+        report_file.write("\n")
+        
+        # 도메인 이름 상세 목록
+        if domain_names:
+            report_file.write("### 커스텀 도메인 상세 목록\n")
+            report_file.write("| 도메인 이름 | 인증서 ARN | 리전별 도메인 | 상태 | 보안 정책 |\n")
+            report_file.write("|-------------|-------------|---------------|------|----------|\n")
+            
+            for domain in domain_names[:10]:
+                domain_name = domain.get('domain_name', 'N/A')
+                cert_arn = domain.get('certificate_arn', 'N/A')[:50] + '...' if len(domain.get('certificate_arn', '')) > 50 else domain.get('certificate_arn', 'N/A')
+                regional_domain = domain.get('regional_domain_name', 'N/A')
+                status = domain.get('domain_name_status', 'N/A')
+                security_policy = domain.get('security_policy', 'N/A')
+                
+                report_file.write(f"| {domain_name} | {cert_arn} | {regional_domain} | {status} | {security_policy} |\n")
+        else:
+            report_file.write("### 커스텀 도메인\n커스텀 도메인 데이터를 찾을 수 없습니다.\n")
         
         report_file.write("\n")
 
-def write_step_functions_analysis(report_file, step_functions_data: Optional[Dict]) -> None:
-    """Step Functions 분석 섹션을 작성합니다."""
-    if not step_functions_data:
-        return
-    
-    report_file.write("### Step Functions 상태 머신\n")
-    
-    if isinstance(step_functions_data, list):
-        sm_count = len(step_functions_data)
-        state_machines = step_functions_data
-    elif isinstance(step_functions_data, dict):
-        if 'stateMachines' in step_functions_data:
-            state_machines = step_functions_data['stateMachines']
-            sm_count = len(state_machines)
-        else:
-            state_machines = [step_functions_data]
-            sm_count = 1
-    else:
-        report_file.write("Step Functions 데이터 형식을 인식할 수 없습니다.\n\n")
-        return
-    
-    report_file.write(f"**총 Step Functions 상태 머신:** {sm_count}개\n\n")
-    
-    if sm_count > 0:
-        report_file.write("| 상태 머신 이름 | 타입 | 상태 | 생성일 |\n")
-        report_file.write("|----------------|------|------|--------|\n")
+    def write_eventbridge_analysis(self, report_file) -> None:
+        """EventBridge 분석 섹션을 작성합니다."""
+        report_file.write("## ⚡ EventBridge 현황\n\n")
         
-        for sm in state_machines:
-            name = sm.get('name', 'N/A')
-            sm_type = sm.get('type', 'N/A')
-            status = sm.get('status', 'N/A')
-            creation_date = sm.get('creationDate', 'N/A')
+        buses = self.collected_data.get('eventbridge_buses', [])
+        rules = self.collected_data.get('eventbridge_rules', [])
+        
+        report_file.write("### EventBridge 개요\n")
+        report_file.write(f"**총 이벤트 버스:** {len(buses)}개\n")
+        report_file.write(f"**총 이벤트 규칙:** {len(rules)}개\n")
+        
+        if rules:
+            active_rules = len([rule for rule in rules if rule.get('state') == 'ENABLED'])
+            report_file.write(f"**활성 규칙:** {active_rules}개\n")
+            report_file.write(f"**비활성 규칙:** {len(rules) - active_rules}개\n")
+        
+        report_file.write("\n")
+        
+        # 이벤트 규칙 상세 목록
+        if rules:
+            report_file.write("### 이벤트 규칙 상세 목록\n")
+            report_file.write("| 규칙 이름 | 상태 | 스케줄 | 이벤트 패턴 | 대상 수 | 설명 |\n")
+            report_file.write("|-----------|------|--------|-------------|---------|------|\n")
             
-            # 날짜 형식 정리
-            if isinstance(creation_date, str) and 'T' in creation_date:
-                creation_date = creation_date.split('T')[0]
-            
-            report_file.write(f"| {name} | {sm_type} | {status} | {creation_date} |\n")
+            for rule in rules[:10]:  # 최대 10개만 표시
+                name = rule.get('name', 'N/A')
+                state = rule.get('state', 'N/A')
+                schedule_expr = rule.get('schedule_expression') or 'N/A'
+                schedule = schedule_expr[:20] + '...' if len(schedule_expr) > 20 else schedule_expr
+                has_pattern = '있음' if rule.get('event_pattern') else '없음'
+                target_count = len(rule.get('targets', [])) if rule.get('targets') else 0
+                desc = rule.get('description') or 'N/A'
+                description = desc[:30] + '...' if len(desc) > 30 else desc
+                
+                report_file.write(f"| {name} | {state} | {schedule} | {has_pattern} | {target_count} | {description} |\n")
+        else:
+            report_file.write("### 이벤트 규칙\n이벤트 규칙 데이터를 찾을 수 없습니다.\n")
         
         report_file.write("\n")
 
-def write_recommendations(report_file, api_gateway_data: Optional[Dict], sns_data: Optional[Dict]) -> None:
-    """권장사항 섹션을 작성합니다."""
-    report_file.write("## 📋 애플리케이션 권장사항\n\n")
-    
-    report_file.write("### 🔴 높은 우선순위\n")
-    
-    recommendations = []
-    
-    # API Gateway 관련 권장사항
-    if api_gateway_data:
-        recommendations.append("**API Gateway 모니터링**: 응답 시간, 오류율 추적")
-        recommendations.append("**API Gateway 보안**: API 키, IAM 역할, WAF 설정 검토")
-        recommendations.append("**API Gateway 캐싱**: 자주 요청되는 엔드포인트에 캐싱 적용")
-    
-    # SNS 관련 권장사항
-    if sns_data:
-        recommendations.append("**메시지 큐 최적화**: DLQ 설정 및 메시지 보존 기간 조정")
-        recommendations.append("**SNS 구독 관리**: 불필요한 구독 정리 및 필터링 정책 적용")
-    
-    # 기본 권장사항
-    if not recommendations:
-        recommendations = [
-            "**API Gateway 모니터링**: 응답 시간, 오류율 추적",
-            "**메시지 큐 최적화**: DLQ 설정 및 메시지 보존 기간 조정"
-        ]
-    
-    for i, rec in enumerate(recommendations, 1):
-        report_file.write(f"{i}. {rec}\n")
-    
-    report_file.write("\n### 🟡 중간 우선순위\n")
-    report_file.write("1. **비용 최적화**: 사용하지 않는 API 및 메시징 리소스 정리\n")
-    report_file.write("2. **로깅 및 모니터링**: CloudWatch 로그 및 메트릭 설정\n")
-    report_file.write("3. **백업 및 복구**: 중요한 설정의 백업 전략 수립\n\n")
-    
-    report_file.write("### 🟢 낮은 우선순위\n")
-    report_file.write("1. **성능 최적화**: API 응답 시간 및 처리량 개선\n")
-    report_file.write("2. **자동화**: Infrastructure as Code를 통한 배포 자동화\n")
-    report_file.write("3. **문서화**: API 문서 및 아키텍처 다이어그램 업데이트\n\n")
+    def write_cicd_analysis(self, report_file) -> None:
+        """CI/CD 파이프라인 분석 섹션을 작성합니다."""
+        report_file.write("## 🚀 CI/CD 파이프라인 현황\n\n")
+        
+        codebuild_projects = self.collected_data.get('codebuild_projects', [])
+        deployment_configs = self.collected_data.get('codedeploy_deployment_configs', [])
+        
+        report_file.write("### CI/CD 개요\n")
+        report_file.write(f"**총 CodeBuild 프로젝트:** {len(codebuild_projects)}개\n")
+        report_file.write(f"**총 배포 구성:** {len(deployment_configs)}개\n\n")
+        
+        # CodeDeploy 배포 구성 상세 목록
+        if deployment_configs:
+            report_file.write("### CodeDeploy 배포 구성 상세 목록\n")
+            report_file.write("| 구성 이름 | 컴퓨트 플랫폼 | 최소 정상 호스트 | 트래픽 라우팅 | 생성일 |\n")
+            report_file.write("|-----------|----------------|------------------|---------------|--------|\n")
+            
+            for config in deployment_configs[:15]:  # 최대 15개만 표시
+                name = config.get('deployment_config_name', 'N/A')
+                platform = config.get('compute_platform', 'N/A')
+                min_healthy = str(config.get('minimum_healthy_hosts', {})) if config.get('minimum_healthy_hosts') else 'N/A'
+                traffic_routing = '있음' if config.get('traffic_routing_config') else '없음'
+                created = config.get('create_time', 'N/A')
+                
+                report_file.write(f"| {name} | {platform} | {min_healthy} | {traffic_routing} | {created} |\n")
+            
+            # 컴퓨트 플랫폼별 분포
+            platforms = Counter(config.get('compute_platform', 'Unknown') for config in deployment_configs)
+            report_file.write("\n#### 컴퓨트 플랫폼별 분포\n")
+            report_file.write("| 플랫폼 | 개수 | 비율 |\n")
+            report_file.write("|--------|------|------|\n")
+            
+            total_configs = len(deployment_configs)
+            for platform, count in platforms.most_common():
+                percentage = round((count / total_configs) * 100, 1)
+                report_file.write(f"| {platform} | {count} | {percentage}% |\n")
+        else:
+            report_file.write("### CodeDeploy 배포 구성\n배포 구성 데이터를 찾을 수 없습니다.\n")
+        
+        report_file.write("\n")
 
-def write_cost_optimization(report_file, api_gateway_data: Optional[Dict], sns_data: Optional[Dict]) -> None:
-    """비용 최적화 섹션을 작성합니다."""
-    report_file.write("## 💰 비용 최적화 기회\n\n")
-    
-    report_file.write("### 즉시 절감 가능\n")
-    
-    cost_items = []
-    
-    # API Gateway 비용 최적화
-    if api_gateway_data:
-        cost_items.append("**API Gateway 사용량 검토**: 사용하지 않는 API 엔드포인트 제거")
-        cost_items.append("**API Gateway 캐싱**: 반복 요청 감소로 비용 절감")
-    
-    # SNS 비용 최적화
-    if sns_data:
-        cost_items.append("**SNS 구독 정리**: 불필요한 구독 및 토픽 제거")
-        cost_items.append("**메시지 필터링**: 불필요한 메시지 전송 방지")
-    
-    # 기본 비용 최적화 항목
-    if not cost_items:
-        cost_items = [
-            "**사용하지 않는 리소스 정리**: 미사용 API 및 메시징 서비스 제거",
-            "**모니터링 설정**: 비용 알림 및 예산 설정"
-        ]
-    
-    for i, item in enumerate(cost_items, 1):
-        report_file.write(f"{i}. {item}\n")
-    
-    report_file.write("\n### 장기 절감 계획\n")
-    report_file.write("1. **예약 용량**: 예측 가능한 워크로드에 대한 예약 용량 구매\n")
-    report_file.write("2. **아키텍처 최적화**: 서버리스 아키텍처로 전환 검토\n")
-    report_file.write("3. **리소스 태깅**: 비용 추적을 위한 체계적인 태깅 전략\n\n")
+    def write_content_delivery_analysis(self, report_file) -> None:
+        """콘텐츠 전송 및 배포 분석 섹션을 작성합니다."""
+        report_file.write("## 🌍 콘텐츠 전송 및 배포 현황\n\n")
+        
+        cloudfront_distributions = self.collected_data.get('cloudfront_distributions', [])
+        cloudfront_oai = self.collected_data.get('cloudfront_oai', [])
+        appsync_apis = self.collected_data.get('appsync_apis', [])
+        
+        report_file.write("### 콘텐츠 전송 개요\n")
+        report_file.write(f"**총 CloudFront 배포:** {len(cloudfront_distributions)}개\n")
+        report_file.write(f"**총 Origin Access Identity:** {len(cloudfront_oai)}개\n")
+        report_file.write(f"**총 AppSync API:** {len(appsync_apis)}개\n\n")
+        
+        # CloudFront 배포 상세 목록
+        if cloudfront_distributions:
+            report_file.write("### CloudFront 배포 상세 목록\n")
+            report_file.write("| 배포 ID | 상태 | 도메인 이름 | 가격 클래스 | HTTP 버전 | IPv6 지원 |\n")
+            report_file.write("|---------|------|-------------|-------------|-----------|----------|\n")
+            
+            for dist in cloudfront_distributions:
+                dist_id = dist.get('id', 'N/A')
+                status = dist.get('status', 'N/A')
+                domain_name = dist.get('domain_name', 'N/A')[:40] + '...' if len(dist.get('domain_name', '')) > 40 else dist.get('domain_name', 'N/A')
+                price_class = dist.get('price_class', 'N/A')
+                http_version = dist.get('http_version', 'N/A')
+                ipv6_enabled = '지원' if dist.get('is_ipv6_enabled', False) else '미지원'
+                
+                report_file.write(f"| {dist_id} | {status} | {domain_name} | {price_class} | {http_version} | {ipv6_enabled} |\n")
+        else:
+            report_file.write("### CloudFront 배포\nCloudFront 배포 데이터를 찾을 수 없습니다.\n")
+        
+        report_file.write("\n")
+
+    def generate_markdown_report(self):
+        """마크다운 리포트 생성"""
+        self.log_info("📝 마크다운 리포트 생성 중...")
+        
+        with open(self.output_file, 'w', encoding='utf-8') as report_file:
+            # 헤더
+            report_file.write("# 애플리케이션 서비스 분석\n\n")
+            report_file.write(f"**생성일시:** {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}\n")
+            report_file.write(f"**분석 대상:** AWS 계정의 애플리케이션 서비스\n\n")
+            
+            # 개요
+            total_services = len([k for k in self.collected_data.keys() if self.collected_data[k]])
+            report_file.write("## 📊 애플리케이션 서비스 개요\n\n")
+            report_file.write(f"**분석된 서비스 카테고리:** {total_services}개\n")
+            
+            # 각 서비스별 개수 요약
+            service_summary = []
+            if self.collected_data.get('api_gateway_api_keys'):
+                service_summary.append(f"- **API Gateway:** {len(self.collected_data['api_gateway_api_keys'])}개 API 키")
+            if self.collected_data.get('eventbridge_rules'):
+                service_summary.append(f"- **EventBridge:** {len(self.collected_data['eventbridge_rules'])}개 이벤트 규칙")
+            if self.collected_data.get('codebuild_projects'):
+                service_summary.append(f"- **CodeBuild:** {len(self.collected_data['codebuild_projects'])}개 프로젝트")
+            if self.collected_data.get('codedeploy_deployment_configs'):
+                service_summary.append(f"- **CodeDeploy:** {len(self.collected_data['codedeploy_deployment_configs'])}개 배포 구성")
+            if self.collected_data.get('cloudfront_distributions'):
+                service_summary.append(f"- **CloudFront:** {len(self.collected_data['cloudfront_distributions'])}개 배포")
+            
+            if service_summary:
+                report_file.write('\n'.join(service_summary))
+            report_file.write("\n\n")
+            
+            # 각 분석 섹션 작성
+            self.write_api_gateway_analysis(report_file)
+            self.write_eventbridge_analysis(report_file)
+            self.write_cicd_analysis(report_file)
+            self.write_content_delivery_analysis(report_file)
+            
+            # 권장사항 섹션
+            report_file.write("## 🎯 종합 권장사항\n\n")
+            recommendations = [
+                "1. **API Gateway 보안 강화**: API 키 및 인증 메커니즘 구현으로 무단 접근 방지",
+                "2. **EventBridge 활용 확대**: 이벤트 기반 아키텍처로 서비스 간 느슨한 결합 구현",
+                "3. **CI/CD 파이프라인 최적화**: 자동화된 빌드 및 배포 프로세스 구축",
+                "4. **Systems Manager 자동화**: 운영 작업 자동화 및 패치 관리 체계화",
+                "5. **콘텐츠 전송 최적화**: CloudFront를 통한 글로벌 성능 향상",
+                "6. **모니터링 및 로깅**: 애플리케이션 성능 및 보안 모니터링 강화",
+                "7. **비용 최적화**: 리소스 사용량 모니터링 및 최적화",
+                "8. **보안 강화**: WAF, SSL/TLS 인증서 등 보안 기능 활용",
+                "9. **재해 복구**: 백업 및 복구 전략 수립",
+                "10. **거버넌스**: 태그 정책 및 리소스 관리 체계 구축"
+            ]
+            
+            for rec in recommendations:
+                report_file.write(f"{rec}\n")
+            
+            report_file.write(f"\n---\n*리포트 생성 완료: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
+        
+        self.log_success(f"📄 리포트 생성 완료: {self.output_file}")
+        return str(self.output_file)
 
 def main():
-    """메인 함수"""
-    print("🌐 Application Analysis 보고서 생성 중...")
+    """메인 실행 함수"""
+    generator = ApplicationReportGenerator()
     
-    # 보고서 디렉토리 설정
-    report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
-    os.chdir(report_dir)
+    generator.log_info("🚀 AWS 애플리케이션 서비스 상세 분석 리포트 생성 시작")
     
-    # JSON 데이터 파일들 로드
-    api_gateway_data = load_json_file("application_api_gateway_rest_apis.json")
-    sns_data = load_json_file("application_sns_topics.json")
-    sqs_data = load_json_file("application_sqs_queues.json")  # 선택적
-    eventbridge_data = load_json_file("application_eventbridge_buses.json")  # 선택적
-    step_functions_data = load_json_file("application_step_functions.json")  # 선택적
-    
-    # 보고서 파일 생성
-    report_path = report_dir / "07-application-analysis.md"
-    
-    try:
-        with open(report_path, 'w', encoding='utf-8') as report_file:
-            # 헤더 작성
-            report_file.write("# 애플리케이션 서비스 분석\n\n")
-            
-            # 각 섹션 작성
-            write_api_gateway_analysis(report_file, api_gateway_data)
-            write_messaging_analysis(report_file, sns_data, sqs_data)
-            write_eventbridge_analysis(report_file, eventbridge_data)
-            write_step_functions_analysis(report_file, step_functions_data)
-            write_recommendations(report_file, api_gateway_data, sns_data)
-            write_cost_optimization(report_file, api_gateway_data, sns_data)
-            
-            # 마무리
-            report_file.write("---\n")
-            report_file.write("*애플리케이션 분석 완료*\n")
-        
-        print("✅ Application Analysis 생성 완료: 07-application-analysis.md")
-        
-    except IOError as e:
-        print(f"❌ 보고서 파일 생성 실패: {e}")
+    # 데이터 수집
+    if not generator.collect_all_data():
+        generator.log_error("데이터 로드 실패. 먼저 steampipe_application_collection.py를 실행하세요.")
         sys.exit(1)
+    
+    # 리포트 생성
+    report_file = generator.generate_markdown_report()
+    
+    # 결과 요약
+    generator.log_info("📋 분석 결과 요약:")
+    total_services = len([k for k in generator.collected_data.keys() if generator.collected_data[k]])
+    generator.log_info(f"   - 분석된 서비스: {total_services}개")
+    generator.log_info(f"   - 리포트 파일: {report_file}")
+    
+    generator.log_success("🎉 애플리케이션 분석 리포트 생성이 완료되었습니다!")
+    generator.log_info("💡 생성된 마크다운 파일을 확인하여 상세 분석 결과를 검토하세요.")
 
 if __name__ == "__main__":
     main()
