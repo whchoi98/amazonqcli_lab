@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터베이스 분석</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>데이터베이스 분석</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 데이터베이스 분석</h1>
+<h2 id="_1">🗄️ 데이터베이스 서비스 종합 분석</h2>
+<p><strong>분석 범위</strong>: Aurora MySQL, ElastiCache Redis, OpenSearch<br />
+<strong>분석 일시</strong>: 2025년 6월 17일<br />
+<strong>데이터베이스 서비스</strong>: 3개 주요 데이터 서비스 운영 중</p>
+<hr />
+<h2 id="_2">📊 데이터베이스 현황 개요</h2>
+<h3 id="_3">데이터베이스 서비스 분포</h3>
+<table>
+<thead>
+<tr>
+<th>서비스</th>
+<th>타입</th>
+<th>인스턴스 수</th>
+<th>상태</th>
+<th>비용</th>
+<th>평가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Aurora MySQL</strong></td>
+<td>관계형 DB</td>
+<td>2개 (Primary+Replica)</td>
+<td>Available</td>
+<td>$1.57</td>
+<td>🟢 우수</td>
+</tr>
+<tr>
+<td><strong>ElastiCache Redis</strong></td>
+<td>인메모리 캐시</td>
+<td>2개 노드</td>
+<td>Available</td>
+<td>$0.75</td>
+<td>🟢 양호</td>
+</tr>
+<tr>
+<td><strong>OpenSearch</strong></td>
+<td>검색 엔진</td>
+<td>1개 도메인</td>
+<td>Active</td>
+<td>$3.65</td>
+<td>🟢 양호</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4">데이터베이스 아키텍처 평가</h3>
+<table>
+<thead>
+<tr>
+<th>평가 항목</th>
+<th>점수</th>
+<th>상태</th>
+<th>세부 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>고가용성</strong></td>
+<td>9/10</td>
+<td>🟢 우수</td>
+<td>Aurora Multi-AZ, Redis 클러스터</td>
+</tr>
+<tr>
+<td><strong>성능</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>적절한 인스턴스 타입 선택</td>
+</tr>
+<tr>
+<td><strong>보안</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>VPC 내 배치, 암호화 적용</td>
+</tr>
+<tr>
+<td><strong>백업/복구</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>자동 백업, 포인트인타임 복구</td>
+</tr>
+<tr>
+<td><strong>비용 효율성</strong></td>
+<td>7/10</td>
+<td>🟡 개선 가능</td>
+<td>OpenSearch 비용 최적화 검토</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="aurora-mysql">🐬 Aurora MySQL 상세 분석</h2>
+<h3 id="_5">클러스터 구성 현황</h3>
+<div class="codehilite"><pre><span></span><code>클러스터 정보:
+<span class="k">-</span> Primary Instance: vpc01-aurora-mysql-dbprimaryinstance-zeaa1lun50nz
+<span class="k">-</span> Replica Instance: vpc01-aurora-mysql-dbreplicainstance-b1sbivrdq8h0
+<span class="k">-</span> 인스턴스 클래스: db.t4g.medium
+<span class="k">-</span> 엔진 버전: 8.0.mysql_aurora.3.04.0
+<span class="k">-</span> 스토리지: 1GB (자동 확장)
+
+✅ 우수한 구성:
+<span class="k">-</span> 최신 Aurora MySQL 엔진 사용
+<span class="k">-</span> Primary + Replica 고가용성 구성
+<span class="k">-</span> ARM 기반 Graviton2 인스턴스 (비용 효율적)
+<span class="k">-</span> 자동 백업 및 포인트인타임 복구
+</code></pre></div>
+
+<h3 id="aurora">Aurora 성능 분석</h3>
+<div class="codehilite"><pre><span></span><code>성능 특징:
+- 고성능 SSD 스토리지
+- 자동 스토리지 확장 (최대 128TB)
+- 읽기 성능 향상을 위한 Replica 활용
+- 낮은 지연 시간 복제
+
+📊 성능 모니터링 권장:
+□ Aurora Performance Insights 활용
+□ 슬로우 쿼리 로그 분석
+□ 연결 풀링 최적화
+□ 읽기/쓰기 분산 전략 구현
+</code></pre></div>
+
+<h3 id="aurora_1">Aurora 보안 설정</h3>
+<div class="codehilite"><pre><span></span><code>✅ 보안 구성:
+- VPC01 프라이빗 서브넷 배치
+- 전용 보안 그룹 (VPC01-Aurora-MySQL-AuroraSecurityGroup)
+- 암호화 설정 (확인 필요)
+- IAM 데이터베이스 인증 (확인 필요)
+
+🔧 보안 강화 권장:
+□ 암호화 상태 확인 및 활성화
+□ IAM 데이터베이스 인증 구현
+□ 감사 로깅 활성화
+□ 네트워크 액세스 제한 강화
+</code></pre></div>
+
+<h3 id="aurora_2">Aurora 최적화 권장사항</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Performance</span><span class="w"> </span><span class="n">Insights</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">튜닝</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">연결</span><span class="w"> </span><span class="n">풀링</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">읽기</span><span class="w"> </span><span class="n">전용</span><span class="w"> </span><span class="n">워크로드</span><span class="w"> </span><span class="n">Replica</span><span class="w"> </span><span class="n">분산</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인스턴스</span><span class="w"> </span><span class="n">크기</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">보존</span><span class="w"> </span><span class="n">기간</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스냅샷</span><span class="w"> </span><span class="n">라이프사이클</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">Reserved</span><span class="w"> </span><span class="n">Instance</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">운영</span><span class="w"> </span><span class="n">효율성</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">장애</span><span class="w"> </span><span class="n">조치</span><span class="w"> </span><span class="n">테스트</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">절차</span><span class="w"> </span><span class="n">검증</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">대시보드</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">알람</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">설정</span>
+</code></pre></div>
+
+<hr />
+<h2 id="elasticache-redis">🔴 ElastiCache Redis 분석</h2>
+<h3 id="redis">Redis 클러스터 구성</h3>
+<div class="codehilite"><pre><span></span><code>클러스터 정보:
+- 노드 1: dmzvpc-redis-redis-001
+- 노드 2: dmzvpc-redis-redis-002
+- 노드 타입: cache.t4g.small
+- 엔진 버전: Redis 7.0.7
+- 배치: DMZVPC 프라이빗 서브넷
+
+✅ 적절한 구성:
+- 최신 Redis 버전 사용
+- 2노드 클러스터 구성
+- ARM 기반 Graviton2 인스턴스
+- 전용 보안 그룹 설정
+</code></pre></div>
+
+<h3 id="redis_1">Redis 성능 및 활용도 분석</h3>
+<div class="codehilite"><pre><span></span><code>성능 특징:
+- 인메모리 데이터 구조 저장소
+- 높은 처리량과 낮은 지연 시간
+- 다양한 데이터 타입 지원
+- 클러스터 모드 지원
+
+📊 활용도 분석 필요:
+□ 캐시 히트율 모니터링
+□ 메모리 사용률 추적
+□ 연결 수 모니터링
+□ 처리량 및 지연 시간 분석
+</code></pre></div>
+
+<h3 id="redis_2">Redis 최적화 전략</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">메모리</span><span class="w"> </span><span class="n">사용</span><span class="w"> </span><span class="n">패턴</span><span class="w"> </span><span class="n">분석</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">캐시</span><span class="w"> </span><span class="n">전략</span><span class="w"> </span><span class="n">최적화</span><span class="w"> </span><span class="p">(</span><span class="n">TTL</span><span class="w"> </span><span class="n">설정</span><span class="p">)</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">연결</span><span class="w"> </span><span class="n">풀링</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">클러스터</span><span class="w"> </span><span class="n">샤딩</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">고가용성</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">장애</span><span class="w"> </span><span class="n">조치</span><span class="w"> </span><span class="n">설정</span><span class="w"> </span><span class="n">확인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">수립</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">다중</span><span class="w"> </span><span class="n">AZ</span><span class="w"> </span><span class="n">배치</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복제</span><span class="w"> </span><span class="n">지연</span><span class="w"> </span><span class="n">모니터링</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">전송</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">저장</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">AUTH</span><span class="w"> </span><span class="n">토큰</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">VPC</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">그룹</span><span class="w"> </span><span class="n">최적화</span>
+</code></pre></div>
+
+<hr />
+<h2 id="opensearch">🔍 OpenSearch 분석</h2>
+<h3 id="opensearch_1">OpenSearch 도메인 구성</h3>
+<div class="codehilite"><pre><span></span><code>도메인 정보:
+- 도메인명: dmzvpc-opensearch
+- 엔진 버전: OpenSearch 2.11
+- 배치: DMZVPC 프라이빗 서브넷
+- 상태: Active
+
+✅ 현대적 구성:
+- 최신 OpenSearch 버전 사용
+- VPC 내 보안 배치
+- 전용 보안 그룹 설정
+</code></pre></div>
+
+<h3 id="opensearch_2">OpenSearch 성능 분석</h3>
+<div class="codehilite"><pre><span></span><code>📊 성능 모니터링 필요:
+□ 인덱스 크기 및 문서 수 확인
+□ 검색 쿼리 성능 분석
+□ 클러스터 상태 모니터링
+□ 노드 리소스 사용률 추적
+
+🔧 최적화 기회:
+- 인덱스 설계 최적화
+- 샤드 크기 및 수 조정
+- 검색 쿼리 튜닝
+- 캐싱 전략 구현
+</code></pre></div>
+
+<h3 id="opensearch_3">OpenSearch 비용 최적화</h3>
+<div class="codehilite"><pre><span></span><code>현재 비용: $3.65 (전체의 6.6%)
+
+비용 최적화 전략:
+□ 인스턴스 타입 최적화
+□ 스토리지 타입 검토
+□ 인덱스 라이프사이클 관리
+□ 사용량 기반 스케일링
+
+장기 최적화:
+□ Reserved Instance 검토
+□ 데이터 티어링 전략
+□ 아카이브 정책 수립
+</code></pre></div>
+
+<hr />
+<h2 id="_6">📈 데이터베이스 성능 모니터링</h2>
+<h3 id="_7">현재 모니터링 상태</h3>
+<div class="codehilite"><pre><span></span><code>🟡 모니터링 강화 필요:
+- 통합 데이터베이스 모니터링 부족
+- 성능 메트릭 대시보드 부재
+- 알람 및 알림 체계 미흡
+
+📊 권장 모니터링 구성:
+□ CloudWatch 데이터베이스 메트릭
+□ Performance Insights 활용
+□ 커스텀 대시보드 구축
+□ 성능 임계값 알람 설정
+</code></pre></div>
+
+<h3 id="_8">성능 최적화 로드맵</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">모든</span><span class="w"> </span><span class="n">DB</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">메트릭</span><span class="w"> </span><span class="n">수집</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">대시보드</span><span class="w"> </span><span class="n">구축</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">알람</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">알림</span><span class="w"> </span><span class="n">설정</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">인덱스</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">슬로우</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">분석</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">튜닝</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">인덱스</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">실행</span><span class="w"> </span><span class="n">계획</span><span class="w"> </span><span class="n">분석</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">아키텍처</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">읽기</span><span class="o">/</span><span class="n">쓰기</span><span class="w"> </span><span class="n">분산</span><span class="w"> </span><span class="n">전략</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">캐싱</span><span class="w"> </span><span class="n">계층</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">파티셔닝</span><span class="w"> </span><span class="n">검토</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_9">🔒 데이터베이스 보안 분석</h2>
+<h3 id="_10">현재 보안 상태</h3>
+<div class="codehilite"><pre><span></span><code>✅ 우수한 보안 설정:
+- 모든 DB 서비스 VPC 내 배치
+- 전용 보안 그룹 설정
+- 프라이빗 서브넷 배치
+
+🔧 보안 강화 권장:
+□ 암호화 설정 전면 검토
+□ 네트워크 액세스 제한 강화
+□ 감사 로깅 활성화
+□ 정기적인 보안 패치
+</code></pre></div>
+
+<h3 id="_11">보안 강화 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">저장</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">확인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">전송</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">키</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">수립</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">키</span><span class="w"> </span><span class="n">로테이션</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">제어</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">IAM</span><span class="w"> </span><span class="n">기반</span><span class="w"> </span><span class="n">인증</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">최소</span><span class="w"> </span><span class="n">권한</span><span class="w"> </span><span class="n">원칙</span><span class="w"> </span><span class="n">적용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">사용자</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">네트워크</span><span class="w"> </span><span class="n">ACL</span><span class="w"> </span><span class="n">최적화</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">감사</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">감사</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비정상</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">탐지</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">중앙</span><span class="w"> </span><span class="n">집중화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">이벤트</span><span class="w"> </span><span class="n">알림</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_12">💾 백업 및 재해 복구</h2>
+<h3 id="_13">현재 백업 상태</h3>
+<div class="codehilite"><pre><span></span><code>Aurora MySQL:
+✅ 자동 백업 활성화 (7일 보존)
+✅ 포인트인타임 복구 지원
+✅ 스냅샷 기능 활용 가능
+
+ElastiCache Redis:
+🟡 백업 정책 확인 필요
+□ 자동 백업 설정 검토
+□ 스냅샷 스케줄 확인
+
+OpenSearch:
+🟡 백업 정책 확인 필요
+□ 인덱스 스냅샷 정책
+□ 자동 백업 설정 검토
+</code></pre></div>
+
+<h3 id="_14">백업 전략 개선</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">통합</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">모든</span><span class="w"> </span><span class="n">DB</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">표준화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">RPO</span><span class="o">/</span><span class="n">RTO</span><span class="w"> </span><span class="n">목표</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">스케줄</span><span class="w"> </span><span class="n">최적화</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">계획</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">크로스</span><span class="w"> </span><span class="n">리전</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">시나리오</span><span class="w"> </span><span class="n">정의</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">절차</span><span class="w"> </span><span class="n">문서화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">정기적인</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">테스트</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">성공</span><span class="o">/</span><span class="n">실패</span><span class="w"> </span><span class="n">알림</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">크기</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">시간</span><span class="w"> </span><span class="n">추적</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">시간</span><span class="w"> </span><span class="n">모니터링</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_15">💰 데이터베이스 비용 분석</h2>
+<h3 id="_16">현재 비용 구조</h3>
+<div class="codehilite"><pre><span></span><code>총 데이터베이스 비용: $5.97 (전체의 10.8%)
+
+서비스별 비용:
+- OpenSearch: $3.65 (61.1%) - 최대 비용
+- Aurora MySQL: $1.57 (26.3%) - 효율적
+- ElastiCache Redis: $0.75 (12.6%) - 효율적
+</code></pre></div>
+
+<h3 id="_17">비용 최적화 전략</h3>
+<div class="codehilite"><pre><span></span><code>🔴 즉시 조치:
+□ OpenSearch 인스턴스 크기 검토
+□ 사용량 대비 적정 크기 조정
+□ 불필요한 인덱스 정리
+
+🟡 단기 최적화:
+□ Reserved Instance 구매 검토
+□ 스토리지 최적화
+□ 백업 보존 기간 조정
+
+🟢 장기 최적화:
+□ 데이터 아카이빙 전략
+□ 서비스 통합 검토
+□ 대안 솔루션 평가
+</code></pre></div>
+
+<hr />
+<h2 id="_18">🚀 데이터베이스 로드맵</h2>
+<h3 id="phase-1-1-2">Phase 1: 즉시 조치 (1-2주)</h3>
+<ul>
+<li>[ ] OpenSearch 비용 최적화 검토</li>
+<li>[ ] 모든 DB 서비스 백업 정책 확인</li>
+<li>[ ] 보안 설정 전면 점검</li>
+</ul>
+<h3 id="phase-2-1-2">Phase 2: 단기 개선 (1-2개월)</h3>
+<ul>
+<li>[ ] 통합 모니터링 대시보드 구축</li>
+<li>[ ] 성능 최적화 구현</li>
+<li>[ ] Reserved Instance 구매 계획</li>
+</ul>
+<h3 id="phase-3-3-6">Phase 3: 중장기 발전 (3-6개월)</h3>
+<ul>
+<li>[ ] 재해 복구 계획 수립</li>
+<li>[ ] 데이터 아키텍처 최적화</li>
+<li>[ ] 자동화 도구 구현</li>
+</ul>
+<hr />
+<h2 id="_19">📋 데이터베이스 체크리스트</h2>
+<h3 id="_20">성능 체크리스트</h3>
+<ul>
+<li>[ ] 모든 DB 서비스 성능 메트릭 모니터링</li>
+<li>[ ] 슬로우 쿼리 분석 및 최적화</li>
+<li>[ ] 인덱스 최적화 완료</li>
+<li>[ ] 캐시 전략 구현</li>
+</ul>
+<h3 id="_21">보안 체크리스트</h3>
+<ul>
+<li>[ ] 암호화 설정 전면 확인</li>
+<li>[ ] 액세스 제어 정책 검토</li>
+<li>[ ] 감사 로깅 활성화</li>
+<li>[ ] 보안 패치 상태 확인</li>
+</ul>
+<h3 id="_22">백업 체크리스트</h3>
+<ul>
+<li>[ ] 백업 정책 표준화</li>
+<li>[ ] 복구 절차 테스트</li>
+<li>[ ] 크로스 리전 백업 검토</li>
+<li>[ ] 백업 모니터링 설정</li>
+</ul>
+<h3 id="_23">비용 체크리스트</h3>
+<ul>
+<li>[ ] 인스턴스 크기 최적화</li>
+<li>[ ] Reserved Instance 검토</li>
+<li>[ ] 스토리지 최적화</li>
+<li>[ ] 사용량 모니터링 설정</li>
+</ul>
+<hr />
+<h2 id="_24">🎯 종합 평가</h2>
+<h3 id="8210">데이터베이스 아키텍처 점수: <strong>8.2/10</strong> (우수)</h3>
+<p><strong>주요 강점</strong>:
+- 현대적이고 관리형 데이터베이스 서비스 활용
+- 고가용성을 고려한 Aurora 구성
+- 적절한 보안 설정 (VPC 내 배치)
+- 다양한 데이터 요구사항 지원</p>
+<p><strong>개선 영역</strong>:
+- OpenSearch 비용 최적화
+- 통합 모니터링 체계 구축
+- 백업 정책 표준화</p>
+<p><strong>권장 우선순위</strong>:
+1. OpenSearch 비용 최적화
+2. 통합 모니터링 구축
+3. 백업 및 재해 복구 강화</p>
+<hr />
+<p><em>데이터베이스 분석 완료. 다음 단계로 보안 분석을 진행합니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>

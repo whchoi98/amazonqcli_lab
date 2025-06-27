@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전체 계정 분석 요약</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>전체 계정 분석 요약</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 전체 계정 분석 요약</h1>
+<h2 id="executive-summary">📊 Executive Summary</h2>
+<p><strong>분석 일시</strong>: 2025년 6월 17일<br />
+<strong>AWS 계정 ID</strong>: 349131490815<br />
+<strong>주요 리전</strong>: ap-northeast-2 (서울)<br />
+<strong>분석 도구</strong>: Steampipe, AWS CLI, CloudFormation 분석</p>
+<hr />
+<h2 id="_1">🎯 핵심 발견사항</h2>
+<h3 id="_2">인프라 현황 개요</h3>
+<ul>
+<li><strong>VPC 구성</strong>: 5개 VPC (관리형 멀티-VPC 아키텍처)</li>
+<li><strong>컴퓨팅 리소스</strong>: 34개 EC2 인스턴스, 1개 EKS 클러스터</li>
+<li><strong>데이터베이스</strong>: Aurora MySQL 클러스터, Redis 클러스터</li>
+<li><strong>스토리지</strong>: S3 버킷, EBS 볼륨</li>
+<li><strong>네트워킹</strong>: Transit Gateway 기반 연결</li>
+</ul>
+<h3 id="_3">아키텍처 성숙도 평가</h3>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>점수</th>
+<th>상태</th>
+<th>주요 특징</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>네트워킹</strong></td>
+<td>9/10</td>
+<td>🟢 우수</td>
+<td>Multi-VPC, Transit Gateway, 체계적 서브넷 설계</td>
+</tr>
+<tr>
+<td><strong>보안</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>세분화된 보안 그룹, 프라이빗 서브넷 활용</td>
+</tr>
+<tr>
+<td><strong>고가용성</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>Multi-AZ 배포, Aurora Replica</td>
+</tr>
+<tr>
+<td><strong>비용 최적화</strong></td>
+<td>6/10</td>
+<td>🟡 개선 필요</td>
+<td>Network Firewall 비용 검토 필요</td>
+</tr>
+<tr>
+<td><strong>운영 효율성</strong></td>
+<td>7/10</td>
+<td>🟡 개선 필요</td>
+<td>IaC 활용, 모니터링 강화 필요</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_4">💰 비용 분석 요약</h2>
+<h3 id="30">월간 비용 현황 (최근 30일)</h3>
+<p><strong>총 예상 비용</strong>: $55.38</p>
+<table>
+<thead>
+<tr>
+<th>순위</th>
+<th>서비스</th>
+<th>비용 (USD)</th>
+<th>비율</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Amazon EC2</td>
+<td>$25.90</td>
+<td>46.8%</td>
+<td>🟢 정상</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AWS Network Firewall</td>
+<td>$14.68</td>
+<td>26.5%</td>
+<td>🟡 검토 필요</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Amazon VPC</td>
+<td>$5.14</td>
+<td>9.3%</td>
+<td>🟢 정상</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Amazon OpenSearch</td>
+<td>$3.65</td>
+<td>6.6%</td>
+<td>🟢 정상</td>
+</tr>
+<tr>
+<td>5</td>
+<td>EC2 - Other</td>
+<td>$2.80</td>
+<td>5.1%</td>
+<td>🟢 정상</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">비용 최적화 기회</h3>
+<ul>
+<li><strong>즉시 조치</strong>: Network Firewall 필요성 재검토 (월 $14.68 절약 가능)</li>
+<li><strong>단기 계획</strong>: EC2 인스턴스 사용률 분석 및 최적화</li>
+<li><strong>중기 계획</strong>: Reserved Instance 도입 검토</li>
+</ul>
+<hr />
+<h2 id="_6">🏗️ 아키텍처 강점</h2>
+<h3 id="_7">✅ 우수한 설계 요소</h3>
+<ol>
+<li><strong>체계적 네트워크 분리</strong></li>
+<li>관리용 VPC (mgmtvpc): VSCode 개발 환경</li>
+<li>DMZ VPC: EKS, Redis, OpenSearch 배치</li>
+<li>
+<p>워크로드 VPC (VPC01, VPC02): 애플리케이션 분리</p>
+</li>
+<li>
+<p><strong>고가용성 구성</strong></p>
+</li>
+<li>Aurora MySQL Primary + Replica</li>
+<li>EKS 다중 AZ 노드 그룹</li>
+<li>
+<p>Redis 클러스터 구성</p>
+</li>
+<li>
+<p><strong>현대적 기술 스택</strong></p>
+</li>
+<li>Kubernetes (EKS 1.31)</li>
+<li>관리형 데이터베이스 (Aurora, ElastiCache)</li>
+<li>
+<p>검색 엔진 (OpenSearch)</p>
+</li>
+<li>
+<p><strong>Infrastructure as Code</strong></p>
+</li>
+<li>CloudFormation 기반 인프라 관리</li>
+<li>eksctl을 통한 EKS 관리</li>
+<li>체계적인 태그 정책</li>
+</ol>
+<hr />
+<h2 id="_8">⚠️ 개선 권장사항</h2>
+<h3 id="_9">🔴 즉시 조치 필요</h3>
+<ol>
+<li><strong>Network Firewall 검토</strong></li>
+<li>현재 전체 비용의 26.5% 차지</li>
+<li>
+<p>실제 사용량 대비 필요성 검증 필요</p>
+</li>
+<li>
+<p><strong>미사용 리소스 정리</strong></p>
+</li>
+<li>정기적인 리소스 사용량 모니터링</li>
+<li>태그 기반 리소스 관리 강화</li>
+</ol>
+<h3 id="1-2">🟡 단기 개선 (1-2개월)</h3>
+<ol>
+<li><strong>모니터링 강화</strong></li>
+<li>CloudWatch 대시보드 구축</li>
+<li>비용 알람 설정</li>
+<li>
+<p>성능 메트릭 모니터링</p>
+</li>
+<li>
+<p><strong>보안 강화</strong></p>
+</li>
+<li>보안 그룹 규칙 정기 검토</li>
+<li>VPC Flow Logs 활성화</li>
+<li>AWS Config 규칙 적용</li>
+</ol>
+<h3 id="3-6">🟢 중장기 계획 (3-6개월)</h3>
+<ol>
+<li><strong>비용 최적화</strong></li>
+<li>Reserved Instance 구매 계획</li>
+<li>Spot Instance 활용 검토</li>
+<li>
+<p>스토리지 계층화 전략</p>
+</li>
+<li>
+<p><strong>운영 자동화</strong></p>
+</li>
+<li>CI/CD 파이프라인 구축</li>
+<li>자동화된 백업 정책</li>
+<li>인프라 드리프트 감지</li>
+</ol>
+<hr />
+<h2 id="_10">📈 권장 로드맵</h2>
+<h3 id="phase-1-1-2">Phase 1: 즉시 조치 (1-2주)</h3>
+<ul>
+<li>[ ] Network Firewall 사용량 분석</li>
+<li>[ ] 비용 모니터링 대시보드 구축</li>
+<li>[ ] 미사용 리소스 식별 및 정리</li>
+</ul>
+<h3 id="phase-2-1-2">Phase 2: 단기 개선 (1-2개월)</h3>
+<ul>
+<li>[ ] Reserved Instance 구매 계획 수립</li>
+<li>[ ] 보안 강화 조치 구현</li>
+<li>[ ] 모니터링 및 알람 체계 구축</li>
+</ul>
+<h3 id="phase-3-3-6">Phase 3: 중장기 발전 (3-6개월)</h3>
+<ul>
+<li>[ ] 멀티 리전 확장 계획</li>
+<li>[ ] 서버리스 아키텍처 도입</li>
+<li>[ ] 컨테이너화 전략 고도화</li>
+</ul>
+<hr />
+<h2 id="_11">🎖️ 종합 평가</h2>
+<h3 id="7610">전체 아키텍처 점수: <strong>7.6/10</strong> (양호)</h3>
+<p><strong>강점</strong>:
+- 체계적이고 확장 가능한 네트워크 설계
+- 현대적 기술 스택과 관리형 서비스 활용
+- Infrastructure as Code 적용</p>
+<p><strong>개선 영역</strong>:
+- 비용 최적화 (특히 Network Firewall)
+- 운영 모니터링 및 자동화
+- 보안 정책 표준화</p>
+<hr />
+<h2 id="_12">📞 다음 단계</h2>
+<ol>
+<li><strong>상세 분석 보고서 검토</strong>: 각 영역별 상세 분석 결과 확인</li>
+<li><strong>우선순위 액션 아이템 실행</strong>: 즉시 조치 항목부터 시작</li>
+<li><strong>정기 리뷰 일정 수립</strong>: 월간/분기별 아키텍처 리뷰</li>
+</ol>
+<hr />
+<p><em>본 요약 보고서는 전체 분석의 핵심 내용을 담고 있습니다. 각 영역별 상세 분석은 개별 보고서를 참조하시기 바랍니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>

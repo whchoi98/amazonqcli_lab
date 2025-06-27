@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구현 가이드</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>구현 가이드</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 구현 가이드</h1>
+<h2 id="_1">🛠️ 단계별 구현 가이드</h2>
+<p><strong>구현 기간</strong>: 6개월<br />
+<strong>총 예상 투자</strong>: $2,000-4,000<br />
+<strong>예상 절약 효과</strong>: $4,000-8,000/년</p>
+<hr />
+<h2 id="phase-1-1-2">📅 Phase 1: 즉시 조치 (1-2주)</h2>
+<h3 id="11-network-firewall">1.1 Network Firewall 최적화</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 1. 현재 Network Firewall 정책 분석</span>
+aws<span class="w"> </span>network-firewall<span class="w"> </span>describe-firewall-policy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--firewall-policy-arn<span class="w"> </span>&lt;policy-arn&gt;
+
+<span class="c1"># 2. 트래픽 로그 분석</span>
+aws<span class="w"> </span>logs<span class="w"> </span>filter-log-events<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--log-group-name<span class="w"> </span>/aws/networkfirewall/flowlogs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--start-time<span class="w"> </span><span class="k">$(</span>date<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;7 days ago&#39;</span><span class="w"> </span>+%s<span class="k">)</span><span class="m">000</span>
+
+<span class="c1"># 3. 보안 그룹 규칙 강화 스크립트 실행</span>
+./scripts/optimize-security-groups.sh
+</code></pre></div>
+
+<h3 id="12">1.2 기본 모니터링 구축</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># CloudWatch 알람 생성</span>
+aws<span class="w"> </span>cloudwatch<span class="w"> </span>put-metric-alarm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alarm-name<span class="w"> </span><span class="s2">&quot;High-CPU-Usage&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alarm-description<span class="w"> </span><span class="s2">&quot;Alert when CPU exceeds 80%&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--metric-name<span class="w"> </span>CPUUtilization<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--namespace<span class="w"> </span>AWS/EC2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--statistic<span class="w"> </span>Average<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--period<span class="w"> </span><span class="m">300</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--threshold<span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--comparison-operator<span class="w"> </span>GreaterThanThreshold
+
+<span class="c1"># SNS 토픽 생성</span>
+aws<span class="w"> </span>sns<span class="w"> </span>create-topic<span class="w"> </span>--name<span class="w"> </span>aws-alerts
+aws<span class="w"> </span>sns<span class="w"> </span>subscribe<span class="w"> </span>--topic-arn<span class="w"> </span>&lt;topic-arn&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--protocol<span class="w"> </span>email<span class="w"> </span>--notification-endpoint<span class="w"> </span>admin@company.com
+</code></pre></div>
+
+<h3 id="13">1.3 비용 알람 설정</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 월간 비용 알람 설정</span>
+aws<span class="w"> </span>budgets<span class="w"> </span>create-budget<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--account-id<span class="w"> </span>&lt;account-id&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--budget<span class="w"> </span>file://budget-config.json
+</code></pre></div>
+
+<hr />
+<h2 id="phase-2-1-2">📅 Phase 2: 단기 개선 (1-2개월)</h2>
+<h3 id="21-ec2-right-sizing">2.1 EC2 Right-sizing 구현</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># EC2 사용률 분석 스크립트</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_ec2_utilization</span><span class="p">():</span>
+    <span class="n">ec2</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;ec2&#39;</span><span class="p">)</span>
+    <span class="n">cloudwatch</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;cloudwatch&#39;</span><span class="p">)</span>
+
+    <span class="n">instances</span> <span class="o">=</span> <span class="n">ec2</span><span class="o">.</span><span class="n">describe_instances</span><span class="p">()</span>
+    <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">reservation</span> <span class="ow">in</span> <span class="n">instances</span><span class="p">[</span><span class="s1">&#39;Reservations&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">reservation</span><span class="p">[</span><span class="s1">&#39;Instances&#39;</span><span class="p">]:</span>
+            <span class="c1"># CPU 사용률 분석</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">cloudwatch</span><span class="o">.</span><span class="n">get_metric_statistics</span><span class="p">(</span>
+                <span class="n">Namespace</span><span class="o">=</span><span class="s1">&#39;AWS/EC2&#39;</span><span class="p">,</span>
+                <span class="n">MetricName</span><span class="o">=</span><span class="s1">&#39;CPUUtilization&#39;</span><span class="p">,</span>
+                <span class="n">Dimensions</span><span class="o">=</span><span class="p">[</span>
+                    <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;InstanceId&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">instance</span><span class="p">[</span><span class="s1">&#39;InstanceId&#39;</span><span class="p">]}</span>
+                <span class="p">],</span>
+                <span class="n">StartTime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">14</span><span class="p">),</span>
+                <span class="n">EndTime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+                <span class="n">Period</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                <span class="n">Statistics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Average&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="n">avg_cpu</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;Average&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;Datapoints&#39;</span><span class="p">]])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;Datapoints&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">avg_cpu</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;InstanceId&#39;</span><span class="p">:</span> <span class="n">instance</span><span class="p">[</span><span class="s1">&#39;InstanceId&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;CurrentType&#39;</span><span class="p">:</span> <span class="n">instance</span><span class="p">[</span><span class="s1">&#39;InstanceType&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;AvgCPU&#39;</span><span class="p">:</span> <span class="n">avg_cpu</span><span class="p">,</span>
+                    <span class="s1">&#39;Recommendation&#39;</span><span class="p">:</span> <span class="s1">&#39;Downsize or schedule&#39;</span>
+                <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">recommendations</span>
+</code></pre></div>
+
+<h3 id="22-reserved-instance">2.2 Reserved Instance 구매 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># RI 권장사항 확인</span>
+aws<span class="w"> </span>ce<span class="w"> </span>get-rightsizing-recommendation<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--service<span class="w"> </span>EC2-Instance<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--page-size<span class="w"> </span><span class="m">100</span>
+
+<span class="c1"># RI 구매 권장사항 확인</span>
+aws<span class="w"> </span>ce<span class="w"> </span>get-reservation-purchase-recommendation<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--service<span class="w"> </span>EC2-Instance<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--account-scope<span class="w"> </span>PAYER
+</code></pre></div>
+
+<hr />
+<h2 id="phase-3-2-4">📅 Phase 3: 중기 발전 (2-4개월)</h2>
+<h3 id="31">3.1 통합 모니터링 플랫폼 구축</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># CloudFormation 템플릿: monitoring-stack.yaml</span>
+<span class="nt">AWSTemplateFormatVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;2010-09-09&#39;</span>
+<span class="nt">Description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Comprehensive</span><span class="nv"> </span><span class="s">Monitoring</span><span class="nv"> </span><span class="s">Stack&#39;</span>
+
+<span class="nt">Resources</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># X-Ray 서비스 맵</span>
+<span class="w">  </span><span class="nt">XRayServiceMap</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWS::XRay::SamplingRule</span>
+<span class="w">    </span><span class="nt">Properties</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">SamplingRule</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">RuleName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BasicSampling</span>
+<span class="w">        </span><span class="nt">Priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9000</span>
+<span class="w">        </span><span class="nt">FixedRate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">        </span><span class="nt">ReservoirSize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">        </span><span class="nt">ServiceName</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">        </span><span class="nt">ServiceType</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">        </span><span class="nt">Host</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">        </span><span class="nt">HTTPMethod</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">        </span><span class="nt">URLPath</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span>
+<span class="w">        </span><span class="nt">Version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+
+<span class="w">  </span><span class="c1"># CloudWatch 대시보드</span>
+<span class="w">  </span><span class="nt">MonitoringDashboard</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWS::CloudWatch::Dashboard</span>
+<span class="w">    </span><span class="nt">Properties</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">DashboardName</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;AWS-Infrastructure-Overview&#39;</span>
+<span class="w">      </span><span class="nt">DashboardBody</span><span class="p">:</span><span class="w"> </span><span class="kt">!Sub</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">        </span><span class="no">{</span>
+<span class="w">          </span><span class="no">&quot;widgets&quot;: [</span>
+<span class="w">            </span><span class="no">{</span>
+<span class="w">              </span><span class="no">&quot;type&quot;: &quot;metric&quot;,</span>
+<span class="w">              </span><span class="no">&quot;properties&quot;: {</span>
+<span class="w">                </span><span class="no">&quot;metrics&quot;: [</span>
+<span class="w">                  </span><span class="no">[&quot;AWS/EC2&quot;, &quot;CPUUtilization&quot;],</span>
+<span class="w">                  </span><span class="no">[&quot;AWS/RDS&quot;, &quot;CPUUtilization&quot;],</span>
+<span class="w">                  </span><span class="no">[&quot;AWS/EKS&quot;, &quot;cluster_failed_request_count&quot;]</span>
+<span class="w">                </span><span class="no">],</span>
+<span class="w">                </span><span class="no">&quot;period&quot;: 300,</span>
+<span class="w">                </span><span class="no">&quot;stat&quot;: &quot;Average&quot;,</span>
+<span class="w">                </span><span class="no">&quot;region&quot;: &quot;${AWS::Region}&quot;,</span>
+<span class="w">                </span><span class="no">&quot;title&quot;: &quot;System Performance Overview&quot;</span>
+<span class="w">              </span><span class="no">}</span>
+<span class="w">            </span><span class="no">}</span>
+<span class="w">          </span><span class="no">]</span>
+<span class="w">        </span><span class="no">}</span>
+</code></pre></div>
+
+<h3 id="32">3.2 백업 정책 구현</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;BackupPlan&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;BackupPlanName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ComprehensiveBackupPlan&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;BackupPlanRule&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;RuleName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DailyBackups&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;TargetBackupVault&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;ScheduleExpression&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cron(0 2 ? * * *)&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;StartWindowMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;CompletionWindowMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;Lifecycle&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;DeleteAfterDays&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;MoveToColdStorageAfterDays&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h2 id="phase-4-4-6">📅 Phase 4: 장기 발전 (4-6개월)</h2>
+<h3 id="41-cicd">4.1 CI/CD 파이프라인 구축</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># CodePipeline 설정</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="nt">phases</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pre_build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Logging in to Amazon ECR...</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Build started on `date`</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Building the Docker image...</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG</span>
+<span class="w">  </span><span class="nt">post_build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Build completed on `date`</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Pushing the Docker image...</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG</span>
+</code></pre></div>
+
+<h3 id="42">4.2 서버리스 아키텍처 도입</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Lambda 함수 예제: 이벤트 처리</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    S3 이벤트를 처리하는 Lambda 함수</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s3_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+    <span class="n">sns_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;sns&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;Records&#39;</span><span class="p">]:</span>
+        <span class="n">bucket</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;s3&#39;</span><span class="p">][</span><span class="s1">&#39;bucket&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;s3&#39;</span><span class="p">][</span><span class="s1">&#39;object&#39;</span><span class="p">][</span><span class="s1">&#39;key&#39;</span><span class="p">]</span>
+
+        <span class="c1"># 파일 처리 로직</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+            <span class="c1"># 처리 로직 구현</span>
+
+            <span class="c1"># 성공 알림</span>
+            <span class="n">sns_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+                <span class="n">TopicArn</span><span class="o">=</span><span class="s1">&#39;arn:aws:sns:region:account:success-topic&#39;</span><span class="p">,</span>
+                <span class="n">Message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Successfully processed </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">Subject</span><span class="o">=</span><span class="s1">&#39;File Processing Success&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># 오류 알림</span>
+            <span class="n">sns_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+                <span class="n">TopicArn</span><span class="o">=</span><span class="s1">&#39;arn:aws:sns:region:account:error-topic&#39;</span><span class="p">,</span>
+                <span class="n">Message</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Error processing </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">Subject</span><span class="o">=</span><span class="s1">&#39;File Processing Error&#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;statusCode&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+        <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="s1">&#39;Processing completed&#39;</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_2">🔧 자동화 스크립트 모음</h2>
+<h3 id="_3">비용 최적화 자동화</h3>
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># cost-optimization.sh</span>
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Starting AWS Cost Optimization...&quot;</span>
+
+<span class="c1"># 1. 미사용 EBS 볼륨 식별</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Identifying unused EBS volumes...&quot;</span>
+aws<span class="w"> </span>ec2<span class="w"> </span>describe-volumes<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--filters<span class="w"> </span><span class="nv">Name</span><span class="o">=</span>status,Values<span class="o">=</span>available<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--query<span class="w"> </span><span class="s1">&#39;Volumes[*].[VolumeId,Size,CreateTime]&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output<span class="w"> </span>table
+
+<span class="c1"># 2. 미사용 Elastic IP 식별</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Identifying unused Elastic IPs...&quot;</span>
+aws<span class="w"> </span>ec2<span class="w"> </span>describe-addresses<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--query<span class="w"> </span><span class="s1">&#39;Addresses[?!InstanceId].[PublicIp,AllocationId]&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output<span class="w"> </span>table
+
+<span class="c1"># 3. 오래된 스냅샷 정리</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Identifying old snapshots...&quot;</span>
+aws<span class="w"> </span>ec2<span class="w"> </span>describe-snapshots<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--owner-ids<span class="w"> </span>self<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--query<span class="w"> </span><span class="s1">&#39;Snapshots[?StartTime&lt;=`2024-01-01`].[SnapshotId,StartTime,VolumeSize]&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output<span class="w"> </span>table
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Cost optimization analysis completed.&quot;</span>
+</code></pre></div>
+
+<h3 id="_4">보안 강화 자동화</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># security-audit.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">audit_security_groups</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;보안 그룹 감사&quot;&quot;&quot;</span>
+    <span class="n">ec2</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;ec2&#39;</span><span class="p">)</span>
+
+    <span class="n">security_groups</span> <span class="o">=</span> <span class="n">ec2</span><span class="o">.</span><span class="n">describe_security_groups</span><span class="p">()</span>
+    <span class="n">risky_groups</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="n">security_groups</span><span class="p">[</span><span class="s1">&#39;SecurityGroups&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">sg</span><span class="p">[</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">ip_range</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">if</span> <span class="n">ip_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">:</span>
+                    <span class="n">risky_groups</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="n">sg</span><span class="p">[</span><span class="s1">&#39;GroupId&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;GroupName&#39;</span><span class="p">:</span> <span class="n">sg</span><span class="p">[</span><span class="s1">&#39;GroupName&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;Protocol&#39;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IpProtocol&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;Port&#39;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FromPort&#39;</span><span class="p">)</span>
+                    <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">risky_groups</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">audit_s3_buckets</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;S3 버킷 보안 감사&quot;&quot;&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+
+    <span class="n">buckets</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_buckets</span><span class="p">()</span>
+    <span class="n">public_buckets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">bucket</span> <span class="ow">in</span> <span class="n">buckets</span><span class="p">[</span><span class="s1">&#39;Buckets&#39;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">acl</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_bucket_acl</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">grant</span> <span class="ow">in</span> <span class="n">acl</span><span class="p">[</span><span class="s1">&#39;Grants&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">grant</span><span class="p">[</span><span class="s1">&#39;Grantee&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URI&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;http://acs.amazonaws.com/groups/global/AllUsers&#39;</span><span class="p">:</span>
+                    <span class="n">public_buckets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bucket</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+    <span class="k">return</span> <span class="n">public_buckets</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Security Audit Results:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Risky Security Groups:&quot;</span><span class="p">,</span> <span class="n">audit_security_groups</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Public S3 Buckets:&quot;</span><span class="p">,</span> <span class="n">audit_s3_buckets</span><span class="p">())</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_5">📊 모니터링 및 검증</h2>
+<h3 id="_6">성과 측정 대시보드</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># performance-dashboard.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_cost_report</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;비용 절약 효과 리포트 생성&quot;&quot;&quot;</span>
+    <span class="n">ce</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;ce&#39;</span><span class="p">)</span>
+
+    <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">start_date</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">ce</span><span class="o">.</span><span class="n">get_cost_and_usage</span><span class="p">(</span>
+        <span class="n">TimePeriod</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;Start&#39;</span><span class="p">:</span> <span class="n">start_date</span><span class="p">,</span>
+            <span class="s1">&#39;End&#39;</span><span class="p">:</span> <span class="n">end_date</span>
+        <span class="p">},</span>
+        <span class="n">Granularity</span><span class="o">=</span><span class="s1">&#39;MONTHLY&#39;</span><span class="p">,</span>
+        <span class="n">Metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BlendedCost&#39;</span><span class="p">],</span>
+        <span class="n">GroupBy</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;Type&#39;</span><span class="p">:</span> <span class="s1">&#39;DIMENSION&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="s1">&#39;SERVICE&#39;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 비용 데이터 시각화</span>
+    <span class="n">services</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;ResultsByTime&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Groups&#39;</span><span class="p">]:</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;Keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;Metrics&#39;</span><span class="p">][</span><span class="s1">&#39;BlendedCost&#39;</span><span class="p">][</span><span class="s1">&#39;Amount&#39;</span><span class="p">])</span>
+        <span class="n">services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+        <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span><span class="n">costs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">services</span><span class="p">,</span> <span class="n">autopct</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%1.1f%%</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;AWS Cost Distribution&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;cost-distribution.png&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">monitor_optimization_progress</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;최적화 진행 상황 모니터링&quot;&quot;&quot;</span>
+    <span class="c1"># KPI 추적 로직 구현</span>
+    <span class="n">kpis</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;cost_reduction&#39;</span><span class="p">:</span> <span class="n">calculate_cost_reduction</span><span class="p">(),</span>
+        <span class="s1">&#39;security_score&#39;</span><span class="p">:</span> <span class="n">calculate_security_score</span><span class="p">(),</span>
+        <span class="s1">&#39;availability&#39;</span><span class="p">:</span> <span class="n">calculate_availability</span><span class="p">(),</span>
+        <span class="s1">&#39;automation_ratio&#39;</span><span class="p">:</span> <span class="n">calculate_automation_ratio</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">kpis</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_7">🚨 문제 해결 가이드</h2>
+<h3 id="_8">일반적인 문제와 해결책</h3>
+<h4 id="1-network-firewall">1. Network Firewall 제거 후 보안 우려</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 해결책: 보안 그룹 강화 및 GuardDuty 활성화</span>
+aws<span class="w"> </span>guardduty<span class="w"> </span>create-detector<span class="w"> </span>--enable
+
+<span class="c1"># VPC Flow Logs 활성화</span>
+aws<span class="w"> </span>ec2<span class="w"> </span>create-flow-logs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--resource-type<span class="w"> </span>VPC<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--resource-ids<span class="w"> </span>vpc-12345678<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--traffic-type<span class="w"> </span>ALL<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--log-destination-type<span class="w"> </span>cloud-watch-logs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--log-group-name<span class="w"> </span>VPCFlowLogs
+</code></pre></div>
+
+<h4 id="2">2. 모니터링 데이터 과부하</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 해결책: 메트릭 필터링 및 집계</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">optimize_monitoring</span><span class="p">():</span>
+    <span class="n">cloudwatch</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;cloudwatch&#39;</span><span class="p">)</span>
+
+    <span class="c1"># 불필요한 메트릭 필터 생성</span>
+    <span class="n">cloudwatch</span><span class="o">.</span><span class="n">put_metric_filter</span><span class="p">(</span>
+        <span class="n">logGroupName</span><span class="o">=</span><span class="s1">&#39;/aws/lambda/function-name&#39;</span><span class="p">,</span>
+        <span class="n">filterName</span><span class="o">=</span><span class="s1">&#39;ErrorFilter&#39;</span><span class="p">,</span>
+        <span class="n">filterPattern</span><span class="o">=</span><span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+        <span class="n">metricTransformations</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;metricName&#39;</span><span class="p">:</span> <span class="s1">&#39;ErrorCount&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;metricNamespace&#39;</span><span class="p">:</span> <span class="s1">&#39;Custom/Application&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;metricValue&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+</code></pre></div>
+
+<h4 id="3">3. 비용 최적화 후 성능 저하</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 해결책: 성능 모니터링 강화</span>
+aws<span class="w"> </span>cloudwatch<span class="w"> </span>put-metric-alarm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alarm-name<span class="w"> </span><span class="s2">&quot;Response-Time-High&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--alarm-description<span class="w"> </span><span class="s2">&quot;Alert when response time is high&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--metric-name<span class="w"> </span>ResponseTime<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--namespace<span class="w"> </span>Custom/Application<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--statistic<span class="w"> </span>Average<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--period<span class="w"> </span><span class="m">300</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--threshold<span class="w"> </span><span class="m">1000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--comparison-operator<span class="w"> </span>GreaterThanThreshold
+</code></pre></div>
+
+<hr />
+<h2 id="_9">📋 체크리스트 및 검증</h2>
+<h3 id="phase-1">Phase 1 완료 체크리스트</h3>
+<ul>
+<li>[ ] Network Firewall 분석 완료</li>
+<li>[ ] 기본 모니터링 알람 설정</li>
+<li>[ ] 비용 알람 구성</li>
+<li>[ ] 보안 그룹 감사 완료</li>
+<li>[ ] 미사용 리소스 정리</li>
+</ul>
+<h3 id="phase-2">Phase 2 완료 체크리스트</h3>
+<ul>
+<li>[ ] EC2 Right-sizing 실행</li>
+<li>[ ] Reserved Instance 구매</li>
+<li>[ ] 백업 정책 구현</li>
+<li>[ ] 통합 대시보드 구축</li>
+<li>[ ] 성능 메트릭 수집</li>
+</ul>
+<h3 id="phase-3">Phase 3 완료 체크리스트</h3>
+<ul>
+<li>[ ] CI/CD 파이프라인 구축</li>
+<li>[ ] 서버리스 함수 구현</li>
+<li>[ ] 자동화 스크립트 배포</li>
+<li>[ ] 보안 자동화 구현</li>
+<li>[ ] 문서화 완료</li>
+</ul>
+<hr />
+<h2 id="kpi">🎯 성공 기준 및 KPI</h2>
+<h3 id="_10">정량적 목표</h3>
+<ul>
+<li>월간 비용 25-35% 절감</li>
+<li>시스템 가용성 99.9% 이상</li>
+<li>평균 장애 해결 시간 50% 단축</li>
+<li>보안 인시던트 0건 유지</li>
+</ul>
+<h3 id="_11">정성적 목표</h3>
+<ul>
+<li>운영 프로세스 표준화</li>
+<li>개발팀 생산성 향상</li>
+<li>보안 문화 정착</li>
+<li>지속적 개선 문화 구축</li>
+</ul>
+<hr />
+<p><em>구현 가이드 완료. 모든 분석 보고서가 준비되었습니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>

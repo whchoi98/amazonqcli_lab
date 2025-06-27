@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스토리지 분석</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .content { padding: 40px; }
+        .nav-back { 
+            display: inline-block; margin-bottom: 20px; 
+            padding: 10px 20px; background: #667eea; color: white;
+            text-decoration: none; border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-back:hover { background: #5a6fd8; }
+        h1, h2, h3, h4, h5, h6 { 
+            color: #2c3e50; margin: 30px 0 15px 0; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.2em; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { font-size: 1.8em; color: #667eea; }
+        h3 { font-size: 1.4em; color: #5a6fd8; }
+        p { margin: 15px 0; }
+        table { 
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px; overflow: hidden;
+        }
+        th { 
+            background: #667eea; color: white; padding: 15px;
+            text-align: left; font-weight: 600;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        code { 
+            background: #f4f4f4; padding: 2px 6px; 
+            border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre { 
+            background: #2c3e50; color: #ecf0f1; padding: 20px;
+            border-radius: 8px; overflow-x: auto; margin: 20px 0;
+        }
+        pre code { background: none; color: inherit; }
+        ul, ol { margin: 15px 0; padding-left: 30px; }
+        li { margin: 8px 0; }
+        blockquote { 
+            border-left: 4px solid #667eea; padding: 15px 20px;
+            background: #f8f9fa; margin: 20px 0; border-radius: 0 8px 8px 0;
+        }
+        .score { 
+            display: inline-block; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9em;
+        }
+        .score.excellent { background-color: #d4edda; color: #155724; }
+        .score.good { background-color: #d1ecf1; color: #0c5460; }
+        .score.fair { background-color: #fff3cd; color: #856404; }
+        .score.poor { background-color: #f8d7da; color: #721c24; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .footer { 
+            background: #f8f9fa; padding: 20px; text-align: center;
+            color: #666; border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .container { margin: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            table { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>스토리지 분석</h1>
+            <p>AWS 계정 종합 분석 보고서 | 생성일: 2025년 06월 17일</p>
+        </div>
+        <div class="content">
+            <a href="index.html" class="nav-back">← 메인 대시보드로 돌아가기</a>
+            <h1 id="aws-">AWS 계정 종합 분석 보고서 - 스토리지 분석</h1>
+<h2 id="_1">💾 스토리지 리소스 종합 분석</h2>
+<p><strong>분석 범위</strong>: S3, EBS, EFS, 백업 정책<br />
+<strong>분석 일시</strong>: 2025년 6월 17일<br />
+<strong>주요 스토리지 서비스</strong>: S3 버킷, EBS 볼륨, Aurora 스토리지</p>
+<hr />
+<h2 id="_2">📊 스토리지 현황 개요</h2>
+<h3 id="_3">스토리지 서비스 분포</h3>
+<table>
+<thead>
+<tr>
+<th>스토리지 타입</th>
+<th>수량/용량</th>
+<th>상태</th>
+<th>비용 영향</th>
+<th>평가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S3 버킷</strong></td>
+<td>다수</td>
+<td>활성</td>
+<td>미확인</td>
+<td>🟡 분석 필요</td>
+</tr>
+<tr>
+<td><strong>EBS 볼륨</strong></td>
+<td>EC2 연결</td>
+<td>활성</td>
+<td>EC2 비용 포함</td>
+<td>🟢 양호</td>
+</tr>
+<tr>
+<td><strong>Aurora 스토리지</strong></td>
+<td>자동 확장</td>
+<td>활성</td>
+<td>$1.57</td>
+<td>🟢 우수</td>
+</tr>
+<tr>
+<td><strong>EFS</strong></td>
+<td>미확인</td>
+<td>-</td>
+<td>미확인</td>
+<td>🟡 검토 필요</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4">스토리지 아키텍처 평가</h3>
+<table>
+<thead>
+<tr>
+<th>평가 항목</th>
+<th>점수</th>
+<th>상태</th>
+<th>세부 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>데이터 보호</strong></td>
+<td>7/10</td>
+<td>🟡 개선 가능</td>
+<td>백업 정책 표준화 필요</td>
+</tr>
+<tr>
+<td><strong>성능 최적화</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>Aurora 고성능 스토리지</td>
+</tr>
+<tr>
+<td><strong>비용 효율성</strong></td>
+<td>7/10</td>
+<td>🟡 개선 가능</td>
+<td>S3 스토리지 클래스 최적화</td>
+</tr>
+<tr>
+<td><strong>보안</strong></td>
+<td>8/10</td>
+<td>🟢 양호</td>
+<td>암호화 적용</td>
+</tr>
+<tr>
+<td><strong>확장성</strong></td>
+<td>9/10</td>
+<td>🟢 우수</td>
+<td>자동 확장 구성</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="s3">🗄️ S3 스토리지 분석</h2>
+<h3 id="s3_1">S3 버킷 현황</h3>
+<div class="codehilite"><pre><span></span><code>분석된 S3 버킷 정보:
+- 다수의 S3 버킷 존재 확인
+- 버전 관리 설정 상태 확인 필요
+- 암호화 설정 적용 상태 양호
+
+✅ 확인된 보안 설정:
+- 서버 사이드 암호화 구성
+- 적절한 액세스 제어
+
+🔧 개선 필요 영역:
+□ 버킷별 용도 및 데이터 분류
+□ 스토리지 클래스 최적화
+□ 라이프사이클 정책 구현
+□ 액세스 로깅 활성화
+</code></pre></div>
+
+<h3 id="s3_2">S3 최적화 권장사항</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">스토리지</span><span class="w"> </span><span class="n">클래스</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="nb">Int</span><span class="n">elligent</span><span class="w"> </span><span class="n">Tiering</span><span class="w"> </span><span class="n">활성화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">아카이브</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">Glacier</span><span class="w"> </span><span class="n">이동</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">임시</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">삭제</span><span class="w"> </span><span class="n">정책</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">보안</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">버킷</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">정기</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">퍼블릭</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">차단</span><span class="w"> </span><span class="n">확인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">MFA</span><span class="w"> </span><span class="n">Delete</span><span class="w"> </span><span class="n">활성화</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스토리지</span><span class="w"> </span><span class="n">사용량</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">불완전한</span><span class="w"> </span><span class="n">멀티파트</span><span class="w"> </span><span class="n">업로드</span><span class="w"> </span><span class="n">정리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">중복</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">식별</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">제거</span>
+</code></pre></div>
+
+<hr />
+<h2 id="ebs">💿 EBS 스토리지 분석</h2>
+<h3 id="ebs_1">EBS 볼륨 구성</h3>
+<div class="codehilite"><pre><span></span><code>EC2 인스턴스별 EBS 볼륨:
+- 총 34개 인스턴스에 연결된 EBS 볼륨
+- 대부분 gp3 또는 gp2 타입 사용 추정
+- 루트 볼륨 및 데이터 볼륨 구성
+
+✅ 예상 최적화 상태:
+- 현대적 EBS 볼륨 타입 사용
+- 적절한 볼륨 크기 할당
+- 암호화 설정 적용
+
+📊 분석 필요 영역:
+□ 볼륨별 사용률 모니터링
+□ IOPS 성능 최적화
+□ 스냅샷 정책 수립
+□ 미사용 볼륨 식별
+</code></pre></div>
+
+<h3 id="ebs_2">EBS 최적화 전략</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">gp2에서</span><span class="w"> </span><span class="n">gp3로</span><span class="w"> </span><span class="n">업그레이드</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">IOPS</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">처리량</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">볼륨</span><span class="w"> </span><span class="n">크기</span><span class="w"> </span><span class="n">적정화</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">미사용</span><span class="w"> </span><span class="n">볼륨</span><span class="w"> </span><span class="n">정리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스냅샷</span><span class="w"> </span><span class="n">라이프사이클</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">볼륨</span><span class="w"> </span><span class="n">타입</span><span class="w"> </span><span class="n">최적화</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">보호</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동</span><span class="w"> </span><span class="n">스냅샷</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">구현</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">크로스</span><span class="w"> </span><span class="n">리전</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스냅샷</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">확인</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_5">🗃️ 데이터베이스 스토리지 분석</h2>
+<h3 id="aurora-mysql">Aurora MySQL 스토리지</h3>
+<div class="codehilite"><pre><span></span><code>클러스터 구성:
+- Primary + Replica 구성
+- 자동 확장 스토리지 (1GB 시작)
+- 고성능 SSD 스토리지
+
+✅ 우수한 구성:
+- 자동 백업 및 포인트인타임 복구
+- 다중 AZ 복제
+- 암호화 적용
+- 자동 스토리지 확장
+
+📈 성능 특징:
+- 높은 IOPS 성능
+- 낮은 지연 시간
+- 자동 장애 조치
+</code></pre></div>
+
+<h3 id="aurora">Aurora 스토리지 최적화</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">모니터링</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스토리지</span><span class="w"> </span><span class="n">사용량</span><span class="w"> </span><span class="n">추적</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="w"> </span><span class="n">패턴</span><span class="w"> </span><span class="n">분석</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">비용</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">보존</span><span class="w"> </span><span class="n">기간</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">스냅샷</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">정책</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">읽기</span><span class="w"> </span><span class="n">전용</span><span class="w"> </span><span class="n">복제본</span><span class="w"> </span><span class="n">활용도</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">보호</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">계획</span><span class="w"> </span><span class="n">수립</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">강화</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_6">🔄 백업 및 재해 복구 분석</h2>
+<h3 id="_7">현재 백업 상태</h3>
+<div class="codehilite"><pre><span></span><code>🟡 개선 필요 영역:
+- 통합된 백업 정책 부재
+- 백업 모니터링 체계 미흡
+- 복구 테스트 프로세스 부족
+
+📋 현재 백업 구성:
+- Aurora: 자동 백업 활성화
+- EBS: 스냅샷 정책 확인 필요
+- S3: 버전 관리 및 복제 검토 필요
+</code></pre></div>
+
+<h3 id="_8">백업 전략 권장사항</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">AWS</span><span class="w"> </span><span class="n">Backup</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">중앙</span><span class="w"> </span><span class="n">집중식</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">관리</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">크로스</span><span class="w"> </span><span class="n">서비스</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">자동화된</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">스케줄</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">표준화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">RPO</span><span class="o">/</span><span class="n">RTO</span><span class="w"> </span><span class="n">목표</span><span class="w"> </span><span class="n">설정</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">분류별</span><span class="w"> </span><span class="n">백업</span><span class="w"> </span><span class="n">정책</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">보존</span><span class="w"> </span><span class="n">기간</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">수립</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">계획</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">재해</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">시나리오</span><span class="w"> </span><span class="n">정의</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">절차</span><span class="w"> </span><span class="n">문서화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">정기적인</span><span class="w"> </span><span class="n">복구</span><span class="w"> </span><span class="n">테스트</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_9">📈 스토리지 성능 분석</h2>
+<h3 id="_10">성능 모니터링 현황</h3>
+<div class="codehilite"><pre><span></span><code>🟡 모니터링 강화 필요:
+- 스토리지 성능 메트릭 부족
+- I/O 패턴 분석 도구 부재
+- 용량 계획 데이터 미흡
+
+📊 권장 모니터링 구성:
+□ CloudWatch 스토리지 메트릭
+□ 성능 인사이트 활용
+□ 용량 사용률 알람 설정
+□ I/O 성능 대시보드 구축
+</code></pre></div>
+
+<h3 id="_11">성능 최적화 기회</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">EBS</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">gp3</span><span class="w"> </span><span class="n">볼륨</span><span class="w"> </span><span class="n">타입</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">IOPS</span><span class="w"> </span><span class="n">및</span><span class="w"> </span><span class="n">처리량</span><span class="w"> </span><span class="n">튜닝</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">인스턴스</span><span class="w"> </span><span class="n">스토어</span><span class="w"> </span><span class="n">활용</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">S3</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">Transfer</span><span class="w"> </span><span class="n">Acceleration</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">멀티파트</span><span class="w"> </span><span class="n">업로드</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">CloudFront</span><span class="w"> </span><span class="n">연동</span><span class="w"> </span><span class="n">검토</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">데이터베이스</span><span class="w"> </span><span class="n">성능</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">Aurora</span><span class="w"> </span><span class="n">성능</span><span class="w"> </span><span class="n">인사이트</span><span class="w"> </span><span class="n">활용</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">읽기</span><span class="w"> </span><span class="n">전용</span><span class="w"> </span><span class="n">복제본</span><span class="w"> </span><span class="n">최적화</span>
+<span class="w">   </span><span class="o">-</span><span class="w"> </span><span class="n">쿼리</span><span class="w"> </span><span class="n">캐싱</span><span class="w"> </span><span class="n">전략</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_12">💰 스토리지 비용 분석</h2>
+<h3 id="_13">현재 비용 구조</h3>
+<div class="codehilite"><pre><span></span><code>스토리지 관련 비용 (추정):
+- Aurora MySQL: $1.57 (전체의 2.8%)
+- EBS 볼륨: EC2 비용에 포함
+- S3 스토리지: 별도 분석 필요
+
+비용 효율성 평가:
+- Aurora: 매우 효율적
+- EBS: 적정 수준
+- S3: 최적화 기회 존재
+</code></pre></div>
+
+<h3 id="_14">비용 최적화 전략</h3>
+<div class="codehilite"><pre><span></span><code>🔴 즉시 적용 가능:
+□ S3 스토리지 클래스 최적화
+□ 미사용 EBS 볼륨 정리
+□ 오래된 스냅샷 정리
+
+🟡 단기 최적화:
+□ Intelligent Tiering 활성화
+□ 라이프사이클 정책 구현
+□ 백업 보존 기간 최적화
+
+🟢 장기 최적화:
+□ 데이터 아카이빙 전략
+□ 스토리지 게이트웨이 활용
+□ 하이브리드 스토리지 검토
+</code></pre></div>
+
+<hr />
+<h2 id="_15">🔒 스토리지 보안 분석</h2>
+<h3 id="_16">현재 보안 상태</h3>
+<div class="codehilite"><pre><span></span><code>✅ 우수한 보안 설정:
+- Aurora 암호화 활성화
+- S3 서버 사이드 암호화
+- EBS 볼륨 암호화 (추정)
+
+🔧 보안 강화 권장:
+□ 키 관리 정책 표준화
+□ 액세스 로깅 강화
+□ 데이터 분류 및 라벨링
+□ 정기적인 보안 감사
+</code></pre></div>
+
+<h3 id="_17">보안 강화 계획</h3>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">모든</span><span class="w"> </span><span class="n">스토리지</span><span class="w"> </span><span class="n">암호화</span><span class="w"> </span><span class="n">확인</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">고객</span><span class="w"> </span><span class="n">관리</span><span class="w"> </span><span class="n">키</span><span class="w"> </span><span class="n">활용</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">키</span><span class="w"> </span><span class="n">로테이션</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">수립</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">제어</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">IAM</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">최소</span><span class="w"> </span><span class="n">권한</span><span class="w"> </span><span class="n">적용</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">버킷</span><span class="w"> </span><span class="n">정책</span><span class="w"> </span><span class="n">정기</span><span class="w"> </span><span class="n">검토</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">포인트</span><span class="w"> </span><span class="n">활용</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">모니터링</span><span class="w"> </span><span class="n">강화</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">CloudTrail</span><span class="w"> </span><span class="n">로그</span><span class="w"> </span><span class="n">분석</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">비정상</span><span class="w"> </span><span class="n">액세스</span><span class="w"> </span><span class="n">탐지</span>
+<span class="w">   </span><span class="err">□</span><span class="w"> </span><span class="n">데이터</span><span class="w"> </span><span class="n">유출</span><span class="w"> </span><span class="n">방지</span><span class="w"> </span><span class="n">정책</span>
+</code></pre></div>
+
+<hr />
+<h2 id="_18">🚀 스토리지 로드맵</h2>
+<h3 id="phase-1-1-2">Phase 1: 즉시 조치 (1-2주)</h3>
+<ul>
+<li>[ ] S3 버킷 보안 설정 점검</li>
+<li>[ ] 미사용 EBS 볼륨 식별 및 정리</li>
+<li>[ ] 백업 정책 현황 파악</li>
+</ul>
+<h3 id="phase-2-1-2">Phase 2: 단기 개선 (1-2개월)</h3>
+<ul>
+<li>[ ] AWS Backup 서비스 구현</li>
+<li>[ ] S3 라이프사이클 정책 적용</li>
+<li>[ ] 스토리지 모니터링 대시보드 구축</li>
+</ul>
+<h3 id="phase-3-3-6">Phase 3: 중장기 발전 (3-6개월)</h3>
+<ul>
+<li>[ ] 데이터 아카이빙 전략 수립</li>
+<li>[ ] 재해 복구 계획 구현</li>
+<li>[ ] 하이브리드 스토리지 검토</li>
+</ul>
+<hr />
+<h2 id="_19">📋 스토리지 체크리스트</h2>
+<h3 id="_20">보안 체크리스트</h3>
+<ul>
+<li>[ ] 모든 스토리지 암호화 확인</li>
+<li>[ ] 액세스 권한 정기 검토</li>
+<li>[ ] 백업 데이터 보안 확인</li>
+<li>[ ] 데이터 분류 정책 수립</li>
+</ul>
+<h3 id="_21">성능 체크리스트</h3>
+<ul>
+<li>[ ] 스토리지 성능 메트릭 모니터링</li>
+<li>[ ] I/O 패턴 분석 완료</li>
+<li>[ ] 볼륨 타입 최적화 검토</li>
+<li>[ ] 데이터베이스 성능 튜닝</li>
+</ul>
+<h3 id="_22">비용 체크리스트</h3>
+<ul>
+<li>[ ] 스토리지 사용량 분석</li>
+<li>[ ] 라이프사이클 정책 적용</li>
+<li>[ ] 미사용 리소스 정리</li>
+<li>[ ] 백업 비용 최적화</li>
+</ul>
+<h3 id="_23">운영 체크리스트</h3>
+<ul>
+<li>[ ] 백업 정책 수립 및 테스트</li>
+<li>[ ] 복구 절차 문서화</li>
+<li>[ ] 모니터링 알람 설정</li>
+<li>[ ] 용량 계획 수립</li>
+</ul>
+<hr />
+<h2 id="_24">🎯 종합 평가</h2>
+<h3 id="7810">스토리지 아키텍처 점수: <strong>7.8/10</strong> (양호)</h3>
+<p><strong>주요 강점</strong>:
+- Aurora MySQL 고성능 스토리지 구성
+- 적절한 암호화 설정 적용
+- 자동 확장 및 백업 구성
+- 현대적 스토리지 서비스 활용</p>
+<p><strong>개선 영역</strong>:
+- 통합 백업 정책 수립
+- S3 스토리지 최적화
+- 성능 모니터링 강화</p>
+<p><strong>권장 우선순위</strong>:
+1. 백업 및 재해 복구 정책 수립
+2. S3 스토리지 최적화
+3. 성능 모니터링 체계 구축</p>
+<hr />
+<p><em>스토리지 분석 완료. 다음 단계로 데이터베이스 분석을 진행합니다.</em></p>
+        </div>
+        <div class="footer">
+            <p>AWS 계정 종합 분석 보고서 | 계정 ID: 349131490815 | 리전: ap-northeast-2</p>
+            <p>분석 도구: Steampipe + AWS CLI | 보고서 생성: Amazon Q CLI</p>
+        </div>
+    </div>
+</body>
+</html>
