@@ -83,39 +83,86 @@ main() {
     
     # API 및 애플리케이션 서비스 수집 배열
     declare -a queries=(
-        # API Gateway
+        # ===== API Gateway REST API =====
         "API Gateway REST API|select id, name, description, created_date, version, warnings, binary_media_types, minimum_compression_size, api_key_source, endpoint_configuration, policy, tags from aws_api_gateway_rest_api where region = '$REGION'|application_api_gateway_rest_apis.json"
+        "API Gateway 리소스|select rest_api_id, id, parent_id, path_part, path, resource_methods from aws_api_gateway_resource where region = '$REGION'|application_api_gateway_resources.json"
+        "API Gateway 메서드|select rest_api_id, resource_id, http_method, authorization_type, authorizer_id, api_key_required, request_validator_id, request_models, request_parameters, method_integration from aws_api_gateway_method where region = '$REGION'|application_api_gateway_methods.json"
+        "API Gateway 배포|select rest_api_id, id, description, created_date, api_summary from aws_api_gateway_deployment where region = '$REGION'|application_api_gateway_deployments.json"
         "API Gateway 스테이지|select rest_api_id, stage_name, deployment_id, description, created_date, last_updated_date, cache_cluster_enabled, cache_cluster_size, cache_cluster_status, method_settings, variables, documentation_version, access_log_settings, canary_settings, tracing_config, web_acl_arn, tags from aws_api_gateway_stage where region = '$REGION'|application_api_gateway_stages.json"
-        "API Gateway 도메인 이름|select domain_name, certificate_name, certificate_arn, certificate_upload_date, regional_domain_name, regional_hosted_zone_id, regional_certificate_name, regional_certificate_arn, distribution_domain_name, distribution_hosted_zone_id, endpoint_configuration, domain_name_status, domain_name_status_message, security_policy, tags from aws_api_gateway_domain_name where region = '$REGION'|application_api_gateway_domain_names.json"
         "API Gateway 사용 계획|select id, name, description, api_stages, throttle, quota, product_code, tags from aws_api_gateway_usage_plan where region = '$REGION'|application_api_gateway_usage_plans.json"
         "API Gateway API 키|select id, name, description, enabled, created_date, last_updated_date, stage_keys, tags from aws_api_gateway_api_key where region = '$REGION'|application_api_gateway_api_keys.json"
-        
-        # SNS
+        "API Gateway 도메인 이름|select domain_name, certificate_name, certificate_arn, certificate_upload_date, regional_domain_name, regional_hosted_zone_id, regional_certificate_name, regional_certificate_arn, distribution_domain_name, distribution_hosted_zone_id, endpoint_configuration, domain_name_status, domain_name_status_message, security_policy, tags from aws_api_gateway_domain_name where region = '$REGION'|application_api_gateway_domain_names.json"
+        "API Gateway 권한 부여자|select rest_api_id, id, name, type, provider_arns, auth_type, authorizer_uri, authorizer_credentials, identity_source, identity_validation_expression, authorizer_result_ttl_in_seconds from aws_api_gateway_authorizer where region = '$REGION'|application_api_gateway_authorizers.json"
+        "API Gateway 모델|select rest_api_id, id, name, description, schema, content_type from aws_api_gateway_model where region = '$REGION'|application_api_gateway_models.json"
+        "API Gateway 요청 검증기|select rest_api_id, id, name, validate_request_body, validate_request_parameters from aws_api_gateway_request_validator where region = '$REGION'|application_api_gateway_request_validators.json"
+        "API Gateway VPC 링크|select id, name, description, target_arns, status, status_message, tags from aws_api_gateway_vpc_link where region = '$REGION'|application_api_gateway_vpc_links.json"
+
+        # ===== API Gateway v2 (HTTP API) =====
+        "API Gateway v2 API|select api_id, name, description, api_endpoint, api_gateway_managed, api_key_selection_expression, cors_configuration, created_date, disable_schema_validation, disable_execute_api_endpoint, import_info, protocol_type, route_selection_expression, version, warnings, tags from aws_apigatewayv2_api where region = '$REGION'|application_apigatewayv2_apis.json"
+        "API Gateway v2 권한 부여자|select api_id, authorizer_id, name, authorizer_type, authorizer_credentials_arn, authorizer_payload_format_version, authorizer_result_ttl_in_seconds, authorizer_uri, enable_simple_responses, identity_sources, jwt_configuration from aws_apigatewayv2_authorizer where region = '$REGION'|application_apigatewayv2_authorizers.json"
+        "API Gateway v2 배포|select api_id, deployment_id, auto_deployed, created_date, deployment_status, deployment_status_message, description from aws_apigatewayv2_deployment where region = '$REGION'|application_apigatewayv2_deployments.json"
+        "API Gateway v2 도메인 이름|select domain_name, api_mapping_selection_expression, domain_name_configurations, mutual_tls_authentication, tags from aws_apigatewayv2_domain_name where region = '$REGION'|application_apigatewayv2_domain_names.json"
+        "API Gateway v2 통합|select api_id, integration_id, connection_id, connection_type, content_handling_strategy, credentials_arn, description, integration_method, integration_response_selection_expression, integration_subtype, integration_type, integration_uri, passthrough_behavior, payload_format_version, request_parameters, request_templates, response_parameters, template_selection_expression, timeout_in_millis, tls_config from aws_apigatewayv2_integration where region = '$REGION'|application_apigatewayv2_integrations.json"
+        "API Gateway v2 모델|select api_id, model_id, content_type, description, name, schema from aws_apigatewayv2_model where region = '$REGION'|application_apigatewayv2_models.json"
+        "API Gateway v2 라우트|select api_id, route_id, api_gateway_managed, api_key_required, authorization_scopes, authorization_type, authorizer_id, model_selection_expression, operation_name, request_models, request_parameters, route_key, route_response_selection_expression, target from aws_apigatewayv2_route where region = '$REGION'|application_apigatewayv2_routes.json"
+        "API Gateway v2 스테이지|select api_id, stage_name, access_log_settings, api_gateway_managed, auto_deploy, client_certificate_id, created_date, default_route_settings, deployment_id, description, last_deployment_status_message, last_updated_date, route_settings, tags, throttle_settings from aws_apigatewayv2_stage where region = '$REGION'|application_apigatewayv2_stages.json"
+        "API Gateway v2 VPC 링크|select vpc_link_id, name, security_group_ids, subnet_ids, tags, vpc_link_status, vpc_link_status_message, vpc_link_version, created_date from aws_apigatewayv2_vpc_link where region = '$REGION'|application_apigatewayv2_vpc_links.json"
+
+        # ===== Application Load Balancer 고급 기능 =====
+        "ALB 리스너 인증서|select listener_arn, certificate_arn, is_default from aws_ec2_load_balancer_listener_certificate where region = '$REGION'|application_alb_listener_certificates.json"
+
+        # ===== SNS =====
         "SNS 토픽|select topic_arn, name, display_name, owner, subscriptions_confirmed, subscriptions_deleted, subscriptions_pending, policy, delivery_policy, effective_delivery_policy, kms_master_key_id, fifo_topic, content_based_deduplication, tags from aws_sns_topic where region = '$REGION'|application_sns_topics.json"
         "SNS 구독|select subscription_arn, topic_arn, owner, protocol, endpoint, confirmation_was_authenticated, delivery_policy, effective_delivery_policy, filter_policy, pending_confirmation, raw_message_delivery, redrive_policy, subscription_role_arn from aws_sns_topic_subscription where region = '$REGION'|application_sns_subscriptions.json"
-        
-        # SQS
+
+        # ===== SQS =====
         "SQS 큐|select queue_url, name, attributes, tags from aws_sqs_queue where region = '$REGION'|application_sqs_queues.json"
-        
-        # EventBridge
-        "EventBridge 규칙|select name, arn, description, event_pattern, schedule_expression, state, targets, managed_by, event_bus_name, role_arn, tags from aws_eventbridge_rule where region = '$REGION'|application_eventbridge_rules.json"
+
+        # ===== Amazon MQ =====
+        "MQ 브로커|select broker_id, broker_name, broker_arn, broker_state, created, deployment_mode, engine_type, engine_version, host_instance_type, publicly_accessible, storage_type, subnet_ids, security_groups, auto_minor_version_upgrade, maintenance_window_start_time, logs, users, configurations, tags from aws_mq_broker where region = '$REGION'|application_mq_brokers.json"
+        "MQ 구성|select id, arn, name, description, engine_type, engine_version, latest_revision, created, authentication_strategy, tags from aws_mq_configuration where region = '$REGION'|application_mq_configurations.json"
+
+        # ===== EventBridge =====
         "EventBridge 이벤트 버스|select name, arn, policy, tags from aws_eventbridge_bus where region = '$REGION'|application_eventbridge_buses.json"
-        
-        # Step Functions
+        "EventBridge 규칙|select name, arn, description, event_pattern, schedule_expression, state, targets, managed_by, event_bus_name, role_arn, tags from aws_eventbridge_rule where region = '$REGION'|application_eventbridge_rules.json"
+
+        # ===== Step Functions =====
         "Step Functions 상태 머신|select state_machine_arn, name, status, type, definition, role_arn, creation_date, logging_configuration, tags from aws_sfn_state_machine where region = '$REGION'|application_stepfunctions_state_machines.json"
-        
-        # AppSync
+        "Step Functions 활동|select activity_arn, name, creation_date from aws_sfn_activity where region = '$REGION'|application_stepfunctions_activities.json"
+
+        # ===== Systems Manager =====
+        "SSM 문서|select name, owner, version_name, platform_types, document_type, document_format, target_type, schema_version, latest_version, default_version, status, status_information, created_date, description, parameters, tags from aws_ssm_document where region = '$REGION' and owner = 'Self'|application_ssm_documents.json"
+        "SSM 연결|select association_id, name, instance_id, association_version, date, last_execution_date, overview, schedule_expression, association_name, automation_target_parameter_name, document_version, max_concurrency, max_errors, compliance_severity, sync_compliance, apply_only_at_cron_interval, calendar_names, target_locations, targets, parameters from aws_ssm_association where region = '$REGION'|application_ssm_associations.json"
+        "SSM 유지보수 창|select window_id, name, description, start_date, end_date, schedule, schedule_timezone, schedule_offset, duration, cutoff, allow_unassociated_targets, enabled, created_date, modified_date, next_execution_time, tags from aws_ssm_maintenance_window where region = '$REGION'|application_ssm_maintenance_windows.json"
+        "SSM 패치 기준선|select baseline_id, name, description, operating_system, global_filters, approval_rules, approved_patches, approved_patches_compliance_level, approved_patches_enable_non_security, rejected_patches, rejected_patches_action, patch_groups, created_date, modified_date, sources, tags from aws_ssm_patch_baseline where region = '$REGION'|application_ssm_patch_baselines.json"
+        "SSM 활성화|select activation_id, description, default_instance_name, iam_role, registration_limit, registrations_count, expiration_date, expired, created_date, tags from aws_ssm_activation where region = '$REGION'|application_ssm_activations.json"
+
+        # ===== CloudFormation =====
+        "CloudFormation 스택|select stack_id, stack_name, description, parameters, creation_time, last_updated_time, rollback_configuration, stack_status, stack_status_reason, drift_information, enable_termination_protection, parent_id, root_id, notification_arns, timeout_in_minutes, capabilities, outputs, role_arn, tags from aws_cloudformation_stack where region = '$REGION'|application_cloudformation_stacks.json"
+        "CloudFormation 스택 세트|select stack_set_id, stack_set_name, description, status, template_body, parameters, capabilities, tags, administration_role_arn, execution_role_name, permission_model, auto_deployment, managed_execution, call_as from aws_cloudformation_stack_set where region = '$REGION'|application_cloudformation_stack_sets.json"
+
+        # ===== CodePipeline =====
+        "CodePipeline 파이프라인|select name, role_arn, artifact_store, stages, version, created, updated from aws_codepipeline_pipeline where region = '$REGION'|application_codepipeline_pipelines.json"
+
+        # ===== CodeBuild =====
+        "CodeBuild 프로젝트|select name, arn, description, source, secondary_sources, source_version, secondary_source_versions, artifacts, secondary_artifacts, cache, environment, service_role, timeout_in_minutes, queued_timeout_in_minutes, encryption_key, tags, created, last_modified, webhook, vpc_config, badge, logs_config, file_system_locations, build_batch_config from aws_codebuild_project where region = '$REGION'|application_codebuild_projects.json"
+
+        # ===== CodeCommit =====
+        "CodeCommit 저장소|select repository_name, repository_id, repository_description, default_branch, last_modified_date, creation_date, clone_url_http, clone_url_ssh, arn from aws_codecommit_repository where region = '$REGION'|application_codecommit_repositories.json"
+
+        # ===== CodeDeploy =====
+        "CodeDeploy 애플리케이션|select application_id, application_name, description, create_time, linked_to_github, github_account_name, compute_platform from aws_codedeploy_application where region = '$REGION'|application_codedeploy_applications.json"
+        "CodeDeploy 배포 구성|select deployment_config_id, deployment_config_name, minimum_healthy_hosts, traffic_routing_config, compute_platform, create_time from aws_codedeploy_deployment_config where region = '$REGION'|application_codedeploy_deployment_configs.json"
+
+        # ===== OpsWorks =====
+        "OpsWorks 스택|select stack_id, name, arn, region, vpc_id, attributes, service_role_arn, default_instance_profile_arn, default_os, hostname_theme, default_availability_zone, default_subnet_id, custom_json, configuration_manager, chef_configuration, use_custom_cookbooks, use_opsworks_security_groups, custom_cookbooks_source, default_ssh_key_name, created_at, default_root_device_type, agent_version from aws_opsworks_stack|application_opsworks_stacks.json"
+
+        # ===== 기존 서비스들 =====
         "AppSync API|select api_id, name, authentication_type, log_config, open_id_connect_config, user_pool_config, lambda_authorizer_config, additional_authentication_providers, xray_enabled, waf_web_acl_arn, tags from aws_appsync_graphql_api where region = '$REGION'|application_appsync_apis.json"
-        
-        # Kinesis
         "Kinesis 스트림|select stream_name, stream_arn, stream_status, stream_mode_details, shard_count, retention_period, encryption_type, key_id, stream_creation_timestamp, tags from aws_kinesis_stream where region = '$REGION'|application_kinesis_streams.json"
         "Kinesis Firehose 스트림|select delivery_stream_name, delivery_stream_arn, delivery_stream_status, delivery_stream_type, version_id, create_timestamp, last_update_timestamp, source, destinations, has_more_destinations, tags from aws_kinesis_firehose_delivery_stream where region = '$REGION'|application_kinesis_firehose_streams.json"
-        
-        # CloudFront
         "CloudFront 배포|select id, arn, status, last_modified_time, domain_name, comment, default_cache_behavior, cache_behaviors, custom_error_responses, logging, enabled, price_class, http_version, is_ipv6_enabled, web_acl_id, tags from aws_cloudfront_distribution|application_cloudfront_distributions.json"
         "CloudFront Origin Access Identity|select id, s3_canonical_user_id, comment from aws_cloudfront_origin_access_identity|application_cloudfront_oai.json"
-        
-        # Amplify
         "Amplify 앱|select app_id, app_arn, name, description, repository, platform, create_time, update_time, iam_service_role_arn, environment_variables, default_domain, enable_branch_auto_build, enable_branch_auto_deletion, enable_basic_auth, basic_auth_credentials, custom_rules, production_branch, build_spec, custom_headers, enable_auto_branch_creation, auto_branch_creation_patterns, auto_branch_creation_config, tags from aws_amplify_app where region = '$REGION'|application_amplify_apps.json"
     )
     
@@ -162,10 +209,15 @@ main() {
     # 다음 단계 안내
     echo -e "\n${YELLOW}💡 다음 단계:${NC}"
     echo "1. 수집된 애플리케이션 데이터를 바탕으로 Phase 1 인프라 분석 진행"
-    echo "2. API Gateway 및 서버리스 아키텍처 최적화 검토"
-    echo "3. 메시징 서비스 (SNS/SQS) 구성 분석"
-    echo "4. 이벤트 기반 아키텍처 패턴 분석"
-    echo "5. CDN 및 콘텐츠 전송 최적화 분석"
+    echo "2. API Gateway (REST/HTTP) 및 서버리스 아키텍처 최적화 검토"
+    echo "3. 메시징 서비스 (SNS/SQS/MQ) 구성 및 패턴 분석"
+    echo "4. 이벤트 기반 아키텍처 (EventBridge/Step Functions) 패턴 분석"
+    echo "5. CI/CD 파이프라인 (CodePipeline/CodeBuild/CodeDeploy) 최적화"
+    echo "6. Systems Manager 자동화 및 패치 관리 전략 검토"
+    echo "7. CloudFormation 스택 및 IaC 거버넌스 분석"
+    echo "8. CDN 및 콘텐츠 전송 최적화 분석"
+    echo "9. OpsWorks 및 애플리케이션 배포 전략 검토"
+    echo "10. 마이크로서비스 아키텍처 패턴 및 통합 분석"
     
     log_info "🎉 API 및 애플리케이션 서비스 리소스 데이터 수집이 완료되었습니다!"
 }
