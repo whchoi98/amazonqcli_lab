@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional
 import logging
 
 class AWSApplicationCollector:
-    def __init__(self, region: str = "ap-northeast-2", report_dir: str = "/home/ec2-user/amazonqcli_lab/report"):
+    def __init__(self, region: str = "ap-northeast-2", report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
         self.region = region
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
@@ -303,7 +303,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="AWS 애플리케이션 서비스 데이터 수집")
     parser.add_argument("--region", default="ap-northeast-2", help="AWS 리전")
-    parser.add_argument("--report-dir", default="/home/ec2-user/amazonqcli_lab/report", help="보고서 디렉토리")
+    parser.add_argument("--report-dir", default="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report", help="보고서 디렉토리")
     
     args = parser.parse_args()
     

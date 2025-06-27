@@ -19,7 +19,7 @@ except ImportError:
     exit(1)
 
 class MarkdownToHtmlConverter:
-    def __init__(self, report_dir="/home/ec2-user/amazonqcli_lab/report", 
+    def __init__(self, report_dir="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report", 
                  output_dir="/home/ec2-user/amazonqcli_lab/html-report"):
         self.report_dir = Path(report_dir)
         self.output_dir = Path(output_dir)

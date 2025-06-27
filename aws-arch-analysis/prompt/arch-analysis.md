@@ -1,12 +1,17 @@
 # AWS 계정 종합 분석 보고서 - 메인 가이드
 
 ## 📋 개요
-이 가이드는 AWS 계정에 대한 종합적인 분석을 수행하고 전문적인 보고서를 생성하기 위한 단계별 프롬프트 모음입니다.
+이 가이드는 AWS 계정에 대한 종합적인 분석을 수행하고 전문적인 보고서를 생성합니다.
+
+## 환경 및 역할
+당신은 AWS의 수준높은 아키텍트 입니다. AWS 계정 내의 아키텍쳐를 상세분석하려고 합니다.
+출력 결과들은 반드시 한글로 출력되어야 합니다.
+리전은 ap-northeast-2 입니다.
 
 ## 🗂️ 프롬프트 구조
 
 ### 단계별 가이드 파일
-각 프롬프트 파일을 순서대로 참조하여 단계별로 진행하세요.
+각 프롬프트 파일을 순서대로 참조하여 단계별로 진행하세요. 데이터 수집은 steampipe 기반으로 수집합니다.
 1. **[01-role-and-environment.md](./01-role-and-environment.md)** - 역할 정의 및 환경 설정
 2. **[02-data-collection-guide.md](./02-data-collection-guide.md)** - 데이터 수집 전략
 3. **[03-execution-methods.md](./03-execution-methods.md)** - 실행 방법론
@@ -24,6 +29,7 @@
 - **08-application-analysis.md** - 애플리케이션 분석
 - **09-monitoring-analysis.md** - 모니터링 분석
 - **10-comprehensive-recommendations.md** - 종합 권장사항
+- index.html , 10개 markdown을 HTML로 변환
 
 ## 🎯 사용 방법
 1. 각 프롬프트 파일을 순서대로 읽고 따라하세요

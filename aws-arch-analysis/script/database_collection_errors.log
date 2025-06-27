@@ -1,0 +1,12 @@
+
+Query failed: select db_cluster_identifier, cluster_members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_username, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, db_cluster_arn, associated_roles, vpc_security_groups, db_subnet_group_name, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, cluster_create_time, copy_tags_to_snapshot, cross_account_clone, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_neptune_cluster where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_neptune_cluster" does not exist (SQLSTATE 42P01)
+
+
+Query failed: select db_cluster_identifier, cluster_members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_username, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, db_cluster_arn, associated_roles, vpc_security_groups, db_subnet_group_name, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, cluster_create_time, copy_tags_to_snapshot, cross_account_clone, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_neptune_cluster where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_neptune_cluster" does not exist (SQLSTATE 42P01)
+
+
+Query failed: select db_cluster_identifier, cluster_members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_username, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, db_cluster_arn, associated_roles, vpc_security_groups, db_subnet_group_name, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, cluster_create_time, copy_tags_to_snapshot, cross_account_clone, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_neptune_cluster where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_neptune_cluster" does not exist (SQLSTATE 42P01)
+

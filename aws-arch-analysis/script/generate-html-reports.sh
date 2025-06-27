@@ -318,25 +318,132 @@ else
     echo "💡 수동으로 변환하려면: cd $SCRIPT_DIR && ./convert-md-to-html.sh"
 fi
 
-# 5. 결과 확인 및 요약
+# 11. 자동 압축 파일 생성
 echo ""
-echo "🎉 HTML 보고서 생성 완료!"
+echo "📦 보고서 압축 파일 생성 중..."
+if [ -f "$SCRIPT_DIR/compress-html-reports.sh" ]; then
+    cd "$SCRIPT_DIR"
+    ./compress-html-reports.sh
+    if [ $? -eq 0 ]; then
+        echo "✅ 압축 파일 생성 완료!"
+    else
+        echo "⚠️ 압축 파일 생성에서 오류가 발생했습니다."
+    fi
+else
+    echo "❌ 압축 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/compress-html-reports.sh"
+    echo "💡 수동으로 압축하려면: cd $SCRIPT_DIR && ./compress-html-reports.sh"
+fi
+
+# 5. 자동 압축 파일 생성
+echo ""
+echo "📦 보고서 압축 파일 생성 중..."
+
+# 현재 날짜와 시간으로 파일명 생성
+TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
+BASE_NAME="aws-analysis-html-report_${TIMESTAMP}"
+
+# 상위 디렉토리로 이동하여 압축
+CURRENT_DIR=$(pwd)
+cd "$(dirname "$HTML_DIR")"
+
+# ZIP 파일 생성
+echo "🗜️ ZIP 파일 생성 중..."
+zip -r "${BASE_NAME}.zip" "$(basename "$HTML_DIR")" >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "✅ ZIP 파일 생성 완료: ${BASE_NAME}.zip ($(du -h "${BASE_NAME}.zip" | cut -f1))"
+else
+    echo "❌ ZIP 파일 생성 실패"
+fi
+
+# TAR.GZ 파일 생성
+echo "🗜️ TAR.GZ 파일 생성 중..."
+tar -czf "${BASE_NAME}.tar.gz" "$(basename "$HTML_DIR")" 2>/dev/null
+if [ $? -eq 0 ]; then
+    echo "✅ TAR.GZ 파일 생성 완료: ${BASE_NAME}.tar.gz ($(du -h "${BASE_NAME}.tar.gz" | cut -f1))"
+else
+    echo "❌ TAR.GZ 파일 생성 실패"
+fi
+
+# 압축 파일을 HTML 디렉토리에도 복사 (웹 다운로드용)
+if [ -f "${BASE_NAME}.zip" ]; then
+    cp "${BASE_NAME}.zip" "$HTML_DIR/"
+    echo "📋 웹 다운로드용 ZIP 파일 복사 완료"
+fi
+
+if [ -f "${BASE_NAME}.tar.gz" ]; then
+    cp "${BASE_NAME}.tar.gz" "$HTML_DIR/"
+    echo "📋 웹 다운로드용 TAR.GZ 파일 복사 완료"
+fi
+
+# 원래 디렉토리로 복귀
+cd "$CURRENT_DIR"
+
+# 11. 자동 압축 파일 생성
+echo ""
+echo "📦 보고서 압축 파일 생성 중..."
+if [ -f "$SCRIPT_DIR/compress-html-reports.sh" ]; then
+    cd "$SCRIPT_DIR"
+    ./compress-html-reports.sh
+    if [ $? -eq 0 ]; then
+        echo "✅ 압축 파일 생성 완료!"
+    else
+        echo "⚠️ 압축 파일 생성에서 오류가 발생했습니다."
+    fi
+else
+    echo "❌ 압축 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/compress-html-reports.sh"
+    echo "💡 수동으로 압축하려면: cd $SCRIPT_DIR && ./compress-html-reports.sh"
+fi
+
+# 6. 결과 확인 및 요약
+echo ""
+echo "🎉 HTML 보고서 생성 및 압축 완료!"
 echo "📁 결과 위치: $HTML_DIR"
 echo ""
-echo "📋 생성된 파일들:"
-ls -la "$HTML_DIR"/*.html 2>/dev/null | while read line; do
-    echo "  📄 $line"
+echo "📋 생성된 HTML 파일들:"
+html_count=$(ls "$HTML_DIR"/*.html 2>/dev/null | wc -l)
+echo "  📄 HTML 파일: ${html_count}개"
+ls -la "$HTML_DIR"/*.html 2>/dev/null | head -5 | while read line; do
+    echo "    $(echo "$line" | awk '{print $9, "(" $5 ")"}')"
 done
+if [ "$html_count" -gt 5 ]; then
+    echo "    ... 및 $((html_count - 5))개 추가 파일"
+fi
+
+echo ""
+echo "📦 생성된 압축 파일들:"
+if [ -f "$(dirname "$HTML_DIR")/${BASE_NAME}.zip" ]; then
+    echo "  🗜️ ${BASE_NAME}.zip ($(du -h "$(dirname "$HTML_DIR")/${BASE_NAME}.zip" | cut -f1))"
+fi
+if [ -f "$(dirname "$HTML_DIR")/${BASE_NAME}.tar.gz" ]; then
+    echo "  🗜️ ${BASE_NAME}.tar.gz ($(du -h "$(dirname "$HTML_DIR")/${BASE_NAME}.tar.gz" | cut -f1))"
+fi
 
 echo ""
 echo "🚀 다음 단계:"
 echo "  1. 메인 대시보드 확인: file://$HTML_DIR/index.html"
 echo "  2. 브라우저에서 열기: firefox $HTML_DIR/index.html"
-echo "  3. 최우선 조치 항목 검토"
-echo "  4. 각 섹션별 상세 보고서 확인"
+echo "  3. 압축 파일 다운로드: ${BASE_NAME}.zip 또는 ${BASE_NAME}.tar.gz"
+echo "  4. 최우선 조치 항목 검토"
+echo "  5. 각 섹션별 상세 보고서 확인"
 
-# 6. 간단한 웹 서버 시작 옵션 제공
+# 7. 간단한 웹 서버 시작 옵션 제공
 echo ""
 echo "💡 로컬 웹 서버로 확인하려면:"
 echo "  cd $HTML_DIR && python3 -m http.server 8080"
 echo "  그 후 브라우저에서 http://localhost:8080 접속"
+echo "  압축 파일도 웹에서 직접 다운로드 가능"
+
+# 8. 압축 파일 정보 요약
+echo ""
+echo "📊 압축 파일 정보:"
+echo "  📍 위치: $(dirname "$HTML_DIR")"
+echo "  📍 웹 다운로드: http://localhost:8080 (웹 서버 실행 시)"
+if [ -f "$(dirname "$HTML_DIR")/${BASE_NAME}.zip" ] && [ -f "$(dirname "$HTML_DIR")/${BASE_NAME}.tar.gz" ]; then
+    zip_size=$(du -b "$(dirname "$HTML_DIR")/${BASE_NAME}.zip" | cut -f1)
+    tar_size=$(du -b "$(dirname "$HTML_DIR")/${BASE_NAME}.tar.gz" | cut -f1)
+    if [ "$tar_size" -lt "$zip_size" ]; then
+        echo "  💡 권장: TAR.GZ 파일 (더 작은 크기)"
+    else
+        echo "  💡 권장: ZIP 파일 (더 넓은 호환성)"
+    fi
+fi

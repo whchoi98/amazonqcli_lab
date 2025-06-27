@@ -1,9 +1,9 @@
 #!/bin/bash
-# Steampipe 기반 데이터베이스 리소스 데이터 수집 스크립트 (강화 버전)
+# 완전한 데이터베이스 리소스 데이터 수집 스크립트 (RDS, NoSQL, 분석 서비스 포함)
 
 # 설정 변수
 REGION="${AWS_REGION:-ap-northeast-2}"
-REPORT_DIR="${REPORT_DIR:-/home/ec2-user/amazonqcli_lab/report}"
+REPORT_DIR="${REPORT_DIR:-/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report}"
 LOG_FILE="steampipe_database_collection.log"
 ERROR_LOG="steampipe_database_errors.log"
 
@@ -12,6 +12,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 # 로깅 함수
@@ -29,6 +31,14 @@ log_warning() {
 
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1" | tee -a "$ERROR_LOG"
+}
+
+log_rds() {
+    echo -e "${PURPLE}[RDS]${NC} $1" | tee -a "$LOG_FILE"
+}
+
+log_nosql() {
+    echo -e "${CYAN}[NoSQL]${NC} $1" | tee -a "$LOG_FILE"
 }
 
 # Steampipe 쿼리 실행 함수
@@ -56,7 +66,7 @@ execute_steampipe_query() {
 
 # 메인 실행부
 main() {
-    log_info "🗄️ Steampipe 기반 데이터베이스 리소스 데이터 수집 시작"
+    log_info "🗄️ 완전한 데이터베이스 리소스 데이터 수집 시작 (RDS, NoSQL, 분석 서비스 포함)"
     log_info "Region: $REGION"
     log_info "Report Directory: $REPORT_DIR"
     
@@ -88,34 +98,89 @@ main() {
     local success_count=0
     local total_count=0
     
-    log_info "🗄️ 데이터베이스 리소스 수집 시작..."
+    log_rds "🏛️ RDS 인스턴스 및 클러스터 수집 시작..."
     
-    # 데이터베이스 리소스 수집 배열
-    declare -a database_queries=(
-        "RDS 인스턴스 상세 정보|select db_instance_identifier, arn, class, engine, engine_version, master_user_name, db_name, allocated_storage, max_allocated_storage, storage_type, storage_encrypted, kms_key_id, iops, storage_throughput, status, endpoint_address, endpoint_port, endpoint_hosted_zone_id, multi_az, availability_zone, secondary_availability_zone, publicly_accessible, vpc_security_groups, db_security_groups, db_parameter_groups, db_subnet_group_name, option_group_memberships, preferred_backup_window, backup_retention_period, preferred_maintenance_window, pending_modified_values, latest_restorable_time, auto_minor_version_upgrade, read_replica_source_db_instance_identifier, read_replica_db_instance_identifiers, read_replica_db_cluster_identifiers, replica_mode, license_model, character_set_name, nchar_character_set_name, enhanced_monitoring_resource_arn, monitoring_interval, monitoring_role_arn, promotion_tier, timezone, iam_database_authentication_enabled, performance_insights_enabled, performance_insights_kms_key_id, performance_insights_retention_period, enabled_cloudwatch_logs_exports, processor_features, deletion_protection, associated_roles, tags from aws_rds_db_instance where region = '$REGION'|database_rds_instances.json"
-        "RDS 클러스터 상세 정보|select db_cluster_identifier, arn, engine, engine_version, engine_mode, master_user_name, database_name, status, endpoint, reader_endpoint, custom_endpoints, multi_az, port, preferred_backup_window, backup_retention_period, preferred_maintenance_window, read_replica_identifiers, members, vpc_security_groups, db_subnet_group, db_cluster_parameter_group, option_group_memberships, availability_zones, character_set_name, kms_key_id, storage_encrypted, associated_roles, iam_database_authentication_enabled, clone_group_id, create_time, earliest_restorable_time, earliest_backtrack_time, backtrack_window, backtrack_consumed_change_records, enabled_cloudwatch_logs_exports, capacity, scaling_configuration_info, deletion_protection, http_endpoint_enabled, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, copy_tags_to_snapshot, cross_account_clone, domain_memberships, tags from aws_rds_db_cluster where region = '$REGION'|database_rds_clusters.json"
-        "RDS 스냅샷|select db_snapshot_identifier, db_instance_identifier, create_time, engine, allocated_storage, status, port, availability_zone, vpc_id, instance_create_time, master_user_name, engine_version, license_model, type, iops, option_group_name, percent_progress, source_region, source_db_snapshot_identifier, storage_type, tde_credential_arn, encrypted, kms_key_id, timezone, iam_database_authentication_enabled, processor_features, dbi_resource_id, tags from aws_rds_db_snapshot where region = '$REGION'|database_rds_snapshots.json"
-        "RDS 클러스터 스냅샷|select db_cluster_snapshot_identifier, db_cluster_identifier, create_time, engine, engine_version, allocated_storage, status, port, vpc_id, cluster_create_time, master_user_name, license_model, type, percent_progress, storage_encrypted, kms_key_id, arn, source_db_cluster_snapshot_arn, iam_database_authentication_enabled, tags from aws_rds_db_cluster_snapshot where region = '$REGION'|database_rds_cluster_snapshots.json"
-        "RDS 서브넷 그룹|select name, arn, description, status, vpc_id, subnets, tags from aws_rds_db_subnet_group where region = '$REGION'|database_rds_subnet_groups.json"
-        "RDS 파라미터 그룹|select name, arn, description, db_parameter_group_family, parameters, tags from aws_rds_db_parameter_group where region = '$REGION'|database_rds_parameter_groups.json"
-        "RDS 옵션 그룹|select name, arn, description, engine_name, major_engine_version, vpc_id, allows_vpc_and_non_vpc_instance_memberships, options, tags from aws_rds_db_option_group where region = '$REGION'|database_rds_option_groups.json"
-        "RDS 이벤트 구독|select cust_subscription_id, customer_aws_id, sns_topic_arn, status, subscription_creation_time, source_type, source_ids_list, event_categories_list, enabled from aws_rds_db_event_subscription where region = '$REGION'|database_rds_event_subscriptions.json"
-        "DynamoDB 테이블 상세 정보|select name, arn, table_id, table_status, creation_date_time, billing_mode, attribute_definitions, key_schema, table_size_bytes, item_count, stream_specification, latest_stream_label, latest_stream_arn, restore_summary, sse_description, replicas, archival_summary, table_class, deletion_protection_enabled, tags from aws_dynamodb_table where region = '$REGION'|database_dynamodb_tables.json"
-        "DynamoDB 백업|select name, arn, table_name, table_arn, table_id, backup_status, backup_type, backup_creation_datetime, backup_expiry_datetime, backup_size_bytes from aws_dynamodb_backup where region = '$REGION'|database_dynamodb_backups.json"
-        "DynamoDB Global Tables|select global_table_name, global_table_status, creation_date_time, global_table_arn, replication_group from aws_dynamodb_global_table where region = '$REGION'|database_dynamodb_global_tables.json"
-        "ElastiCache 클러스터 상세 정보|select cache_cluster_id, configuration_endpoint, client_download_landing_page, cache_node_type, engine, engine_version, cache_cluster_status, num_cache_nodes, preferred_availability_zone, preferred_outpost_arn, cache_cluster_create_time, preferred_maintenance_window, pending_modified_values, notification_configuration, cache_security_groups, cache_parameter_group, cache_subnet_group_name, cache_nodes, auto_minor_version_upgrade, security_groups, replication_group_id, snapshot_retention_limit, snapshot_window, auth_token_enabled, auth_token_last_modified_date, transit_encryption_enabled, at_rest_encryption_enabled, arn, replication_group_log_delivery_enabled, log_delivery_configurations, network_type, ip_discovery, transit_encryption_mode, tags from aws_elasticache_cluster where region = '$REGION'|database_elasticache_clusters.json"
-        "ElastiCache 복제 그룹|select replication_group_id, description, global_replication_group_info, status, pending_modified_values, member_clusters, node_groups, snapshotting_cluster_id, automatic_failover, multi_az, configuration_endpoint, snapshot_retention_limit, snapshot_window, cluster_enabled, cache_node_type, auth_token_enabled, auth_token_last_modified_date, transit_encryption_enabled, at_rest_encryption_enabled, member_clusters_outpost_arns, kms_key_id, arn, user_group_ids, log_delivery_configurations, replication_group_create_time, data_tiering, network_type, ip_discovery, transit_encryption_mode, cluster_mode from aws_elasticache_replication_group where region = '$REGION'|database_elasticache_replication_groups.json"
-        "ElastiCache 서브넷 그룹|select cache_subnet_group_name, cache_subnet_group_description, vpc_id, subnets, arn, supported_network_types from aws_elasticache_subnet_group where region = '$REGION'|database_elasticache_subnet_groups.json"
-        "ElastiCache 파라미터 그룹|select cache_parameter_group_name, cache_parameter_group_family, description, is_global, arn from aws_elasticache_parameter_group where region = '$REGION'|database_elasticache_parameter_groups.json"
-        "Redshift 클러스터|select cluster_identifier, node_type, cluster_status, cluster_availability_status, modify_status, master_username, db_name, endpoint, cluster_create_time, automated_snapshot_retention_period, manual_snapshot_retention_period, cluster_security_groups, vpc_security_groups, cluster_parameter_groups, cluster_subnet_group_name, vpc_id, availability_zone, preferred_maintenance_window, pending_modified_values, cluster_version, allow_version_upgrade, number_of_nodes, publicly_accessible, encrypted, restore_status, data_transfer_progress, hsm_status, cluster_snapshot_copy_status, cluster_public_key, cluster_nodes, elastic_ip_status, cluster_revision_number, tags, kms_key_id, enhanced_vpc_routing, iam_roles, pending_actions, maintenance_track_name, elastic_resize_number_of_node_options, deferred_maintenance_windows, snapshot_schedule_identifier, snapshot_schedule_state, expected_next_snapshot_schedule_time, expected_next_snapshot_schedule_time_status, next_maintenance_window_start_time, resize_info, availability_zone_relocation_status, cluster_namespace_arn, total_storage_capacity_in_mega_bytes, aqua_configuration, default_iam_role_arn, reserved_node_exchange_status from aws_redshift_cluster where region = '$REGION'|database_redshift_clusters.json"
-        "DocumentDB 클러스터|select db_cluster_identifier, members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_user_name, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, arn, associated_roles, vpc_security_groups, db_subnet_group, cluster_create_time, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_docdb_cluster where region = '$REGION'|database_docdb_clusters.json"
-        "Neptune 클러스터|select db_cluster_identifier, cluster_members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_username, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, db_cluster_arn, associated_roles, vpc_security_groups, db_subnet_group_name, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, cluster_create_time, copy_tags_to_snapshot, cross_account_clone, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_neptune_cluster where region = '$REGION'|database_neptune_clusters.json"
-        "MemoryDB 클러스터|select name, description, status, pending_updates, number_of_shards, cluster_endpoint, node_type, engine_version, engine_patch_version, parameter_group_name, parameter_group_status, security_groups, subnet_group_name, tls_enabled, kms_key_id, arn, sns_topic_arn, sns_topic_status, snapshot_retention_limit, maintenance_window, snapshot_window, acl_name, auto_minor_version_upgrade, data_tiering from aws_memorydb_cluster where region = '$REGION'|database_memorydb_clusters.json"
-        "DAX 클러스터|select cluster_name, description, arn, total_nodes, active_nodes, node_type, status, cluster_discovery_endpoint, node_ids_to_remove, nodes, preferred_maintenance_window, notification_configuration, subnet_group, security_groups, iam_role_arn, parameter_group, sse_description, cluster_endpoint_encryption_type, tags from aws_dax_cluster where region = '$REGION'|database_dax_clusters.json"
+    # RDS 기본 리소스 수집 배열
+    declare -a rds_queries=(
+        "RDS DB 인스턴스|select db_instance_identifier, db_instance_class, engine, engine_version, db_instance_status, allocated_storage, storage_type, storage_encrypted, multi_az, publicly_accessible, vpc_security_groups, db_subnet_group_name, backup_retention_period, preferred_backup_window, preferred_maintenance_window, auto_minor_version_upgrade, deletion_protection, tags from aws_rds_db_instance where region = '$REGION'|database_rds_instances.json"
+        "RDS DB 클러스터|select db_cluster_identifier, engine, engine_version, database_name, db_cluster_members, vpc_security_groups, db_subnet_group_name, backup_retention_period, preferred_backup_window, preferred_maintenance_window, multi_az, storage_encrypted, kms_key_id, endpoint, reader_endpoint, status, deletion_protection, tags from aws_rds_db_cluster where region = '$REGION'|database_rds_clusters.json"
+        "RDS 서브넷 그룹|select db_subnet_group_name, db_subnet_group_description, vpc_id, subnet_group_status, subnets, tags from aws_rds_db_subnet_group where region = '$REGION'|database_rds_subnet_groups.json"
+        "RDS 파라미터 그룹|select db_parameter_group_name, db_parameter_group_family, description, tags from aws_rds_db_parameter_group where region = '$REGION'|database_rds_parameter_groups.json"
+        "RDS 스냅샷|select db_snapshot_identifier, db_instance_identifier, snapshot_create_time, engine, allocated_storage, status, encrypted, kms_key_id, tags from aws_rds_db_snapshot where region = '$REGION'|database_rds_snapshots.json"
     )
     
-    # 데이터베이스 리소스 쿼리 실행
-    for query_info in "${database_queries[@]}"; do
+    # RDS 쿼리 실행
+    for query_info in "${rds_queries[@]}"; do
+        IFS='|' read -r description query output_file <<< "$query_info"
+        ((total_count++))
+        if execute_steampipe_query "$description" "$query" "$output_file"; then
+            ((success_count++))
+        fi
+    done
+    
+    log_nosql "🔥 DynamoDB 리소스 수집 시작..."
+    
+    # DynamoDB 관련 리소스 수집 배열
+    declare -a dynamodb_queries=(
+        "DynamoDB 테이블|select name, table_status, creation_date_time, billing_mode_summary, provisioned_throughput, global_secondary_indexes, stream_specification, deletion_protection_enabled, tags from aws_dynamodb_table where region = '$REGION'|database_dynamodb_tables.json"
+        "DynamoDB 백업|select backup_name, backup_status, backup_type, backup_creation_date_time, table_name, backup_size_bytes from aws_dynamodb_backup where region = '$REGION'|database_dynamodb_backups.json"
+    )
+    
+    # DynamoDB 쿼리 실행
+    for query_info in "${dynamodb_queries[@]}"; do
+        IFS='|' read -r description query output_file <<< "$query_info"
+        ((total_count++))
+        if execute_steampipe_query "$description" "$query" "$output_file"; then
+            ((success_count++))
+        fi
+    done
+    
+    log_nosql "⚡ ElastiCache 리소스 수집 시작..."
+    
+    # ElastiCache 관련 리소스 수집 배열
+    declare -a elasticache_queries=(
+        "ElastiCache 클러스터|select cache_cluster_id, cache_node_type, engine, engine_version, cache_cluster_status, num_cache_nodes, preferred_availability_zone, cache_cluster_create_time, preferred_maintenance_window, auto_minor_version_upgrade, security_groups, replication_group_id from aws_elasticache_cluster where region = '$REGION'|database_elasticache_clusters.json"
+        "ElastiCache 복제 그룹|select replication_group_id, description, status, member_clusters, automatic_failover, multi_az, cache_node_type, auth_token_enabled, transit_encryption_enabled, at_rest_encryption_enabled from aws_elasticache_replication_group where region = '$REGION'|database_elasticache_replication_groups.json"
+    )
+    
+    # ElastiCache 쿼리 실행
+    for query_info in "${elasticache_queries[@]}"; do
+        IFS='|' read -r description query output_file <<< "$query_info"
+        ((total_count++))
+        if execute_steampipe_query "$description" "$query" "$output_file"; then
+            ((success_count++))
+        fi
+    done
+    
+    log_info "🏢 데이터 웨어하우스 서비스 수집 시작..."
+    
+    # 데이터 웨어하우스 관련 리소스 수집 배열
+    declare -a warehouse_queries=(
+        "Redshift 클러스터|select cluster_identifier, node_type, cluster_status, master_username, db_name, endpoint, cluster_create_time, number_of_nodes, publicly_accessible, encrypted, vpc_id, tags from aws_redshift_cluster where region = '$REGION'|database_redshift_clusters.json"
+        "OpenSearch 도메인|select domain_name, elasticsearch_version, endpoint, processing, created, deleted, elasticsearch_cluster_config, ebs_options, vpc_options, encryption_at_rest_options, tags from aws_opensearch_domain where region = '$REGION'|database_opensearch_domains.json"
+    )
+    
+    # 데이터 웨어하우스 쿼리 실행
+    for query_info in "${warehouse_queries[@]}"; do
+        IFS='|' read -r description query output_file <<< "$query_info"
+        ((total_count++))
+        if execute_steampipe_query "$description" "$query" "$output_file"; then
+            ((success_count++))
+        fi
+    done
+    
+    log_info "🚀 빅데이터 처리 서비스 수집 시작..."
+    
+    # 빅데이터 처리 관련 리소스 수집 배열
+    declare -a bigdata_queries=(
+        "EMR 클러스터|select id, name, status, ec2_instance_attributes, log_uri, release_label, auto_terminate, termination_protected, applications, service_role, tags from aws_emr_cluster where region = '$REGION'|database_emr_clusters.json"
+        "Kinesis 스트림|select name, status, retention_period, shard_count, stream_creation_timestamp, tags from aws_kinesis_stream where region = '$REGION'|database_kinesis_streams.json"
+        "Glue 데이터베이스|select name, description, location_uri, create_time from aws_glue_catalog_database where region = '$REGION'|database_glue_databases.json"
+        "Athena 워크그룹|select name, description, state, configuration, creation_time, tags from aws_athena_workgroup where region = '$REGION'|database_athena_workgroups.json"
+    )
+    
+    # 빅데이터 처리 쿼리 실행
+    for query_info in "${bigdata_queries[@]}"; do
         IFS='|' read -r description query output_file <<< "$query_info"
         ((total_count++))
         if execute_steampipe_query "$description" "$query" "$output_file"; then
@@ -124,7 +189,7 @@ main() {
     done
     
     # 결과 요약
-    log_success "데이터베이스 리소스 데이터 수집 완료!"
+    log_success "완전한 데이터베이스 리소스 데이터 수집 완료!"
     log_info "성공: $success_count/$total_count"
     
     # 파일 목록 및 크기 표시
@@ -146,6 +211,15 @@ main() {
     echo "성공한 쿼리: $success_count"
     echo "실패한 쿼리: $((total_count - success_count))"
     
+    # 카테고리별 수집 현황
+    echo -e "\n${BLUE}📋 카테고리별 수집 현황:${NC}"
+    echo "🏛️  RDS 리소스: 5개"
+    echo "🔥 DynamoDB: 2개"
+    echo "⚡ ElastiCache: 2개"
+    echo "🏢 데이터 웨어하우스: 2개"
+    echo "🚀 빅데이터 처리: 4개"
+    echo "📊 총 리소스 타입: 15개"
+    
     # 오류 로그 확인
     if [ -s "$ERROR_LOG" ]; then
         log_warning "오류가 발생했습니다. $ERROR_LOG 파일을 확인하세요."
@@ -155,13 +229,15 @@ main() {
     
     # 다음 단계 안내
     echo -e "\n${YELLOW}💡 다음 단계:${NC}"
-    echo "1. 수집된 데이터베이스 데이터를 바탕으로 Phase 1 인프라 분석 진행"
+    echo "1. 수집된 완전한 데이터베이스 데이터를 바탕으로 상세 분석 진행"
     echo "2. RDS 인스턴스 성능 및 비용 최적화 분석"
     echo "3. DynamoDB 테이블 구성 및 성능 검토"
     echo "4. ElastiCache 클러스터 최적화 분석"
-    echo "5. 데이터베이스 백업 및 보안 설정 검토"
+    echo "5. 데이터 웨어하우스 및 분석 서비스 활용도 분석"
+    echo "6. 빅데이터 처리 파이프라인 최적화"
+    echo "7. 데이터베이스 백업 및 보안 설정 종합 검토"
     
-    log_info "🎉 데이터베이스 리소스 데이터 수집이 완료되었습니다!"
+    log_info "🎉 완전한 데이터베이스 리소스 데이터 수집이 완료되었습니다!"
 }
 
 # 도움말 함수
@@ -170,12 +246,16 @@ show_help() {
     echo ""
     echo "옵션:"
     echo "  -r, --region REGION    AWS 리전 설정 (기본값: ap-northeast-2)"
-    echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정 (기본값: ~/report)"
+    echo "  -d, --dir DIRECTORY    보고서 디렉토리 설정"
     echo "  -h, --help            이 도움말 표시"
     echo ""
     echo "환경 변수:"
     echo "  AWS_REGION            AWS 리전 설정"
     echo "  REPORT_DIR            보고서 디렉토리 설정"
+    echo ""
+    echo "필수 요구사항:"
+    echo "  - Steampipe 설치"
+    echo "  - AWS 플러그인 설치: steampipe plugin install aws"
     echo ""
     echo "예시:"
     echo "  $0                                    # 기본 설정으로 실행"

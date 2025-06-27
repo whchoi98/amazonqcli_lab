@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 class DatabaseReportGenerator:
-    def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/report"):
+    def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -65,7 +65,7 @@ class DatabaseReportGenerator:
         report_file.write("| 인스턴스 ID | 엔진 | 클래스 | 상태 | Multi-AZ | 암호화 | 백업 보존 |\n")
         report_file.write("|-------------|------|--------|------|----------|--------|------------|\n")
         
-        for instance in rds_data[:10]:
+        for instance in rds_data:
             db_id = instance.get('db_instance_identifier', 'N/A')
             engine = instance.get('engine', 'N/A')
             db_class = instance.get('db_instance_class', 'N/A')
@@ -102,7 +102,7 @@ class DatabaseReportGenerator:
         report_file.write("| 테이블 이름 | 상태 | 빌링 모드 | 생성일 | GSI 수 |\n")
         report_file.write("|-------------|------|-----------|--------|--------|\n")
         
-        for table in dynamodb_data[:10]:
+        for table in dynamodb_data:
             table_name = table.get('table_name', 'N/A')
             status = table.get('table_status', 'N/A')
             billing_mode = table.get('billing_mode_summary', {}).get('billing_mode', 'N/A')
@@ -137,7 +137,7 @@ class DatabaseReportGenerator:
         report_file.write("| 클러스터 ID | 엔진 | 노드 타입 | 상태 | 노드 수 | 암호화 |\n")
         report_file.write("|-------------|------|-----------|------|---------|--------|\n")
         
-        for cluster in elasticache_data[:10]:
+        for cluster in elasticache_data:
             cluster_id = cluster.get('cache_cluster_id', 'N/A')
             engine = cluster.get('engine', 'N/A')
             node_type = cluster.get('cache_node_type', 'N/A')
@@ -229,7 +229,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="데이터베이스 분석 보고서 생성")
-    parser.add_argument("--report-dir", default="/home/ec2-user/amazonqcli_lab/report", help="보고서 디렉토리")
+    parser.add_argument("--report-dir", default="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report", help="보고서 디렉토리")
     
     args = parser.parse_args()
     

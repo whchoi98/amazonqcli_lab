@@ -8,13 +8,8 @@
 #### 1. 🚀 종합 데이터 수집 실행 (권장)
 모든 AWS 리소스 데이터를 한 번에 수집하는 통합 스크립트를 사용합니다:
 
-**방법 1: 빠른 실행 (추천)**
-```bash
-cd ~/amazonqcli_lab/aws-arch-analysis/script
-./quick_collect.sh
-```
 
-**방법 2: Python 스크립트 직접 실행**
+**방법 : Python 스크립트 직접 실행**
 ```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
 python3 collect_all_data.py

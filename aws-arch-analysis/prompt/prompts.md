@@ -30,7 +30,7 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 ```
 
 ### 예상 결과
-- ✅ AWS CLI 구성 확인
+- ✅ AWS CLI 설치 확인
 - ✅ Steampipe 설치 및 AWS 플러그인 확인
 - ✅ Python 패키지 설치 상태 확인
 - ✅ 분석 디렉토리 구조 생성

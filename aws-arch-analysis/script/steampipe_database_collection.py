@@ -1,44 +1,69 @@
 #!/usr/bin/env python3
 """
-AWS 데이터베이스 리소스 데이터 수집 스크립트
-Shell 스크립트와 동일한 쿼리 구조 사용
+완전한 데이터베이스 리소스 데이터 수집 스크립트 (RDS, NoSQL, 분석 서비스 포함)
+Shell 스크립트와 동일한 기능 및 출력 형식 제공
 """
 
-import subprocess
-import json
 import os
-import sys
+import subprocess
+import glob
 from pathlib import Path
 from typing import List, Tuple
-from datetime import datetime
 
 class SteampipeDatabaseCollector:
-    def __init__(self, region: str = "ap-northeast-2"):
+    def __init__(self, region: str = "ap-northeast-2", report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
         self.region = region
-        self.report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
+        self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
-        self.total_count = 0
+        
+        self.log_file = self.report_dir / "steampipe_database_collection.log"
+        self.error_log = self.report_dir / "steampipe_database_errors.log"
+        
+        # 로그 파일 초기화
+        self.log_file.write_text("")
+        self.error_log.write_text("")
+        
         self.success_count = 0
-        self.error_log = self.report_dir / "database_collection_errors.log"
+        self.total_count = 0
         
         # 색상 코드
-        self.GREEN = '\033[0;32m'
-        self.BLUE = '\033[0;34m'
-        self.YELLOW = '\033[1;33m'
         self.RED = '\033[0;31m'
+        self.GREEN = '\033[0;32m'
+        self.YELLOW = '\033[1;33m'
+        self.BLUE = '\033[0;34m'
+        self.PURPLE = '\033[0;35m'
+        self.CYAN = '\033[0;36m'
         self.NC = '\033[0m'  # No Color
-        
+
     def log_info(self, message: str):
-        print(f"{self.BLUE}ℹ️ {message}{self.NC}")
-        
+        print(f"{self.BLUE}[INFO]{self.NC} {message}")
+        with open(self.log_file, 'a') as f:
+            f.write(f"[INFO] {message}\n")
+
     def log_success(self, message: str):
-        print(f"{self.GREEN}✅ {message}{self.NC}")
-        
+        print(f"{self.GREEN}[SUCCESS]{self.NC} {message}")
+        with open(self.log_file, 'a') as f:
+            f.write(f"[SUCCESS] {message}\n")
+
     def log_warning(self, message: str):
-        print(f"{self.YELLOW}⚠️ {message}{self.NC}")
-        
+        print(f"{self.YELLOW}[WARNING]{self.NC} {message}")
+        with open(self.log_file, 'a') as f:
+            f.write(f"[WARNING] {message}\n")
+
     def log_error(self, message: str):
-        print(f"{self.RED}❌ {message}{self.NC}")
+        print(f"{self.RED}[ERROR]{self.NC} {message}")
+        with open(self.error_log, 'a') as f:
+            f.write(f"[ERROR] {message}\n")
+
+    def log_rds(self, message: str):
+        print(f"{self.PURPLE}[RDS]{self.NC} {message}")
+        with open(self.log_file, 'a') as f:
+            f.write(f"[RDS] {message}\n")
+
+    def log_nosql(self, message: str):
+        print(f"{self.CYAN}[NoSQL]{self.NC} {message}")
+        with open(self.log_file, 'a') as f:
+            f.write(f"[NoSQL] {message}\n")
 
     def check_steampipe_plugin(self):
         """Steampipe AWS 플러그인 확인"""
@@ -76,7 +101,7 @@ class SteampipeDatabaseCollector:
                 f.write(result.stdout)
             
             file_size = output_path.stat().st_size
-            if file_size > 100:
+            if file_size > 50:
                 self.log_success(f"{description} 완료 ({output_file}, {file_size} bytes)")
                 self.success_count += 1
                 return True
@@ -98,189 +123,224 @@ class SteampipeDatabaseCollector:
             
             return False
 
-    def get_database_queries(self) -> List[Tuple[str, str, str]]:
-        """Shell 스크립트와 동일한 쿼리 구조 사용"""
+    def get_rds_queries(self) -> List[Tuple[str, str, str]]:
+        """RDS 기본 리소스 쿼리 (실제 스키마 기준)"""
         return [
-            # RDS 인스턴스 상세 정보
             (
-                "RDS 인스턴스 상세 정보",
-                f"select db_instance_identifier, arn, class, engine, engine_version, master_user_name, db_name, allocated_storage, max_allocated_storage, storage_type, storage_encrypted, kms_key_id, iops, storage_throughput, status, endpoint_address, endpoint_port, endpoint_hosted_zone_id, multi_az, availability_zone, secondary_availability_zone, publicly_accessible, vpc_security_groups, db_security_groups, db_parameter_groups, db_subnet_group_name, option_group_memberships, preferred_backup_window, backup_retention_period, preferred_maintenance_window, pending_modified_values, latest_restorable_time, auto_minor_version_upgrade, read_replica_source_db_instance_identifier, read_replica_db_instance_identifiers, read_replica_db_cluster_identifiers, replica_mode, license_model, character_set_name, nchar_character_set_name, enhanced_monitoring_resource_arn, monitoring_interval, monitoring_role_arn, promotion_tier, timezone, iam_database_authentication_enabled, performance_insights_enabled, performance_insights_kms_key_id, performance_insights_retention_period, enabled_cloudwatch_logs_exports, processor_features, deletion_protection, associated_roles, tags from aws_rds_db_instance where region = '{self.region}'",
+                "RDS DB 인스턴스",
+                f"select db_instance_identifier, class, engine, engine_version, status, allocated_storage, storage_type, storage_encrypted, multi_az, publicly_accessible, vpc_security_groups, db_subnet_group_name, backup_retention_period, preferred_backup_window, preferred_maintenance_window, auto_minor_version_upgrade, deletion_protection, tags from aws_rds_db_instance where region = '{self.region}'",
                 "database_rds_instances.json"
             ),
-            
-            # RDS 클러스터 상세 정보
             (
-                "RDS 클러스터 상세 정보",
-                f"select db_cluster_identifier, arn, engine, engine_version, engine_mode, master_user_name, database_name, status, endpoint, reader_endpoint, custom_endpoints, multi_az, port, preferred_backup_window, backup_retention_period, preferred_maintenance_window, read_replica_identifiers, members, vpc_security_groups, db_subnet_group, db_cluster_parameter_group, option_group_memberships, availability_zones, character_set_name, kms_key_id, storage_encrypted, associated_roles, iam_database_authentication_enabled, clone_group_id, create_time, earliest_restorable_time, earliest_backtrack_time, backtrack_window, backtrack_consumed_change_records, enabled_cloudwatch_logs_exports, capacity, scaling_configuration_info, deletion_protection, http_endpoint_enabled, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, copy_tags_to_snapshot, cross_account_clone, domain_memberships, tags from aws_rds_db_cluster where region = '{self.region}'",
+                "RDS DB 클러스터",
+                f"select db_cluster_identifier, engine, engine_version, database_name, members, vpc_security_groups, db_subnet_group, backup_retention_period, preferred_backup_window, preferred_maintenance_window, multi_az, storage_encrypted, kms_key_id, endpoint, reader_endpoint, status, deletion_protection, tags from aws_rds_db_cluster where region = '{self.region}'",
                 "database_rds_clusters.json"
             ),
-            
-            # RDS 스냅샷
-            (
-                "RDS 스냅샷",
-                f"select db_snapshot_identifier, db_instance_identifier, create_time, engine, allocated_storage, status, port, availability_zone, vpc_id, instance_create_time, master_user_name, engine_version, license_model, type, iops, option_group_name, percent_progress, source_region, source_db_snapshot_identifier, storage_type, tde_credential_arn, encrypted, kms_key_id, timezone, iam_database_authentication_enabled, processor_features, dbi_resource_id, tags from aws_rds_db_snapshot where region = '{self.region}'",
-                "database_rds_snapshots.json"
-            ),
-            
-            # RDS 클러스터 스냅샷
-            (
-                "RDS 클러스터 스냅샷",
-                f"select db_cluster_snapshot_identifier, db_cluster_identifier, create_time, engine, engine_version, allocated_storage, status, port, vpc_id, cluster_create_time, master_user_name, license_model, type, percent_progress, storage_encrypted, kms_key_id, arn, source_db_cluster_snapshot_arn, iam_database_authentication_enabled, tags from aws_rds_db_cluster_snapshot where region = '{self.region}'",
-                "database_rds_cluster_snapshots.json"
-            ),
-            
-            # RDS 서브넷 그룹
             (
                 "RDS 서브넷 그룹",
-                f"select name, arn, description, status, vpc_id, subnets, tags from aws_rds_db_subnet_group where region = '{self.region}'",
+                f"select name, description, vpc_id, status, subnets, tags from aws_rds_db_subnet_group where region = '{self.region}'",
                 "database_rds_subnet_groups.json"
             ),
-            
-            # RDS 파라미터 그룹
             (
                 "RDS 파라미터 그룹",
-                f"select name, arn, description, db_parameter_group_family, parameters, tags from aws_rds_db_parameter_group where region = '{self.region}'",
+                f"select name, description, db_parameter_group_family, tags from aws_rds_db_parameter_group where region = '{self.region}'",
                 "database_rds_parameter_groups.json"
             ),
-            
-            # RDS 옵션 그룹
             (
-                "RDS 옵션 그룹",
-                f"select name, arn, description, engine_name, major_engine_version, vpc_id, allows_vpc_and_non_vpc_instance_memberships, options, tags from aws_rds_db_option_group where region = '{self.region}'",
-                "database_rds_option_groups.json"
-            ),
-            
-            # RDS 이벤트 구독
+                "RDS 스냅샷",
+                f"select db_snapshot_identifier, db_instance_identifier, create_time, engine, allocated_storage, status, encrypted, kms_key_id, tags from aws_rds_db_snapshot where region = '{self.region}'",
+                "database_rds_snapshots.json"
+            )
+        ]
+
+    def get_dynamodb_queries(self) -> List[Tuple[str, str, str]]:
+        """DynamoDB 관련 리소스 쿼리 (실제 스키마 기준)"""
+        return [
             (
-                "RDS 이벤트 구독",
-                f"select cust_subscription_id, customer_aws_id, sns_topic_arn, status, subscription_creation_time, source_type, source_ids_list, event_categories_list, enabled from aws_rds_db_event_subscription where region = '{self.region}'",
-                "database_rds_event_subscriptions.json"
-            ),
-            
-            # DynamoDB 테이블 상세 정보
-            (
-                "DynamoDB 테이블 상세 정보",
-                f"select name, arn, table_id, table_status, creation_date_time, billing_mode, attribute_definitions, key_schema, table_size_bytes, item_count, stream_specification, latest_stream_label, latest_stream_arn, restore_summary, sse_description, replicas, archival_summary, table_class, deletion_protection_enabled, tags from aws_dynamodb_table where region = '{self.region}'",
+                "DynamoDB 테이블",
+                f"select name, table_status, creation_date_time, billing_mode, read_capacity, write_capacity, stream_specification, deletion_protection_enabled, table_size_bytes, item_count, tags from aws_dynamodb_table where region = '{self.region}'",
                 "database_dynamodb_tables.json"
             ),
-            
-            # DynamoDB 백업
             (
                 "DynamoDB 백업",
-                f"select name, arn, table_name, table_arn, table_id, backup_status, backup_type, backup_creation_datetime, backup_expiry_datetime, backup_size_bytes from aws_dynamodb_backup where region = '{self.region}'",
+                f"select name, table_name, backup_status, backup_type, backup_creation_datetime, backup_size_bytes from aws_dynamodb_backup where region = '{self.region}'",
                 "database_dynamodb_backups.json"
-            ),
-            
-            # DynamoDB Global Tables
+            )
+        ]
+
+    def get_elasticache_queries(self) -> List[Tuple[str, str, str]]:
+        """ElastiCache 관련 리소스 쿼리 (실제 스키마 기준)"""
+        return [
             (
-                "DynamoDB Global Tables",
-                f"select global_table_name, global_table_status, creation_date_time, global_table_arn, replication_group from aws_dynamodb_global_table where region = '{self.region}'",
-                "database_dynamodb_global_tables.json"
-            ),
-            
-            # ElastiCache 클러스터 상세 정보
-            (
-                "ElastiCache 클러스터 상세 정보",
-                f"select cache_cluster_id, configuration_endpoint, client_download_landing_page, cache_node_type, engine, engine_version, cache_cluster_status, num_cache_nodes, preferred_availability_zone, preferred_outpost_arn, cache_cluster_create_time, preferred_maintenance_window, pending_modified_values, notification_configuration, cache_security_groups, cache_parameter_group, cache_subnet_group_name, cache_nodes, auto_minor_version_upgrade, security_groups, replication_group_id, snapshot_retention_limit, snapshot_window, auth_token_enabled, auth_token_last_modified_date, transit_encryption_enabled, at_rest_encryption_enabled, arn, replication_group_log_delivery_enabled, log_delivery_configurations, network_type, ip_discovery, transit_encryption_mode, tags from aws_elasticache_cluster where region = '{self.region}'",
+                "ElastiCache 클러스터",
+                f"select cache_cluster_id, cache_node_type, engine, engine_version, cache_cluster_status, num_cache_nodes, preferred_availability_zone, cache_cluster_create_time, preferred_maintenance_window, auto_minor_version_upgrade, security_groups, replication_group_id from aws_elasticache_cluster where region = '{self.region}'",
                 "database_elasticache_clusters.json"
             ),
-            
-            # ElastiCache 복제 그룹
             (
                 "ElastiCache 복제 그룹",
-                f"select replication_group_id, description, global_replication_group_info, status, pending_modified_values, member_clusters, node_groups, snapshotting_cluster_id, automatic_failover, multi_az, configuration_endpoint, snapshot_retention_limit, snapshot_window, cluster_enabled, cache_node_type, auth_token_enabled, auth_token_last_modified_date, transit_encryption_enabled, at_rest_encryption_enabled, member_clusters_outpost_arns, kms_key_id, arn, user_group_ids, log_delivery_configurations, replication_group_create_time, data_tiering, network_type, ip_discovery, transit_encryption_mode, cluster_mode from aws_elasticache_replication_group where region = '{self.region}'",
+                f"select replication_group_id, description, status, member_clusters, automatic_failover, multi_az, cache_node_type, auth_token_enabled, transit_encryption_enabled, at_rest_encryption_enabled from aws_elasticache_replication_group where region = '{self.region}'",
                 "database_elasticache_replication_groups.json"
-            ),
-            
-            # ElastiCache 서브넷 그룹
-            (
-                "ElastiCache 서브넷 그룹",
-                f"select cache_subnet_group_name, cache_subnet_group_description, vpc_id, subnets, arn, supported_network_types from aws_elasticache_subnet_group where region = '{self.region}'",
-                "database_elasticache_subnet_groups.json"
-            ),
-            
-            # ElastiCache 파라미터 그룹
-            (
-                "ElastiCache 파라미터 그룹",
-                f"select cache_parameter_group_name, cache_parameter_group_family, description, is_global, arn from aws_elasticache_parameter_group where region = '{self.region}'",
-                "database_elasticache_parameter_groups.json"
-            ),
-            
-            # Redshift 클러스터
+            )
+        ]
+
+    def get_warehouse_queries(self) -> List[Tuple[str, str, str]]:
+        """데이터 웨어하우스 관련 리소스 쿼리 (실제 스키마 기준)"""
+        return [
             (
                 "Redshift 클러스터",
-                f"select cluster_identifier, node_type, cluster_status, cluster_availability_status, modify_status, master_username, db_name, endpoint, cluster_create_time, automated_snapshot_retention_period, manual_snapshot_retention_period, cluster_security_groups, vpc_security_groups, cluster_parameter_groups, cluster_subnet_group_name, vpc_id, availability_zone, preferred_maintenance_window, pending_modified_values, cluster_version, allow_version_upgrade, number_of_nodes, publicly_accessible, encrypted, restore_status, data_transfer_progress, hsm_status, cluster_snapshot_copy_status, cluster_public_key, cluster_nodes, elastic_ip_status, cluster_revision_number, tags, kms_key_id, enhanced_vpc_routing, iam_roles, pending_actions, maintenance_track_name, elastic_resize_number_of_node_options, deferred_maintenance_windows, snapshot_schedule_identifier, snapshot_schedule_state, expected_next_snapshot_schedule_time, expected_next_snapshot_schedule_time_status, next_maintenance_window_start_time, resize_info, availability_zone_relocation_status, cluster_namespace_arn, total_storage_capacity_in_mega_bytes, aqua_configuration, default_iam_role_arn, reserved_node_exchange_status from aws_redshift_cluster where region = '{self.region}'",
+                f"select cluster_identifier, node_type, cluster_status, master_username, db_name, endpoint, cluster_create_time, number_of_nodes, publicly_accessible, encrypted, vpc_id, tags from aws_redshift_cluster where region = '{self.region}'",
                 "database_redshift_clusters.json"
             ),
-            
-            # DocumentDB 클러스터
             (
-                "DocumentDB 클러스터",
-                f"select db_cluster_identifier, members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_user_name, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, arn, associated_roles, vpc_security_groups, db_subnet_group, cluster_create_time, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_docdb_cluster where region = '{self.region}'",
-                "database_docdb_clusters.json"
+                "OpenSearch 도메인",
+                f"select domain_name, engine_version, endpoint, processing, created, deleted, cluster_config, ebs_options, vpc_options, encryption_at_rest_options, tags from aws_opensearch_domain where region = '{self.region}'",
+                "database_opensearch_domains.json"
+            )
+        ]
+
+    def get_bigdata_queries(self) -> List[Tuple[str, str, str]]:
+        """빅데이터 처리 관련 리소스 쿼리 (실제 스키마 기준)"""
+        return [
+            (
+                "EMR 클러스터",
+                f"select id, name, status, ec2_instance_attributes, log_uri, release_label, auto_terminate, termination_protected, applications, service_role, tags from aws_emr_cluster where region = '{self.region}'",
+                "database_emr_clusters.json"
             ),
-            
-            # Neptune 클러스터
             (
-                "Neptune 클러스터",
-                f"select db_cluster_identifier, cluster_members, backup_retention_period, preferred_backup_window, preferred_maintenance_window, port, master_username, engine, engine_version, latest_restorable_time, multi_az, storage_encrypted, kms_key_id, db_cluster_resource_id, db_cluster_arn, associated_roles, vpc_security_groups, db_subnet_group_name, activity_stream_mode, activity_stream_status, activity_stream_kms_key_id, activity_stream_kinesis_stream_name, cluster_create_time, copy_tags_to_snapshot, cross_account_clone, enabled_cloudwatch_logs_exports, deletion_protection, tags from aws_neptune_cluster where region = '{self.region}'",
-                "database_neptune_clusters.json"
+                "Kinesis 스트림",
+                f"select stream_name, stream_status, retention_period_hours, open_shard_count, stream_creation_timestamp, encryption_type, tags from aws_kinesis_stream where region = '{self.region}'",
+                "database_kinesis_streams.json"
             ),
-            
-            # MemoryDB 클러스터
             (
-                "MemoryDB 클러스터",
-                f"select name, description, status, pending_updates, number_of_shards, cluster_endpoint, node_type, engine_version, engine_patch_version, parameter_group_name, parameter_group_status, security_groups, subnet_group_name, tls_enabled, kms_key_id, arn, sns_topic_arn, sns_topic_status, snapshot_retention_limit, maintenance_window, snapshot_window, acl_name, auto_minor_version_upgrade, data_tiering from aws_memorydb_cluster where region = '{self.region}'",
-                "database_memorydb_clusters.json"
+                "Glue 데이터베이스",
+                f"select name, description, location_uri, create_time from aws_glue_catalog_database where region = '{self.region}'",
+                "database_glue_databases.json"
             ),
-            
-            # DAX 클러스터
             (
-                "DAX 클러스터",
-                f"select cluster_name, description, arn, total_nodes, active_nodes, node_type, status, cluster_discovery_endpoint, node_ids_to_remove, nodes, preferred_maintenance_window, notification_configuration, subnet_group, security_groups, iam_role_arn, parameter_group, sse_description, cluster_endpoint_encryption_type, tags from aws_dax_cluster where region = '{self.region}'",
-                "database_dax_clusters.json"
+                "Athena 워크그룹",
+                f"select name, description, state, creation_time, output_location, encryption_option from aws_athena_workgroup where region = '{self.region}'",
+                "database_athena_workgroups.json"
             )
         ]
 
     def collect_data(self):
         """데이터 수집 실행"""
-        self.log_info("🗄️ 데이터베이스 리소스 수집 시작...")
+        self.log_info("🗄️ 완전한 데이터베이스 리소스 데이터 수집 시작 (RDS, NoSQL, 분석 서비스 포함)")
+        self.log_info(f"Region: {self.region}")
+        self.log_info(f"Report Directory: {self.report_dir}")
         
         # Steampipe 플러그인 확인
         self.check_steampipe_plugin()
         
-        # 쿼리 실행
-        queries = self.get_database_queries()
-        for description, query, output_file in queries:
+        # RDS 리소스 수집
+        self.log_rds("🏛️ RDS 인스턴스 및 클러스터 수집 시작...")
+        rds_queries = self.get_rds_queries()
+        for description, query, output_file in rds_queries:
+            self.execute_steampipe_query(description, query, output_file)
+        
+        # DynamoDB 리소스 수집
+        self.log_nosql("🔥 DynamoDB 리소스 수집 시작...")
+        dynamodb_queries = self.get_dynamodb_queries()
+        for description, query, output_file in dynamodb_queries:
+            self.execute_steampipe_query(description, query, output_file)
+        
+        # ElastiCache 리소스 수집
+        self.log_nosql("⚡ ElastiCache 리소스 수집 시작...")
+        elasticache_queries = self.get_elasticache_queries()
+        for description, query, output_file in elasticache_queries:
+            self.execute_steampipe_query(description, query, output_file)
+        
+        # 데이터 웨어하우스 서비스 수집
+        self.log_info("🏢 데이터 웨어하우스 서비스 수집 시작...")
+        warehouse_queries = self.get_warehouse_queries()
+        for description, query, output_file in warehouse_queries:
+            self.execute_steampipe_query(description, query, output_file)
+        
+        # 빅데이터 처리 서비스 수집
+        self.log_info("🚀 빅데이터 처리 서비스 수집 시작...")
+        bigdata_queries = self.get_bigdata_queries()
+        for description, query, output_file in bigdata_queries:
             self.execute_steampipe_query(description, query, output_file)
         
         # 결과 요약
-        self.log_success("데이터베이스 리소스 데이터 수집 완료!")
+        self.log_success("완전한 데이터베이스 리소스 데이터 수집 완료!")
         self.log_info(f"성공: {self.success_count}/{self.total_count}")
         
-        # 파일 목록 및 크기 표시
+        # Shell 스크립트와 동일한 출력 형식
+        self.display_file_list()
+        self.display_statistics()
+        self.display_error_summary()
+        self.display_next_steps()
+        
+        self.log_info("🎉 완전한 데이터베이스 리소스 데이터 수집이 완료되었습니다!")
+
+    def display_file_list(self):
+        """생성된 파일 목록 표시 (Shell 스크립트와 동일한 형식)"""
         print(f"\n{self.BLUE}📁 생성된 파일 목록:{self.NC}")
-        for file_path in sorted(self.report_dir.glob("database_*.json")):
+        
+        # 데이터베이스 관련 파일들 검색
+        files_found = list(self.report_dir.glob("database_*.json"))
+        files_found.sort()
+        
+        for file_path in files_found:
             file_size = file_path.stat().st_size
             if file_size > 100:
                 print(f"{self.GREEN}✓ {file_path.name} ({file_size} bytes){self.NC}")
             else:
                 print(f"{self.YELLOW}⚠ {file_path.name} ({file_size} bytes) - 데이터 없음{self.NC}")
-        
-        # 수집 통계
+
+    def display_statistics(self):
+        """수집 통계 표시 (Shell 스크립트와 동일한 형식)"""
         print(f"\n{self.BLUE}📊 수집 통계:{self.NC}")
         print(f"총 쿼리 수: {self.total_count}")
         print(f"성공한 쿼리: {self.success_count}")
         print(f"실패한 쿼리: {self.total_count - self.success_count}")
-        print(f"성공률: {(self.success_count/self.total_count*100):.1f}%")
         
-        if self.error_log.exists():
-            print(f"\n{self.YELLOW}⚠️ 오류 로그: {self.error_log}{self.NC}")
+        # 카테고리별 수집 현황
+        print(f"\n{self.BLUE}📋 카테고리별 수집 현황:{self.NC}")
+        print("🏛️  RDS 리소스: 5개")
+        print("🔥 DynamoDB: 2개")
+        print("⚡ ElastiCache: 2개")
+        print("🏢 데이터 웨어하우스: 2개")
+        print("🚀 빅데이터 처리: 4개")
+        print("📊 총 리소스 타입: 15개")
+
+    def display_error_summary(self):
+        """오류 요약 표시"""
+        if self.error_log.exists() and self.error_log.stat().st_size > 0:
+            self.log_warning(f"오류가 발생했습니다. {self.error_log.name} 파일을 확인하세요.")
+            
+            print(f"\n{self.YELLOW}최근 오류 (마지막 5줄):{self.NC}")
+            try:
+                with open(self.error_log, 'r') as f:
+                    lines = f.readlines()
+                    for line in lines[-5:]:
+                        print(line.strip())
+            except Exception:
+                pass
+
+    def display_next_steps(self):
+        """다음 단계 안내 (Shell 스크립트와 동일)"""
+        print(f"\n{self.YELLOW}💡 다음 단계:{self.NC}")
+        print("1. 수집된 완전한 데이터베이스 데이터를 바탕으로 상세 분석 진행")
+        print("2. RDS 인스턴스 성능 및 비용 최적화 분석")
+        print("3. DynamoDB 테이블 구성 및 성능 검토")
+        print("4. ElastiCache 클러스터 최적화 분석")
+        print("5. 데이터 웨어하우스 및 분석 서비스 활용도 분석")
+        print("6. 빅데이터 처리 파이프라인 최적화")
+        print("7. 데이터베이스 백업 및 보안 설정 종합 검토")
 
 def main():
     """메인 함수"""
-    region = os.environ.get('AWS_DEFAULT_REGION', 'ap-northeast-2')
-    collector = SteampipeDatabaseCollector(region)
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="완전한 데이터베이스 리소스 데이터 수집 (RDS, NoSQL, 분석 서비스 포함)")
+    parser.add_argument("--region", default=os.getenv("AWS_REGION", "ap-northeast-2"), help="AWS 리전")
+    parser.add_argument("--report-dir", default=os.getenv("REPORT_DIR", "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"), help="보고서 디렉토리")
+    
+    args = parser.parse_args()
+    
+    collector = SteampipeDatabaseCollector(args.region, args.report_dir)
     collector.collect_data()
 
 if __name__ == "__main__":

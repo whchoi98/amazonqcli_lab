@@ -1,0 +1,60 @@
+
+Query failed: select snapshot_id, volume_id, volume_size, state, start_time, progress, owner_id, description, encrypted, kms_key_id, data_encryption_key_id, outpost_arn, storage_tier, restore_expiry_time, tags from aws_ebs_snapshot where region = 'ap-northeast-2' and owner_id = (select account_id from aws_caller_identity)
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_caller_identity" does not exist (SQLSTATE 42P01)
+
+
+Query failed: select ebs_encryption_by_default, ebs_default_kms_key_id from aws_ec2_regional_settings where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "ebs_encryption_by_default" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, arn, region, creation_date, lifecycle_rules, logging, event_notification_configuration, object_lock_configuration, policy, policy_std, replication, server_side_encryption_configuration, versioning_enabled, versioning_mfa_delete, website_configuration, block_public_acls, block_public_policy, ignore_public_acls, restrict_public_buckets, tags from aws_s3_bucket
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: XJ91BX7SQC0FR52T, HostID: r9FoMy5wlVS2z1Ff7sX3/5jc6pHkcryC+LgudTUZbj/QlcdTGifmcDlmXngNcrT+gOx58MeyxIteVuHU68+DZUfb8CwgWDv3, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, policy, policy_std from aws_s3_bucket where policy is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYRFSGXW3J29T9R4, HostID: 3NH8p1WK+IYkfhM4moLiloekaK/vRJQF4C9Q4Aaq6xGjnrNOA3/E1p1LTSiez8NrWcAB9Ee0u9NH1STd179M5l41yHwiMO8B, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, block_public_acls, block_public_policy, ignore_public_acls, restrict_public_buckets from aws_s3_bucket
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYRCVCVGZTBCTMXK, HostID: a/w7ZB/H/RzcfzZrvSmBIk4O4KndSVpOsGl/H2aSwNqwxoMQslnrQ1xV/LtocdBfTF3+NHCzYidSuid+NqlRTc6S8mAGRoYO, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, cors_rules from aws_s3_bucket where cors_rules is not null
+Error: Warning: query 1 of 1 failed: ERROR: column "cors_rules" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, lifecycle_rules from aws_s3_bucket where lifecycle_rules is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYRCE4KZYEH367ES, HostID: qO8S+V7C/EdtgysDsXfBxDhzso8jmw2L4FRSQk6YpwrwNcFNl0hNGoErGwP2S9Ir+xqJjOYP+XhMuAbYdCb1GscAeqnG2Uex, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, replication from aws_s3_bucket where replication is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYR4MKGX04XBCG1A, HostID: JwVySLv2ilTTet8cJTA8bHuQjNIJjY41CE+TJ+wFeSoBomz6+x31c6uvZH5uFNBNbK/ilv0jEKc=, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, versioning_enabled, versioning_mfa_delete from aws_s3_bucket
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYR6Y3JH5MRW64RY, HostID: dnYbUlpsBn9ilWhfXzhVRp6Hee5BWqSiFImPEVeYhyQTc++SJDyv4yIjAPhgmWbqCRyhCPu42AKWrvhW6Ue5WIyuf4MjMdd+, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, logging from aws_s3_bucket where logging is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: QYR4P339ND57BC9Y, HostID: h+GGypj7u8WJbkUyAmjxYXM7fQMX3Tzf2gJTZhHtkUwrFXHPRtb037oNZMRoYXeUr2am0BESW+TWBBuhz8t20W5Lwt4yOzSe, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, event_notification_configuration from aws_s3_bucket where event_notification_configuration is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: 38KQST8ME2GKXSHY, HostID: gCEyCu4qyGJo36UlZ9XdENDncFju41/QsCze91yrXVEIq4Dkqw3kFaJ+CdBmovtl/IiBn9bVuqAITcI2D15VILPRmvSLQuzL, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select name, website_configuration from aws_s3_bucket where website_configuration is not null
+Error: Error: aws: operation error S3: ListBuckets, https response error StatusCode: 400, RequestID: 38KX9C1EHBXKRHEC, HostID: e/f2W3EaJ7a8mXUj621SOwPpbaW4PcutBpNXs2T0/dtmc4uQ/NUQtj75jZ7/gtEuenpXEpT5lOlRy8R5t2QVCaTLXyF7QwhV, api error InvalidToken: The provided token is malformed or otherwise invalid. (SQLSTATE HV000)
+
+
+Query failed: select file_system_id, backup_policy from aws_efs_backup_policy where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_efs_backup_policy" does not exist (SQLSTATE 42P01)
+
+
+Query failed: select backup_id, file_system_id, type, lifecycle, failure_details, progress_percent, creation_time, kms_key_id, resource_arn, tags, volume_id, source_backup_id, source_backup_region, resource_type, backup_type from aws_fsx_backup where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_fsx_backup" does not exist (SQLSTATE 42P01)
+
+
+Query failed: select gateway_id, gateway_name, gateway_timezone, gateway_type, gateway_state, ec2_instance_id, ec2_instance_region, host_environment, host_environment_id, endpoint_type, gateway_capacity, supported_gateway_capacities, deprecation_date, software_updates_end_date, tags from aws_storagegateway_gateway where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: relation "aws_storagegateway_gateway" does not exist (SQLSTATE 42P01)
+

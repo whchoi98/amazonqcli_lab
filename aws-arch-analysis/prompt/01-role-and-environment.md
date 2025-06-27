@@ -15,10 +15,11 @@
 ```
 ~/amazonqcli_lab/
 ├── aws-arch-analysis/
-│   ├── script/          # 데이터 수집 스크립트
-│   ├── prompt/          # 분석 프롬프트
-│   └── sample/          # HTML 템플릿 샘플
-└── report/              # 수집된 데이터 및 생성된 보고서
+   ├── script/          # 데이터 수집 스크립트
+   ├── prompt/          # 분석 프롬프트
+   ├── report/          # 수집된 데이터 및 생성된 보고서
+   └── sample/          # HTML 템플릿 샘플
+          
 ```
 
 ## 🔧 필수 도구 설치 확인

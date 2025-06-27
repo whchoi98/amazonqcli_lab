@@ -303,7 +303,7 @@ def main():
     print("🌐 Application Analysis 보고서 생성 중...")
     
     # 보고서 디렉토리 설정
-    report_dir = Path("/home/ec2-user/amazonqcli_lab/report")
+    report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
     os.chdir(report_dir)
     
     # JSON 데이터 파일들 로드
