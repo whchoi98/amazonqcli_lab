@@ -9,12 +9,14 @@ SCRIPT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/script"
 echo "🌐 HTML 보고서 생성 시작..."
 echo "📁 출력 디렉토리: $HTML_DIR"
 
-# HTML 디렉토리 생성
+# HTML 디렉토리 및 assets 구조 생성
 mkdir -p "$HTML_DIR"
 mkdir -p "$HTML_DIR/assets/css"
 mkdir -p "$HTML_DIR/assets/js"
+mkdir -p "$HTML_DIR/assets/images"
+mkdir -p "$HTML_DIR/data"
 
-# 1. 기본 CSS 파일 생성
+# 1. 메인 CSS 파일 생성
 echo "🎨 CSS 스타일 파일 생성 중..."
 cat > "$HTML_DIR/assets/css/style.css" << 'EOF'
 * {
@@ -92,7 +94,67 @@ EOF
 
 echo "✅ CSS 파일 생성 완료"
 
-# 2. 기본 JavaScript 파일 생성
+# 2. 반응형 CSS 파일 생성
+echo "📱 반응형 CSS 파일 생성 중..."
+cat > "$HTML_DIR/assets/css/responsive.css" << 'EOF'
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .nav-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .header h1 {
+        font-size: 1.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nav-card {
+        padding: 15px;
+    }
+}
+EOF
+
+# 3. 인쇄용 CSS 파일 생성
+echo "🖨️ 인쇄용 CSS 파일 생성 중..."
+cat > "$HTML_DIR/assets/css/print.css" << 'EOF'
+@media print {
+    .header {
+        background: none !important;
+        color: black !important;
+    }
+    
+    .nav-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc;
+    }
+    
+    .priority-section {
+        background: none !important;
+        border: 1px solid #ffc107 !important;
+    }
+    
+    .page-break {
+        page-break-before: always;
+    }
+}
+EOF
+
+echo "✅ 모든 CSS 파일 생성 완료"
+
+# 4. 메인 JavaScript 파일 생성
 echo "⚡ JavaScript 파일 생성 중..."
 cat > "$HTML_DIR/assets/js/main.js" << 'EOF'
 function openReport(filename) {
@@ -113,9 +175,119 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 EOF
 
+# 5. 네비게이션 JavaScript 파일 생성
+echo "🧭 네비게이션 JavaScript 파일 생성 중..."
+cat > "$HTML_DIR/assets/js/navigation.js" << 'EOF'
+// 네비게이션 기능
+function navigateToReport(reportId) {
+    const reportFiles = {
+        'executive': '01-executive-summary.html',
+        'networking': '02-networking-analysis.html',
+        'compute': '03-compute-analysis.html',
+        'database': '04-database-analysis.html',
+        'storage': '05-storage-analysis.html',
+        'security': '06-security-analysis.html',
+        'application': '07-application-analysis.html',
+        'monitoring': '08-monitoring-analysis.html',
+        'cost': '09-cost-optimization.html',
+        'recommendations': '10-recommendations.html'
+    };
+    
+    if (reportFiles[reportId]) {
+        window.open(reportFiles[reportId], '_blank');
+    }
+}
+
+// 브레드크럼 네비게이션
+function updateBreadcrumb(currentPage) {
+    const breadcrumb = document.getElementById('breadcrumb');
+    if (breadcrumb) {
+        breadcrumb.innerHTML = `
+            <a href="index.html">홈</a> > 
+            <span class="current">${currentPage}</span>
+        `;
+    }
+}
+EOF
+
+# 6. 차트 JavaScript 파일 생성
+echo "📊 차트 JavaScript 파일 생성 중..."
+cat > "$HTML_DIR/assets/js/charts.js" << 'EOF'
+// 차트 생성 함수들
+function createResourceChart(data) {
+    // 리소스 분포 차트 생성 로직
+    console.log('Creating resource chart with data:', data);
+}
+
+function createCostChart(data) {
+    // 비용 트렌드 차트 생성 로직
+    console.log('Creating cost chart with data:', data);
+}
+
+function createSecurityChart(data) {
+    // 보안 점수 차트 생성 로직
+    console.log('Creating security chart with data:', data);
+}
+EOF
+
+# 7. 검색 JavaScript 파일 생성
+echo "🔍 검색 JavaScript 파일 생성 중..."
+cat > "$HTML_DIR/assets/js/search.js" << 'EOF'
+// 검색 기능
+function searchReports(query) {
+    const searchResults = [];
+    // 검색 로직 구현
+    return searchResults;
+}
+
+function highlightSearchTerms(element, terms) {
+    // 검색어 하이라이트 기능
+    console.log('Highlighting terms:', terms);
+}
+EOF
+
+echo "✅ 모든 JavaScript 파일 생성 완료"
+
+# 8. 샘플 JSON 데이터 파일 생성
+echo "📋 JSON 데이터 파일 생성 중..."
+cat > "$HTML_DIR/data/resource-counts.json" << 'EOF'
+{
+    "vpc": 5,
+    "ec2": 34,
+    "rds": 2,
+    "ebs": 34,
+    "security_groups": 26,
+    "iam_roles": 44
+}
+EOF
+
+cat > "$HTML_DIR/data/cost-data.json" << 'EOF'
+{
+    "monthly_cost": 1200,
+    "cost_trend": [1000, 1100, 1200],
+    "cost_by_service": {
+        "EC2": 600,
+        "RDS": 300,
+        "EBS": 200,
+        "Other": 100
+    }
+}
+EOF
+
+cat > "$HTML_DIR/data/security-metrics.json" << 'EOF'
+{
+    "overall_score": 75,
+    "iam_score": 70,
+    "network_score": 80,
+    "encryption_score": 75
+}
+EOF
+
+echo "✅ JSON 데이터 파일 생성 완료"
+
 echo "✅ JavaScript 파일 생성 완료"
 
-# 3. 동적 index.html 생성 (실제 AWS 데이터 기반)
+# 9. 동적 index.html 생성 (실제 AWS 데이터 기반)
 echo "📊 실제 AWS 데이터를 기반으로 index.html 생성 중..."
 cd "$SCRIPT_DIR"
 ./generate-dynamic-index.sh
@@ -131,12 +303,19 @@ else
     fi
 fi
 
-# 4. Markdown 파일들을 HTML로 변환
+# 10. Markdown 파일들을 HTML로 변환
 echo "📝 Markdown 파일들을 HTML로 변환 중..."
 if [ -f "$SCRIPT_DIR/convert-md-to-html.sh" ]; then
+    cd "$SCRIPT_DIR"
     ./convert-md-to-html.sh
+    if [ $? -eq 0 ]; then
+        echo "✅ 모든 Markdown 파일이 HTML로 변환되었습니다!"
+    else
+        echo "⚠️ 일부 변환에서 오류가 발생했습니다."
+    fi
 else
-    echo "⚠️ Markdown 변환 스크립트를 찾을 수 없습니다."
+    echo "❌ Markdown 변환 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/convert-md-to-html.sh"
+    echo "💡 수동으로 변환하려면: cd $SCRIPT_DIR && ./convert-md-to-html.sh"
 fi
 
 # 5. 결과 확인 및 요약

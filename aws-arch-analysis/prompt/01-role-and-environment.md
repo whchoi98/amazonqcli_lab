@@ -21,6 +21,10 @@
 └── report/              # 수집된 데이터 및 생성된 보고서
 ```
 
+## 🔧 필수 도구 설치 확인
+```bash
+~/amazonqcli_lab/aws-arch-analysis/script/check-environment.sh`
+
 ## 📋 체크리스트
 
 ### 데이터 수집 완료 확인

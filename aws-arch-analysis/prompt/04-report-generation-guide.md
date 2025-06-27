@@ -43,6 +43,7 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 - Auto Scaling 및 Load Balancer 구성
 - 서버리스 서비스 (Lambda, Fargate) 활용도
 - 컨테이너 서비스 (ECS, EKS) 현황
+- kubernetes 상세 내용.
 - 성능 최적화 및 비용 절감 방안
 
 **실행 방법**:
