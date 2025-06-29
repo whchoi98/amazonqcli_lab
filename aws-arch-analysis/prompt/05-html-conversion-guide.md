@@ -13,14 +13,14 @@
 
 ### Step 1: 개선된 HTML 변환 스크립트 실행
 ```bash
-# 새로운 개선된 변환 스크립트 사용
+# 개선된 변환 스크립트 사용 (권장)
 cd ~/amazonqcli_lab/aws-arch-analysis/script
 ./convert-md-to-html-simple.sh
 ```
 
-**또는 기존 메인 스크립트 사용:**
+**index.html 생성이 필요한 경우:**
 ```bash
-# 메인 HTML 변환 스크립트 실행 - 모든 것을 자동으로 처리
+# 메인 HTML 변환 스크립트 실행 - index.html과 assets 생성
 ./generate-html-reports.sh
 ```
 
@@ -125,7 +125,7 @@ python3 -m http.server 8080
 cd ~/amazonqcli_lab/aws-arch-analysis/script
 ./convert-md-to-html-simple.sh
 
-# 2. 기존 메인 스크립트 재실행
+# 2. index.html 생성 (필요시)
 ./generate-html-reports.sh
 
 # 3. 검증 실행
@@ -183,15 +183,15 @@ grep -c "<ul>\|<li>" ~/amazonqcli_lab/html-report/*.html
 
 - **`convert-md-to-html-simple.sh`**: 개선된 Markdown → HTML 변환 (권장)
 - **`simple-md-to-html.py`**: Python 기반 고급 Markdown 파서
+- **`generate-html-reports.sh`**: 전체 HTML 보고서 생성 (index.html + assets 포함)
 - **`validate-html-conversion.sh`**: 변환 결과 자동 검증
 - **`troubleshoot-html-conversion.sh`**: 문제 진단 및 해결
-- **`convert-md-to-html.sh`**: 기존 변환 엔진 (백업용)
 
 ---
 
 ## 🎯 개선된 변환 프로세스의 특징
 
-### ✨ 새로운 기능들
+### ✨ 핵심 기능들
 1. **고급 Markdown 파싱**: Python 정규식 기반 정교한 변환
 2. **중첩 포맷팅 지원**: `**볼드** 안의 *이탤릭*` 등 복잡한 포맷팅 처리
 3. **테이블 스타일링**: 전문적인 그라데이션 헤더와 호버 효과
@@ -204,6 +204,11 @@ grep -c "<ul>\|<li>" ~/amazonqcli_lab/html-report/*.html
 3. **리스트 아이템** → 스타일링된 HTML 리스트
 4. **헤더** → 적절한 HTML 헤더 태그
 5. **단락 처리** → HTML `<p>` 태그로 감싸기
+
+### ⚠️ 주의사항
+- **`convert-md-to-html.sh`는 사용하지 마세요**: Python 문법 오류로 인해 빈 내용 생성
+- **파일 크기 확인**: 6KB 이하면 변환 실패, 8KB-35KB가 정상
+- **품질 검증 필수**: 테이블, 볼드, 리스트 변환 개수 확인
 
 ---
 

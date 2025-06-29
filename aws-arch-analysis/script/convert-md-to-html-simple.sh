@@ -55,7 +55,7 @@ generate_html_template() {
         .report-content h2 { color: #34495e; margin: 25px 0 15px 0; }
         .report-content h3 { color: #7f8c8d; margin: 20px 0 10px 0; }
         
-        /* 테이블 스타일 */
+        /* 개선된 테이블 스타일 - 가독성 향상 */
         .analysis-table {
             width: 100%;
             border-collapse: collapse;
@@ -64,43 +64,69 @@ generate_html_template() {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
+            border: 1px solid #ddd;
         }
         
         .analysis-table thead {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: #ffffff !important;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: #ffffff;
         }
         
         .analysis-table th {
             color: #ffffff !important;
             font-weight: 700;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            padding: 15px 12px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            padding: 16px 14px;
             text-align: left;
-            border-bottom: 2px solid #34495e;
+            border-bottom: 2px solid #2980b9;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .analysis-table td {
-            padding: 12px 15px;
+            padding: 14px 16px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e0e0e0;
             background-color: #ffffff;
+            color: #2c3e50;
+            font-weight: 500;
         }
         
         .analysis-table tbody tr:hover {
             background-color: #f8f9fa !important;
             transform: translateY(-1px);
             transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .analysis-table tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
+            background-color: #f9f9f9;
         }
         
         .analysis-table tbody tr:nth-child(odd) {
-            background-color: white;
+            background-color: #ffffff;
+        }
+        
+        /* 숫자 데이터 강조 */
+        .analysis-table td:last-child {
+            font-weight: 600;
+            color: #2980b9;
+        }
+        
+        /* 상태 표시 개선 */
+        .analysis-table td[data-status="available"] {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .analysis-table td[data-status="running"] {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .analysis-table td[data-status="stopped"] {
+            color: #e74c3c;
+            font-weight: 600;
         }
         
         /* 리스트 스타일 */

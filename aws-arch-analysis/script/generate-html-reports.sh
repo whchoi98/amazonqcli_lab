@@ -327,17 +327,17 @@ fi
 
 # 10. Markdown 파일들을 HTML로 변환
 echo "📝 Markdown 파일들을 HTML로 변환 중..."
-if [ -f "$SCRIPT_DIR/convert-md-to-html.sh" ]; then
+if [ -f "$SCRIPT_DIR/convert-md-to-html-simple.sh" ]; then
     cd "$SCRIPT_DIR"
-    ./convert-md-to-html.sh
+    ./convert-md-to-html-simple.sh
     if [ $? -eq 0 ]; then
         echo "✅ 모든 Markdown 파일이 HTML로 변환되었습니다!"
     else
         echo "⚠️ 일부 변환에서 오류가 발생했습니다."
     fi
 else
-    echo "❌ Markdown 변환 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/convert-md-to-html.sh"
-    echo "💡 수동으로 변환하려면: cd $SCRIPT_DIR && ./convert-md-to-html.sh"
+    echo "❌ Markdown 변환 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/convert-md-to-html-simple.sh"
+    echo "💡 수동으로 변환하려면: cd $SCRIPT_DIR && ./convert-md-to-html-simple.sh"
 fi
 
 # 5. 자동 압축 파일 생성
