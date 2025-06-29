@@ -362,13 +362,14 @@ def main():
     generator.log_info("💡 생성된 마크다운 파일을 확인하여 상세 분석 결과를 검토하세요.")
     
     # Enhanced 권장사항 통계 출력
-    stats = generator.get_recommendations_summary()
-    if stats['total'] > 0:
-        generator.log_info(f"📋 Enhanced 권장사항 통계:")
-        generator.log_info(f"   - 높은 우선순위: {stats['high_priority']}개")
-        generator.log_info(f"   - 중간 우선순위: {stats['medium_priority']}개")
-        generator.log_info(f"   - 낮은 우선순위: {stats['low_priority']}개")
-        generator.log_info(f"   - 총 권장사항: {stats['total']}개")
+    if hasattr(generator, 'get_recommendations_summary'):
+        stats = generator.get_recommendations_summary()
+        if stats['total'] > 0:
+            generator.log_info(f"📋 Enhanced 권장사항 통계:")
+            generator.log_info(f"   - 높은 우선순위: {stats['high_priority']}개")
+            generator.log_info(f"   - 중간 우선순위: {stats['medium_priority']}개")
+            generator.log_info(f"   - 낮은 우선순위: {stats['low_priority']}개")
+            generator.log_info(f"   - 총 권장사항: {stats['total']}개")
 
 if __name__ == "__main__":
     main()
