@@ -272,33 +272,6 @@ class SteampipeApplicationCollector:
                 "application_stepfunctions_activities.json"
             ),
 
-            # ===== Systems Manager =====
-            (
-                "SSM 문서",
-                f"select name, owner, version_name, platform_types, document_type, document_format, target_type, schema_version, latest_version, default_version, status, status_information, created_date, description, parameters, tags from aws_ssm_document where region = '{self.region}' and owner = 'Self'",
-                "application_ssm_documents.json"
-            ),
-            (
-                "SSM 연결",
-                f"select association_id, name, instance_id, association_version, date, last_execution_date, overview, schedule_expression, association_name, automation_target_parameter_name, document_version, max_concurrency, max_errors, compliance_severity, sync_compliance, apply_only_at_cron_interval, calendar_names, target_locations, targets, parameters from aws_ssm_association where region = '{self.region}'",
-                "application_ssm_associations.json"
-            ),
-            (
-                "SSM 유지보수 창",
-                f"select window_id, name, description, start_date, end_date, schedule, schedule_timezone, schedule_offset, duration, cutoff, allow_unassociated_targets, enabled, created_date, modified_date, next_execution_time, tags from aws_ssm_maintenance_window where region = '{self.region}'",
-                "application_ssm_maintenance_windows.json"
-            ),
-            (
-                "SSM 패치 기준선",
-                f"select baseline_id, name, description, operating_system, global_filters, approval_rules, approved_patches, approved_patches_compliance_level, approved_patches_enable_non_security, rejected_patches, rejected_patches_action, patch_groups, created_date, modified_date, sources, tags from aws_ssm_patch_baseline where region = '{self.region}'",
-                "application_ssm_patch_baselines.json"
-            ),
-            (
-                "SSM 활성화",
-                f"select activation_id, description, default_instance_name, iam_role, registration_limit, registrations_count, expiration_date, expired, created_date, tags from aws_ssm_activation where region = '{self.region}'",
-                "application_ssm_activations.json"
-            ),
-
             # ===== CloudFormation =====
             (
                 "CloudFormation 스택",
@@ -426,9 +399,8 @@ class SteampipeApplicationCollector:
         print("3. 메시징 서비스 (SNS/SQS/MQ) 구성 및 패턴 분석")
         print("4. 이벤트 기반 아키텍처 (EventBridge/Step Functions) 패턴 분석")
         print("5. CI/CD 파이프라인 (CodePipeline/CodeBuild/CodeDeploy) 최적화")
-        print("6. Systems Manager 자동화 및 패치 관리 전략 검토")
-        print("7. CloudFormation 스택 및 IaC 거버넌스 분석")
-        print("8. CDN 및 콘텐츠 전송 최적화 분석")
+        print("6. CloudFormation 스택 및 IaC 거버넌스 분석")
+        print("7. CDN 및 콘텐츠 전송 최적화 분석")
         print("9. OpsWorks 및 애플리케이션 배포 전략 검토")
         print("10. 마이크로서비스 아키텍처 패턴 및 통합 분석")
         

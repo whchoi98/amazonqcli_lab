@@ -1,8 +1,25 @@
-# AWS 계정 분석 - 보고서 생성 가이드
+# AWS 계정 분석 - Enhanced 보고서 생성 가이드
 
-## 📋 보고서 생성 상세 가이드
+## 📋 Enhanced 보고서 생성 상세 가이드
+
+### 🚀 Enhanced 권장사항 시스템 개요
+
+**새로운 Enhanced 보고서 시스템**은 실제 AWS 리소스 데이터를 분석하여 **데이터 기반의 정량적 권장사항**을 제공합니다.
+
+#### 🎯 Enhanced 권장사항 특징
+- **데이터 기반 분석**: 실제 AWS 리소스 데이터에서 권장사항 도출
+- **정량적 효과**: 구체적인 비용 절감액, 영향받는 리소스 수 제시
+- **우선순위 분류**: 3단계 우선순위 (높음/중간/낮음)
+- **실행 가능성**: 구현 난이도와 예상 효과 명시
+
+#### 📊 우선순위 분류 기준
+- **🔴 높은 우선순위 (즉시 실행)**: 보안 위험, 높은 비용 영향
+- **🟡 중간 우선순위 (1-3개월)**: 성능 개선, 중간 비용 영향
+- **🟢 낮은 우선순위 (3-6개월)**: 운영 효율성, 장기적 개선
 
 ### 보고서 생성 스크립트 매핑
+
+생성 스크립트는 Enhanced 권장사항을 포함한 python 스크립트를 우선으로 수행합니다. 
 
 #### 1. 📊 전체 계정 분석 요약 (`01-executive-summary.md`)
 **생성 스크립트**: `generate-executive-summary.py`
@@ -21,9 +38,14 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 ```
 
 #### 2. 🌐 네트워킹 분석 (`02-networking-analysis.md`)
-**생성 스크립트**: `generate-networking-report.py`
+**생성 스크립트**: `generate-networking-report.py` ✨ **Enhanced**
 **목적**: 네트워크 아키텍처 및 보안 분석
-**내용**:
+**Enhanced 권장사항 예시**:
+- SSH 접근 제한: 6개 보안 그룹의 전체 인터넷 SSH 접근 제한
+- NAT Gateway 최적화: 월 최대 $45.00 절감 가능
+- VPC Flow Logs 활성화: 5개 VPC의 네트워크 모니터링 강화
+
+**분석 내용**:
 **VPC 관련 리소스:**
 □ VPC (aws_vpc) - 모든 VPC의 CIDR, 상태, 태그 분석
 □ 서브넷 (aws_vpc_subnet) - 퍼블릭/프라이빗 분류, AZ 분산, CIDR 할당
@@ -51,114 +73,82 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 □ Elastic IP (aws_vpc_eip) - 고정 IP 할당 및 사용 현황
 
 
-**실행 방법**
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+python3 generate-networking-report.py
 ```
-./generate-networking-report.py
+**Enhanced 출력 예시**:
+```
+✅ Networking Analysis 생성 완료: 02-networking-analysis.md
+📋 Enhanced 권장사항 통계:
+   - 높은 우선순위: 4개
+   - 중간 우선순위: 0개
+   - 낮은 우선순위: 0개
+   - 총 권장사항: 4개
 ```
 
 #### 3. 💻 컴퓨팅 분석 (`03-compute-analysis.md`)
-**생성 스크립트**: `generate-compute-report.py` (Python 버전)
+**생성 스크립트**: `generate-compute-report.py` ✨ **Enhanced**
 **목적**: 컴퓨팅 리소스 효율성 및 최적화
-**내용**:
-다음 모든 컴퓨팅 리소스를 상세 분석해주세요:
-
+**Enhanced 권장사항 예시**:
+- 미사용 EC2 인스턴스 정리: 월 $XXX 절감 가능
+- Reserved Instance 활용: 연간 XX% 비용 절감
+- 인스턴스 타입 최적화: 성능 개선 및 비용 절감
+**분석 내용**:
 **EC2 관련:**
 □ EC2 인스턴스 (aws_ec2_instance) - 타입, 상태, 사용률, 비용 분석
 □ AMI (aws_ec2_ami) - 사용 중인 이미지, 보안 패치 상태
 □ 키 페어 (aws_ec2_key_pair) - SSH 키 관리 현황
-□ 인스턴스 타입 (aws_ec2_instance_type) - 사용 가능한 타입 분석
-□ 스팟 가격 (aws_ec2_spot_price) - 스팟 인스턴스 활용 기회
 □ 예약 인스턴스 (aws_ec2_reserved_instance) - RI 활용 현황
-□ 배치 그룹 (aws_ec2_placement_group) - 성능 최적화 설정
-
-**Auto Scaling:**
-□ Auto Scaling 그룹 (aws_ec2_autoscaling_group) - 스케일링 정책
-□ 시작 구성 (aws_ec2_launch_configuration) - 인스턴스 템플릿
-□ 시작 템플릿 (aws_ec2_launch_template) - 최신 템플릿 활용
-□ 시작 템플릿 버전 (aws_ec2_launch_template_version) - 버전 관리
-
-**로드 밸런싱:**
-□ Application Load Balancer (aws_ec2_application_load_balancer)
-□ Network Load Balancer (aws_ec2_network_load_balancer)
-□ Classic Load Balancer (aws_ec2_classic_load_balancer)
-□ 타겟 그룹 (aws_ec2_target_group) - 헬스 체크, 라우팅 규칙
-□ 리스너 (aws_ec2_load_balancer_listener) - 포트, 프로토콜 설정
-□ 리스너 규칙 (aws_ec2_load_balancer_listener_rule) - 라우팅 로직
+□ 스팟 인스턴스 - 비용 최적화 기회
 
 **서버리스 컴퓨팅:**
 □ Lambda 함수 (aws_lambda_function) - 런타임, 메모리, 성능
 □ Lambda 레이어 (aws_lambda_layer) - 공통 라이브러리 관리
-□ Lambda 별칭 (aws_lambda_alias) - 버전 관리
-□ Lambda 버전 (aws_lambda_version) - 배포 이력
-□ 이벤트 소스 매핑 (aws_lambda_event_source_mapping) - 트리거 설정
 
 **컨테이너 서비스:**
 □ ECS 클러스터 (aws_ecs_cluster) - 컨테이너 오케스트레이션
-□ ECS 서비스 (aws_ecs_service) - 서비스 정의, 스케일링
-□ ECS 태스크 (aws_ecs_task) - 실행 중인 태스크
-□ ECS 태스크 정의 (aws_ecs_task_definition) - 컨테이너 스펙
-□ ECS 컨테이너 인스턴스 (aws_ecs_container_instance) - 호스트 인스턴스
 □ EKS 클러스터 (aws_eks_cluster) - Kubernetes 클러스터
-□ EKS 노드 그룹 (aws_eks_node_group) - 워커 노드 관리
-□ EKS 애드온 (aws_eks_addon) - 클러스터 확장 기능
-□ EKS Fargate 프로필 (aws_eks_fargate_profile) - 서버리스 컨테이너
-
-**기타 컴퓨팅:**
-□ Elastic Beanstalk 애플리케이션 (aws_elastic_beanstalk_application)
-□ Elastic Beanstalk 환경 (aws_elastic_beanstalk_environment)
-□ Batch 작업 큐 (aws_batch_queue) - 배치 처리
-□ Lightsail 인스턴스 (aws_lightsail_instance) - 간소화된 VPS
-
 
 **실행 방법**:
-```
+```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-compute-report.py
-# 또는 기존 bapy 버전
-./generate-compute-report.py
+python3 generate-compute-report.py
 ```
 
 #### 4. 💾 스토리지 분석 (`04-storage-analysis.md`)
-**생성 스크립트**: `generate-storage-report.py`
+**생성 스크립트**: `generate_storage_report.py` ✨ **Enhanced**
 **목적**: 스토리지 전략 및 데이터 관리 최적화
-**내용**:
-다음 모든 스토리지 리소스를 상세 분석해주세요:
+**Enhanced 권장사항 예시**:
+- 미사용 EBS 볼륨 정리: 월 $XXX 절감 가능
+- S3 스토리지 클래스 최적화: 연간 XX% 비용 절감
+- 스냅샷 정리: 불필요한 백업 제거
 
+**분석 내용**:
 **블록 스토리지:**
 □ EBS 볼륨 (aws_ebs_volume) - 타입, 크기, 성능, 암호화 상태
 □ EBS 스냅샷 (aws_ebs_snapshot) - 백업 정책, 보존 기간
-□ EBS 볼륨 메트릭 (aws_ebs_volume_metric_*) - 성능 분석
 
 **객체 스토리지:**
 □ S3 버킷 (aws_s3_bucket) - 설정, 보안, 비용 최적화
 □ S3 객체 (aws_s3_object) - 스토리지 클래스, 크기 분석
-□ S3 액세스 포인트 (aws_s3_access_point) - 액세스 제어
-□ S3 멀티 리전 액세스 포인트 (aws_s3_multi_region_access_point)
-□ S3 멀티파트 업로드 (aws_s3_multipart_upload) - 미완료 업로드
-□ S3 인텔리전트 티어링 (aws_s3_bucket_intelligent_tiering_configuration)
-
-**파일 시스템:**
-□ EFS 파일 시스템 (aws_efs_file_system) - 성능 모드, 처리량
-□ EFS 액세스 포인트 (aws_efs_access_point) - 액세스 제어
-□ EFS 마운트 타겟 (aws_efs_mount_target) - 네트워크 연결
-□ FSx 파일 시스템 (aws_fsx_file_system) - 고성능 파일 시스템
-
-**아카이브 스토리지:**
-□ Glacier 볼트 (aws_glacier_vault) - 장기 보관 스토리지
-
-**스토리지 게이트웨이:**
-□ Storage Gateway (aws_storagegateway_*) - 하이브리드 스토리지
 
 **실행 방법**:
-```
+```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-storage-report.py
+python3 generate_storage_report.py
 ```
 
 #### 5. 🗄️ 데이터베이스 분석 (`05-database-analysis.md`)
-**생성 스크립트**: `generate-database-report.py`
+**생성 스크립트**: `generate-database-report.py` ✨ **Enhanced**
 **목적**: 데이터베이스 성능 및 가용성 분석
-**내용**:
+**Enhanced 권장사항 예시**:
+- RDS 인스턴스 타입 최적화: 성능 개선 및 비용 절감
+- Multi-AZ 설정: 고가용성 확보
+- 백업 정책 개선: 데이터 보호 강화
+
+**분석 내용**:
 **RDS 인스턴스:**
 □ RDS DB 인스턴스 (aws_rds_db_instance) - 타입, 엔진, 성능, 비용
 □ RDS DB 클러스터 (aws_rds_db_cluster) - Aurora 클러스터 구성
@@ -207,107 +197,88 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 **기타 NoSQL:**
 □ DocumentDB 클러스터 (aws_docdb_cluster) - MongoDB 호환
 □ DocumentDB 인스턴스 (aws_docdb_cluster_instance) - 클러스터 노드
-□ DocumentDB 스냅샷 (aws_docdb_cluster_snapshot) - 백업
-□ Neptune 클러스터 (aws_neptune_db_cluster) - 그래프 데이터베이스
-□ Neptune 스냅샷 (aws_neptune_db_cluster_snapshot) - 그래프 DB 백업
-□ Keyspaces 키스페이스 (aws_keyspaces_keyspace) - Cassandra 호환
-□ Keyspaces 테이블 (aws_keyspaces_table) - Cassandra 테이블
-□ MemoryDB 클러스터 (aws_memorydb_cluster) - Redis 호환 인메모리
-```
+**RDS 인스턴스:**
+□ RDS DB 인스턴스 (aws_rds_db_instance) - 타입, 엔진, 성능, 비용
+□ RDS DB 클러스터 (aws_rds_db_cluster) - Aurora 클러스터 구성
+□ RDS 스냅샷 (aws_rds_db_snapshot) - 백업 정책
 
-#### 2.3 📊 분석 및 데이터 웨어하우스 (완전 분석)
-```
-다음 모든 분석 서비스를 상세 분석해주세요:
-
-**데이터 웨어하우스:**
-□ Redshift 클러스터 (aws_redshift_cluster) - 데이터 웨어하우스
-□ Redshift 스냅샷 (aws_redshift_snapshot) - 백업 정책
-□ Redshift 파라미터 그룹 (aws_redshift_parameter_group) - 설정
-□ Redshift 서브넷 그룹 (aws_redshift_subnet_group) - 네트워크
-□ Redshift 이벤트 구독 (aws_redshift_event_subscription) - 알림
-□ Redshift Serverless 네임스페이스 (aws_redshiftserverless_namespace)
-□ Redshift Serverless 워크그룹 (aws_redshiftserverless_workgroup)
-
-**검색 및 분석:**
-□ OpenSearch 도메인 (aws_opensearch_domain) - 검색 엔진
-□ Elasticsearch 도메인 (aws_elasticsearch_domain) - 레거시 검색
-
-**빅데이터 처리:**
-□ EMR 클러스터 (aws_emr_cluster) - 빅데이터 처리
-□ EMR 인스턴스 (aws_emr_instance) - 클러스터 노드
-□ EMR 인스턴스 그룹 (aws_emr_instance_group) - 노드 그룹
-□ EMR 인스턴스 플릿 (aws_emr_instance_fleet) - 플릿 관리
-□ EMR 보안 구성 (aws_emr_security_configuration) - 보안 설정
-□ EMR 스튜디오 (aws_emr_studio) - 개발 환경
-□ EMR 퍼블릭 액세스 차단 (aws_emr_block_public_access_configuration)
-
-**스트리밍 데이터:**
-□ Kinesis 스트림 (aws_kinesis_stream) - 실시간 데이터 스트리밍
-□ Kinesis Firehose (aws_kinesis_firehose_delivery_stream) - 데이터 전송
-□ Kinesis Video 스트림 (aws_kinesis_video_stream) - 비디오 스트리밍
-□ Kinesis 소비자 (aws_kinesis_consumer) - 스트림 소비자
-□ Kinesis Analytics v2 (aws_kinesisanalyticsv2_application) - 실시간 분석
-□ MSK 클러스터 (aws_msk_cluster) - 관리형 Kafka
-□ MSK Serverless 클러스터 (aws_msk_serverless_cluster) - 서버리스 Kafka
-
-**데이터 카탈로그 및 ETL:**
-□ Glue 데이터베이스 (aws_glue_catalog_database) - 데이터 카탈로그
-□ Glue 테이블 (aws_glue_catalog_table) - 메타데이터
-□ Glue 작업 (aws_glue_job) - ETL 작업
-□ Glue 크롤러 (aws_glue_crawler) - 스키마 발견
-□ Glue 연결 (aws_glue_connection) - 데이터 소스 연결
-□ Glue 개발 엔드포인트 (aws_glue_dev_endpoint) - 개발 환경
-□ Glue 보안 구성 (aws_glue_security_configuration) - 보안 설정
-□ Glue 데이터 품질 규칙셋 (aws_glue_data_quality_ruleset) - 품질 관리
-□ Glue 암호화 설정 (aws_glue_data_catalog_encryption_settings)
-
-**쿼리 서비스:**
-□ Athena 워크그룹 (aws_athena_workgroup) - 쿼리 그룹
-□ Athena 쿼리 실행 (aws_athena_query_execution) - 쿼리 이력
+**NoSQL 데이터베이스:**
+□ DynamoDB 테이블 (aws_dynamodb_table) - 성능, 비용, 인덱스
+□ DocumentDB 클러스터 (aws_docdb_cluster) - MongoDB 호환
 
 **실행 방법**:
-```
+```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-database-report.py
+python3 generate-database-report.py
 ```
 
 #### 6. 🔒 보안 분석 (`06-security-analysis.md`)
-**생성 스크립트**: `generate-security-report.py`
+**생성 스크립트**: `generate_security_report.py` ✨ **Enhanced**
 **목적**: 보안 태세 및 컴플라이언스 평가
-**내용**:
+**Enhanced 권장사항 예시**:
+- MFA 미설정 사용자: X명의 사용자에 MFA 설정 필요
+- 과도한 권한 정책: 최소 권한 원칙 적용
+- 암호화 미설정 리소스: 데이터 보호 강화
+
+**분석 내용**:
 **IAM 핵심 구성 요소:**
 □ IAM 사용자 (aws_iam_user) - 사용자 계정, MFA, 액세스 키
 □ IAM 그룹 (aws_iam_group) - 사용자 그룹화
 □ IAM 역할 (aws_iam_role) - 서비스 역할, 크로스 계정 액세스
 □ IAM 정책 (aws_iam_policy) - 권한 정책 분석
-□ IAM 정책 연결 (aws_iam_policy_attachment) - 정책 할당 현황
-□ IAM 액세스 키 (aws_iam_access_key) - 프로그래밍 액세스
-□ IAM 서버 인증서 (aws_iam_server_certificate) - SSL/TLS 인증서
-□ IAM 가상 MFA 디바이스 (aws_iam_virtual_mfa_device) - MFA 설정
 
-**IAM 고급 기능:**
-□ IAM 액세스 어드바이저 (aws_iam_access_advisor) - 권한 사용 분석
-□ IAM 자격 증명 보고서 (aws_iam_credential_report) - 보안 감사
-□ IAM 계정 요약 (aws_iam_account_summary) - 계정 한도 및 사용량
-□ IAM 계정 암호 정책 (aws_iam_account_password_policy) - 암호 정책
-□ IAM 정책 시뮬레이터 (aws_iam_policy_simulator) - 권한 테스트
-□ IAM 액션 (aws_iam_action) - 사용 가능한 액션 목록
-□ IAM 서비스별 자격 증명 (aws_iam_service_specific_credential)
+**보안 서비스:**
+□ GuardDuty - 위협 탐지
+□ WAF - 웹 애플리케이션 방화벽
+□ KMS - 암호화 키 관리
 
-**외부 자격 증명 제공자:**
-□ IAM OIDC 제공자 (aws_iam_open_id_connect_provider) - OpenID Connect
-□ IAM SAML 제공자 (aws_iam_saml_provider) - SAML 연동
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+python3 generate_security_report.py
+```
 
-**AWS SSO/Identity Center:**
-□ SSO 인스턴스 (aws_ssoadmin_instance) - Identity Center 인스턴스
-□ SSO 권한 세트 (aws_ssoadmin_permission_set) - 권한 템플릿
-□ SSO 계정 할당 (aws_ssoadmin_account_assignment) - 계정 액세스
-□ SSO 관리형 정책 연결 (aws_ssoadmin_managed_policy_attachment)
+#### 7. 💰 비용 최적화 분석 (`07-cost-analysis.md`)
+**생성 스크립트**: `generate-cost-report.py` ✨ **Enhanced**
+**목적**: 비용 분석 및 최적화 기회 발굴
+**Enhanced 권장사항 예시**:
+- Reserved Instance 구매: 연간 XX% 비용 절감
+- 미사용 리소스 정리: 월 $XXX 절감 가능
+- 스토리지 클래스 최적화: 자동 티어링 적용
 
-**Identity Store:**
-□ Identity Store 사용자 (aws_identitystore_user) - 사용자 관리
-□ Identity Store 그룹 (aws_identitystore_group) - 그룹 관리
-□ Identity Store 그룹 멤버십 (aws_identitystore_group_membership)
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+python3 generate-cost-report.py
+```
+
+#### 8. 🚀 애플리케이션 분석 (`08-application-analysis.md`)
+**생성 스크립트**: `generate-application-report.py` ✨ **Enhanced**
+**목적**: 애플리케이션 서비스 및 API 분석
+**Enhanced 권장사항 예시**:
+- API Gateway 최적화: 캐싱 및 스로틀링 설정
+- Lambda 함수 최적화: 메모리 및 타임아웃 조정
+- CloudFront 활용: 글로벌 성능 개선
+
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+python3 generate-application-report.py
+```
+
+#### 9. 📊 모니터링 분석 (`09-monitoring-analysis.md`)
+**생성 스크립트**: `generate_monitoring_report.py` ✨ **Enhanced**
+**목적**: 모니터링 및 로깅 체계 분석
+**Enhanced 권장사항 예시**:
+- CloudWatch 알람 설정: 중요 메트릭 모니터링
+- 로그 보존 정책: 비용 최적화 및 컴플라이언스
+- X-Ray 추적: 애플리케이션 성능 분석
+
+**실행 방법**:
+```bash
+cd ~/amazonqcli_lab/aws-arch-analysis/script
+python3 generate_monitoring_report.py
+```
 
 
 **KMS (Key Management Service):**
@@ -386,11 +357,122 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 □ Network Firewall 방화벽 (aws_networkfirewall_firewall) - 네트워크 방화벽
 □ Network Firewall 정책 (aws_networkfirewall_firewall_policy) - 방화벽 정책
 □ Network Firewall 규칙 그룹 (aws_networkfirewall_rule_group) - 규칙 그룹
-**실행 방법**:
-```
+## 🚀 Enhanced 보고서 일괄 생성
+
+### 모든 Enhanced 보고서 한번에 생성
+```bash
 cd ~/amazonqcli_lab/aws-arch-analysis/script
-./generate-security-report.py
+
+# Python 버전 (권장)
+python3 generate-all-enhanced-reports.py
+
+# Shell 버전
+./generate-all-enhanced-reports.sh
 ```
+
+### Enhanced 보고서 생성 결과 예시
+```
+🚀 Enhanced AWS 계정 분석 보고서 일괄 생성
+============================================================
+📅 시작 시간: 2025-06-29 16:38:42
+
+🔄 🌐 네트워킹 분석 생성 중...
+✅ 🌐 네트워킹 분석 생성 완료 (0.0초)
+   📋 Enhanced 권장사항 통계:
+   - 높은 우선순위: 4개
+   - 중간 우선순위: 0개
+   - 낮은 우선순위: 0개
+   - 총 권장사항: 4개
+
+🔄 💻 컴퓨팅 분석 생성 중...
+✅ 💻 컴퓨팅 분석 생성 완료 (0.0초)
+
+📊 Enhanced 보고서 생성 완료 요약
+============================================================
+✅ 성공: 8/8 보고서
+⏱️  소요 시간: 45.2초
+🎉 모든 Enhanced 보고서가 성공적으로 생성되었습니다!
+```
+
+## 📋 Enhanced 권장사항 시스템 특징
+
+### 🎯 데이터 기반 분석
+- **실제 리소스 데이터 분석**: JSON 파일에서 실제 AWS 리소스 정보 추출
+- **정량적 효과 계산**: 구체적인 비용 절감액, 영향받는 리소스 수 제시
+- **근거 기반 권장사항**: 추상적 제안이 아닌 데이터에 기반한 구체적 권장사항
+
+### 📊 우선순위 분류 시스템
+```
+🔴 높은 우선순위 (즉시 실행)
+- 보안 위험 (security_risk)
+- 높은 비용 영향 (cost_impact)
+- 컴플라이언스 위반 (compliance)
+
+🟡 중간 우선순위 (1-3개월)
+- 성능 개선 (performance)
+- 중간 비용 영향
+- 가용성 향상 (availability)
+
+🟢 낮은 우선순위 (3-6개월)
+- 운영 효율성 (operational_efficiency)
+- 장기적 개선
+- 모니터링 강화
+```
+
+### 💡 Enhanced 권장사항 예시
+
+#### 네트워킹 분석 결과
+```markdown
+## 📋 네트워킹 권장사항
+
+### 🔴 높은 우선순위 (즉시 실행)
+1. **SSH 접근 제한**: 6개의 보안 그룹이 전체 인터넷에서 SSH(22번 포트) 접근을 허용합니다.
+   - **영향도**: high, **구현 난이도**: low
+2. **NAT Gateway 최적화**: 3개의 NAT Gateway가 있습니다. 통합을 고려하세요.
+   - **예상 효과**: 통합 시 월 최대 $45.00 절감 가능
+   - **영향도**: medium, **구현 난이도**: high
+```
+
+## 🔧 Enhanced 시스템 구성 요소
+
+### 핵심 모듈
+1. **`recommendation_base.py`**: 통합 권장사항 프레임워크
+2. **`enhanced_recommendations.py`**: 서비스별 특화 권장사항 클래스
+3. **Enhanced 보고서 생성기들**: 각 서비스별 데이터 기반 분석
+
+### 권장사항 생성 프로세스
+```
+1. AWS 리소스 데이터 로드 (JSON 파일)
+     ↓
+2. 서비스별 분석 클래스에서 데이터 분석
+     ↓
+3. 우선순위 기준에 따른 권장사항 분류
+     ↓
+4. 정량적 효과 계산 (비용, 리소스 수 등)
+     ↓
+5. 마크다운 형태로 권장사항 출력
+```
+
+## 📈 기존 시스템 대비 개선사항
+
+| 구분 | 기존 시스템 | Enhanced 시스템 |
+|------|-------------|-----------------|
+| **권장사항 기준** | 정적 템플릿 | 실제 데이터 분석 |
+| **정량적 효과** | 일반적 설명 | 구체적 수치 제시 |
+| **우선순위** | 단순 나열 | 3단계 우선순위 |
+| **실행 가능성** | 추상적 제안 | 구현 난이도 명시 |
+| **통계 정보** | 없음 | 실시간 권장사항 통계 |
+
+## 🎯 사용 권장사항
+
+1. **정기적 실행**: 월 1회 이상 Enhanced 보고서 생성
+2. **우선순위 기반 실행**: 높은 우선순위부터 순차적 적용
+3. **효과 추적**: 권장사항 적용 후 실제 효과 측정
+4. **지속적 개선**: 새로운 리소스 추가 시 재분석 실행
+
+---
+
+💡 **Enhanced 권장사항 시스템**을 통해 AWS 인프라를 더욱 효율적이고 안전하게 관리하세요!
 
 #### 7. 💰 비용 최적화 (`07-cost-optimization.md`)
 **생성 스크립트**: `generate-cost-report.py` (Python 버전)
@@ -740,29 +822,73 @@ for file in ~/amazonqcli_lab/report/*.md; do
 done
 ```
 
-### 보고서 작성 품질 기준
+## 📋 Enhanced 보고서 품질 기준
 
-#### 📝 내용 품질
-- **정확성**: 수집된 데이터 기반 정확한 분석
-- **완전성**: 모든 주요 영역 포괄적 검토
-- **실용성**: 실행 가능한 구체적 권장사항
-- **우선순위**: 비즈니스 영향도 기반 우선순위 제시
+### 📝 Enhanced 내용 품질
+- **데이터 기반 정확성**: 실제 AWS 리소스 데이터에서 추출한 정확한 분석
+- **정량적 완전성**: 구체적 수치와 함께 모든 주요 영역 검토
+- **실행 가능성**: 구현 난이도와 예상 효과가 명시된 권장사항
+- **우선순위 기반**: 3단계 우선순위 시스템으로 체계적 분류
 
-#### 📊 시각화 요구사항
-- 표와 차트를 활용한 데이터 시각화
-- 비교 분석 및 트렌드 표시
-- 색상 코딩을 통한 우선순위 표시
-- 아키텍처 다이어그램 포함 (필요시)
+### 📊 Enhanced 시각화 요구사항
+- 실제 데이터 기반 표와 차트 활용
+- 비용 절감 효과 및 리소스 영향도 시각화
+- 우선순위별 색상 코딩 (🔴🟡🟢)
+- 권장사항 통계 실시간 표시
 
-#### 🎯 권장사항 형식
+### 🎯 Enhanced 권장사항 형식
 ```markdown
 ### 🔴 높은 우선순위 (즉시 실행)
-1. **권장사항 제목**: 구체적 설명
-   - **예상 효과**: 정량적 지표
-   - **구현 난이도**: 쉬움/보통/어려움
-   - **예상 기간**: X주/X개월
-   - **필요 리소스**: 인력/예산
+1. **SSH 접근 제한**: 6개의 보안 그룹이 전체 인터넷에서 SSH 접근을 허용합니다.
+   - **영향도**: high, **구현 난이도**: low
+   - **예상 효과**: 보안 위험 제거
+   - **대상 리소스**: 6개 보안 그룹
 
-### 🟡 중간 우선순위 (1-3개월)
-### 🟢 낮은 우선순위 (3-6개월)
+2. **NAT Gateway 최적화**: 3개의 NAT Gateway 통합 검토
+   - **예상 효과**: 통합 시 월 최대 $45.00 절감 가능
+   - **영향도**: medium, **구현 난이도**: high
 ```
+
+### 🔍 Enhanced 보고서 검증 체크리스트
+- [ ] ✨ Enhanced 권장사항 시스템 적용
+- [ ] 📊 실시간 권장사항 통계 출력
+- [ ] 💰 정량적 비용 절감 효과 계산
+- [ ] 🎯 3단계 우선순위 분류 적용
+- [ ] 📋 데이터 기반 구체적 권장사항 제시
+- [ ] 🔧 구현 난이도 및 영향도 명시
+
+### 📈 Enhanced 시스템 성과 지표
+```
+📋 Enhanced 권장사항 통계:
+   - 높은 우선순위: X개 (즉시 실행)
+   - 중간 우선순위: X개 (1-3개월)
+   - 낮은 우선순위: X개 (3-6개월)
+   - 총 권장사항: X개
+```
+
+## 🚀 Enhanced 보고서 활용 가이드
+
+### 1. 경영진 보고
+- **Executive Summary**: 높은 우선순위 권장사항 중심
+- **ROI 분석**: 구체적 비용 절감 효과 제시
+- **리스크 평가**: 보안 및 컴플라이언스 위험도
+
+### 2. 기술팀 실행
+- **단계별 구현**: 우선순위 기반 순차적 적용
+- **리소스 계획**: 구현 난이도별 인력 배치
+- **효과 측정**: 적용 전후 정량적 비교
+
+### 3. 지속적 개선
+- **정기 재분석**: 월 1회 Enhanced 보고서 재생성
+- **트렌드 분석**: 권장사항 변화 추이 모니터링
+- **효과 추적**: 적용된 권장사항의 실제 효과 검증
+
+---
+
+**🎯 Enhanced 보고서 시스템의 핵심 가치**
+- **데이터 기반 의사결정**: 추측이 아닌 실제 데이터 기반 분석
+- **실행 가능한 권장사항**: 구체적 수치와 구현 방법 제시
+- **우선순위 기반 실행**: 효율적 리소스 배분 및 최대 효과 달성
+- **지속적 최적화**: 정기적 재분석을 통한 지속적 개선
+
+💡 **Enhanced 권장사항 시스템**으로 AWS 인프라를 더욱 효율적이고 안전하게 관리하세요!

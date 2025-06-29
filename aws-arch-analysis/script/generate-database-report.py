@@ -95,8 +95,10 @@ class DatabaseReportGenerator:
         summary = f"""# 🗄️ 데이터베이스 리소스 종합 분석
 
 > **분석 일시**: {self.current_time}  
-> **분석 대상**: AWS 계정 내 모든 데이터베이스 서비스  
+> **분석 대상**: AWS 계정 내 모든 데이터베이스 리소스  
 > **분석 리전**: ap-northeast-2 (서울)
+
+이 보고서는 AWS 계정의 데이터베이스 인프라에 대한 종합적인 분석을 제공하며, RDS 인스턴스, DynamoDB 테이블, Aurora 클러스터, ElastiCache 등의 구성 상태와 성능 최적화 방안을 평가합니다.
 
 ## 📊 Executive Summary
 
@@ -702,6 +704,15 @@ def main():
         generator.save_report(report_content)
         
         print("🎉 Enhanced Database Analysis 보고서 생성이 완료되었습니다!")
+        
+        # Enhanced 권장사항 통계 출력
+        stats = generator.get_recommendations_summary()
+        if stats['total'] > 0:
+            print(f"📋 Enhanced 권장사항 통계:")
+            print(f"   - 높은 우선순위: {stats['high_priority']}개")
+            print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+            print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+            print(f"   - 총 권장사항: {stats['total']}개")
         
     except KeyboardInterrupt:
         print("\n❌ 사용자에 의해 중단되었습니다.")

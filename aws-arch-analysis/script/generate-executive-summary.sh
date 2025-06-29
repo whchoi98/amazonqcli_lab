@@ -1,7 +1,7 @@
 #!/bin/bash
 # Executive Summary 보고서 생성 스크립트
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "N/A")
 REGION="ap-northeast-2"
 ANALYSIS_DATE=$(date +"%Y-%m-%d")
@@ -27,7 +27,13 @@ SECURITY_GROUPS=$(jq '.rows | length' security_groups.json 2>/dev/null || echo "
 LOG_GROUPS=$(jq '.rows | length' monitoring_cloudwatch_log_groups.json 2>/dev/null || echo "0")
 
 cat > 01-executive-summary.md << MDEOF
-# AWS 계정 종합 분석 보고서 - Executive Summary
+# 📊 AWS 계정 종합 분석
+
+> **분석 일시**: $(date +"%Y-%m-%d %H:%M:%S")  
+> **분석 대상**: AWS 계정 내 모든 리소스 및 서비스  
+> **분석 리전**: $REGION (서울)
+
+이 보고서는 AWS 계정의 전체 인프라에 대한 종합적인 분석을 제공하며, 네트워킹, 컴퓨팅, 스토리지, 데이터베이스, 보안, 비용 최적화 관점에서 현재 상태를 평가하고 개선 방안을 제시합니다.
 
 ## 📊 계정 개요
 

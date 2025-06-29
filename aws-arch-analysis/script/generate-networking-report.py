@@ -2,6 +2,7 @@
 """
 네트워킹 분석 보고서 생성 스크립트 (Python 버전)
 Shell 스크립트와 동일한 기능 및 출력 형식 제공
+Enhanced 권장사항 기능 추가
 """
 
 import json
@@ -9,9 +10,15 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from datetime import datetime
 
-class NetworkingReportGenerator:
+# Enhanced 권장사항 모듈 import
+sys.path.append(str(Path(__file__).parent))
+from enhanced_recommendations import NetworkingRecommendations
+
+class NetworkingReportGenerator(NetworkingRecommendations):
     def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+        super().__init__()  # Enhanced 권장사항 초기화
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -206,30 +213,58 @@ class NetworkingReportGenerator:
             report_file.write("Network ACL 데이터를 찾을 수 없습니다.\n")
 
     def write_recommendations_section(self, report_file):
-        """권장사항 섹션 생성"""
-        content = """
-## 📋 네트워킹 권장사항
-
-### 🔴 높은 우선순위
-1. **보안 그룹 규칙 검토**: 0.0.0.0/0 허용 규칙 최소화
-2. **VPC Flow Logs 활성화**: 네트워크 트래픽 모니터링 강화
-3. **미사용 Elastic IP 정리**: 연결되지 않은 EIP 해제
-
-### 🟡 중간 우선순위
-1. **VPC 엔드포인트 구성**: AWS 서비스 접근 최적화
-2. **서브넷 구성 최적화**: 퍼블릭/프라이빗 서브넷 적절한 분리
-3. **라우팅 테이블 정리**: 불필요한 라우팅 규칙 제거
-
-### 🟢 낮은 우선순위
-1. **Transit Gateway 검토**: 복잡한 네트워크 연결 시 고려
-2. **VPC 피어링 최적화**: 불필요한 피어링 연결 정리
-3. **DNS 설정 최적화**: Route 53 Private Hosted Zone 활용
-
-## 📊 네트워킹 보안 점검
-
-### 보안 그룹 분석 결과
-"""
-        report_file.write(content)
+        """Enhanced 권장사항 섹션 생성"""
+        
+        # 네트워킹 데이터 로드 및 분석
+        data_dict = {
+            'security_groups': self.load_json_file("security_groups.json"),
+            'security_groups_ingress': self.load_json_file("security_groups_ingress_rules.json"),
+            'flow_logs': self.load_json_file("networking_flow_logs.json"),
+            'vpc': self.load_json_file("networking_vpc.json"),
+            'elastic_ips': self.load_json_file("networking_eip.json"),
+            'nat': self.load_json_file("networking_nat.json"),
+            'vpc_endpoints': self.load_json_file("networking_vpc_endpoints.json")
+        }
+        
+        # Enhanced 권장사항 생성
+        self.analyze_networking_data(data_dict)
+        
+        # Enhanced 권장사항 섹션 작성
+        self.write_enhanced_recommendations_section(report_file, "네트워킹 권장사항")
+        
+        # 기존 보안 분석 결과도 유지
+        report_file.write("## 📊 네트워킹 보안 점검\n\n")
+        report_file.write("### 보안 그룹 분석 결과\n")
+        
+        # 보안 그룹 상세 분석 (기존 로직 유지)
+        sg_data = self.load_json_file("security_groups.json")
+        if sg_data:
+            # 0.0.0.0/0 허용 규칙 확인
+            open_rules_count = 0
+            ssh_open_count = 0
+            rdp_open_count = 0
+            
+            for sg in sg_data:
+                ip_permissions = sg.get('ip_permissions', [])
+                for perm in ip_permissions:
+                    ip_ranges = perm.get('ip_ranges', [])
+                    for ip_range in ip_ranges:
+                        if ip_range.get('cidr_ip') == '0.0.0.0/0':
+                            open_rules_count += 1
+                            from_port = perm.get('from_port', 0)
+                            if from_port == 22:
+                                ssh_open_count += 1
+                            elif from_port == 3389:
+                                rdp_open_count += 1
+            
+            report_file.write(f"- **전체 개방 규칙**: {open_rules_count}개\n")
+            report_file.write(f"- **SSH 전체 개방**: {ssh_open_count}개\n")
+            report_file.write(f"- **RDP 전체 개방**: {rdp_open_count}개\n\n")
+            
+            if open_rules_count > 0:
+                report_file.write("⚠️ **보안 주의**: 전체 인터넷에서 접근 가능한 규칙이 발견되었습니다.\n\n")
+        else:
+            report_file.write("보안 그룹 데이터를 분석할 수 없습니다.\n\n")
 
     def write_security_analysis(self, report_file):
         """보안 분석 섹션 생성"""
@@ -286,6 +321,10 @@ class NetworkingReportGenerator:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
                 report_file.write("# 네트워킹 리소스 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 네트워킹 리소스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 계정의 네트워킹 인프라에 대한 종합적인 분석을 제공하며, VPC, 서브넷, 보안 그룹, 라우팅 테이블, NAT Gateway 등의 구성 상태와 보안 최적화 방안을 평가합니다.\n\n")
                 report_file.write("## 📊 네트워킹 개요\n\n### VPC 구성 현황\n")
                 
                 # 각 섹션 순차적으로 생성
@@ -303,6 +342,15 @@ class NetworkingReportGenerator:
                 report_file.write("\n---\n*네트워킹 분석 완료*\n")
             
             print("✅ Networking Analysis 생성 완료: 02-networking-analysis.md")
+            
+            # Enhanced 권장사항 통계 출력
+            stats = self.get_recommendations_summary()
+            if stats['total'] > 0:
+                print(f"📋 Enhanced 권장사항 통계:")
+                print(f"   - 높은 우선순위: {stats['high_priority']}개")
+                print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+                print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+                print(f"   - 총 권장사항: {stats['total']}개")
             
         except IOError as e:
             print(f"❌ 보고서 파일 생성 실패: {e}")

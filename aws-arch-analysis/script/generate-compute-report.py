@@ -2,6 +2,7 @@
 """
 확장된 컴퓨팅 분석 보고서 생성 스크립트 (Python 버전)
 모든 컴퓨팅 리소스와 Kubernetes 워크로드 포함
+Enhanced 권장사항 기능 추가
 """
 
 import json
@@ -10,9 +11,15 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 from collections import Counter, defaultdict
+from datetime import datetime
 
-class ExtendedComputeReportGenerator:
+# Enhanced 권장사항 모듈 import
+sys.path.append(str(Path(__file__).parent))
+from enhanced_recommendations import ComputeRecommendations
+
+class ExtendedComputeReportGenerator(ComputeRecommendations):
     def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+        super().__init__()  # Enhanced 권장사항 초기화
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -310,23 +317,22 @@ class ExtendedComputeReportGenerator:
             report_file.write("Lambda 함수 데이터를 찾을 수 없습니다.\n\n")
 
     def write_recommendations(self, report_file) -> None:
-        """컴퓨팅 최적화 권장사항을 작성합니다."""
-        report_file.write("## 📋 컴퓨팅 최적화 권장사항\n\n")
+        """Enhanced 컴퓨팅 최적화 권장사항을 작성합니다."""
         
-        report_file.write("### 🔴 높은 우선순위\n")
-        report_file.write("1. **인스턴스 타입 최적화**: 워크로드에 맞는 적절한 인스턴스 타입 선택\n")
-        report_file.write("2. **Auto Scaling 정책 검토**: 트래픽 패턴에 맞는 스케일링 정책 설정\n")
-        report_file.write("3. **미사용 리소스 정리**: 중지된 인스턴스 및 미사용 로드 밸런서 제거\n\n")
+        # 컴퓨팅 데이터 로드 및 분석
+        data_dict = {
+            'compute_ec2_instances': self.load_json_file("compute_ec2_instances.json"),
+            'ec2_reserved_instances': self.load_json_file("compute_ec2_reserved_instances.json"),
+            'compute_asg_detailed': self.load_json_file("compute_asg_detailed.json"),
+            'lambda_functions': self.load_json_file("iac_lambda_functions.json"),
+            'eks_clusters': self.load_json_file("compute_eks_clusters.json")
+        }
         
-        report_file.write("### 🟡 중간 우선순위\n")
-        report_file.write("1. **스팟 인스턴스 활용**: 적절한 워크로드에 스팟 인스턴스 도입\n")
-        report_file.write("2. **컨테이너화 검토**: 마이크로서비스 아키텍처로 전환 고려\n")
-        report_file.write("3. **서버리스 전환**: 이벤트 기반 워크로드의 Lambda 전환\n\n")
+        # Enhanced 권장사항 생성
+        self.analyze_compute_data(data_dict)
         
-        report_file.write("### 🟢 낮은 우선순위\n")
-        report_file.write("1. **예약 인스턴스 구매**: 장기 실행 워크로드에 대한 RI 구매\n")
-        report_file.write("2. **Kubernetes 최적화**: 리소스 요청/제한 설정 최적화\n")
-        report_file.write("3. **모니터링 강화**: CloudWatch 메트릭 및 알람 설정\n\n")
+        # Enhanced 권장사항 섹션 작성
+        self.write_enhanced_recommendations_section(report_file, "컴퓨팅 최적화 권장사항")
 
     def generate_report(self):
         """확장된 컴퓨팅 분석 보고서를 생성합니다."""
@@ -345,7 +351,11 @@ class ExtendedComputeReportGenerator:
         try:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
-                report_file.write("# 컴퓨팅 리소스 분석\n\n")
+                report_file.write("# 💻 컴퓨팅 리소스 종합 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 컴퓨팅 리소스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 계정의 컴퓨팅 인프라에 대한 종합적인 분석을 제공하며, EC2 인스턴스, Lambda 함수, ECS/EKS 클러스터, Auto Scaling 그룹 등의 구성 상태와 성능 최적화 방안을 평가합니다.\n\n")
                 
                 # 각 섹션 작성
                 self.write_ec2_analysis(report_file, ec2_data)
@@ -361,6 +371,15 @@ class ExtendedComputeReportGenerator:
                 report_file.write("*컴퓨팅 리소스 분석 완료*\n")
             
             print("✅ 확장된 Compute Analysis 생성 완료: 03-compute-analysis.md")
+            
+            # Enhanced 권장사항 통계 출력
+            stats = self.get_recommendations_summary()
+            if stats['total'] > 0:
+                print(f"📋 Enhanced 권장사항 통계:")
+                print(f"   - 높은 우선순위: {stats['high_priority']}개")
+                print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+                print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+                print(f"   - 총 권장사항: {stats['total']}개")
             
         except IOError as e:
             print(f"❌ 보고서 파일 생성 실패: {e}")

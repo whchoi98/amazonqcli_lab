@@ -1,0 +1,48 @@
+
+Query failed: select name, user_id, arn, path, create_date, password_last_used, mfa_enabled, login_profile, attached_policy_arns, inline_policies, groups, permissions_boundary_arn, permissions_boundary_type, tags from aws_iam_user
+Error: Error: aws: operation error IAM: ListGroupsForUser, https response error StatusCode: 403, RequestID: 48e9c9cc-33dc-47e6-a77a-f7e3f0e3b821, api error AccessDenied: User: arn:aws:sts::613137910751:assumed-role/mgmtvpc-SSMRole/i-0365e20b713970fb2 is not authorized to perform: iam:ListGroupsForUser on resource: user WSControlPlaneUser with an explicit deny in a service control policy (SQLSTATE HV000)
+
+
+Query failed: select access_key_id, user_name, status, create_date, access_key_last_used_date, access_key_last_used_region, access_key_last_used_service from aws_iam_access_key
+Error: Error: aws: operation error IAM: ListAccessKeys, https response error StatusCode: 403, RequestID: 24461ac6-4adb-4b1c-a861-501a67134519, api error AccessDenied: User: arn:aws:sts::613137910751:assumed-role/mgmtvpc-SSMRole/i-0365e20b713970fb2 is not authorized to perform: iam:ListAccessKeys on resource: user WSControlPlaneUser with an explicit deny in a service control policy (SQLSTATE HV000)
+
+
+Query failed: select user_name, user_creation_time, password_enabled, password_last_used, password_last_changed, password_next_rotation, mfa_active, access_key_1_active, access_key_1_last_rotated, access_key_1_last_used_date, access_key_1_last_used_region, access_key_1_last_used_service, access_key_2_active, access_key_2_last_rotated, access_key_2_last_used_date, access_key_2_last_used_region, access_key_2_last_used_service, cert_1_active, cert_1_last_rotated, cert_2_active, cert_2_last_rotated from aws_iam_credential_report
+Error: Error: aws: credential report not available. Please run 'aws iam generate-credential-report' to generate it and try again (SQLSTATE HV000)
+
+
+Query failed: select name, type, value, version, last_modified_date, last_modified_user, allowed_pattern, data_type, policies, tier from aws_ssm_parameter where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "allowed_pattern" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, arn, rule_id, description, source, input_parameters, created_by, config_rule_state, tags from aws_config_rule where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "config_rule_state" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, arn, s3_bucket_name, s3_key_prefix, include_global_service_events, is_multi_region_trail, enable_log_file_validation, cloud_watch_logs_log_group_arn, cloud_watch_logs_role_arn, kms_key_id, has_custom_event_selectors, has_insight_selectors, is_organization_trail, home_region, trail_arn, log_file_validation_enabled, event_selectors, insight_selectors, tags from aws_cloudtrail_trail where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "enable_log_file_validation" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, user_id, arn, path, create_date, password_last_used, mfa_enabled, login_profile, attached_policy_arns, inline_policies, groups, permissions_boundary_arn, permissions_boundary_type, tags from aws_iam_user
+Error: Error: aws: operation error IAM: ListGroupsForUser, https response error StatusCode: 403, RequestID: a4100936-fea1-4185-837a-d6e339df5520, api error AccessDenied: User: arn:aws:sts::613137910751:assumed-role/mgmtvpc-SSMRole/i-0365e20b713970fb2 is not authorized to perform: iam:ListGroupsForUser on resource: user WSControlPlaneUser with an explicit deny in a service control policy (SQLSTATE HV000)
+
+
+Query failed: select access_key_id, user_name, status, create_date, access_key_last_used_date, access_key_last_used_region, access_key_last_used_service from aws_iam_access_key
+Error: Error: aws: operation error IAM: ListAccessKeys, https response error StatusCode: 403, RequestID: f6debfe2-d245-4d89-896d-f7b2ae93615c, api error AccessDenied: User: arn:aws:sts::613137910751:assumed-role/mgmtvpc-SSMRole/i-0365e20b713970fb2 is not authorized to perform: iam:ListAccessKeys on resource: user WSControlPlaneUser with an explicit deny in a service control policy (SQLSTATE HV000)
+
+
+Query failed: select user_name, user_creation_time, password_enabled, password_last_used, password_last_changed, password_next_rotation, mfa_active, access_key_1_active, access_key_1_last_rotated, access_key_1_last_used_date, access_key_1_last_used_region, access_key_1_last_used_service, access_key_2_active, access_key_2_last_rotated, access_key_2_last_used_date, access_key_2_last_used_region, access_key_2_last_used_service, cert_1_active, cert_1_last_rotated, cert_2_active, cert_2_last_rotated from aws_iam_credential_report
+Error: Error: aws: credential report not available. Please run 'aws iam generate-credential-report' to generate it and try again (SQLSTATE HV000)
+
+
+Query failed: select name, type, value, version, last_modified_date, last_modified_user, allowed_pattern, data_type, policies, tier from aws_ssm_parameter where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "allowed_pattern" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, arn, rule_id, description, source, input_parameters, created_by, config_rule_state, tags from aws_config_rule where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "config_rule_state" does not exist (SQLSTATE 42703)
+
+
+Query failed: select name, arn, s3_bucket_name, s3_key_prefix, include_global_service_events, is_multi_region_trail, enable_log_file_validation, cloud_watch_logs_log_group_arn, cloud_watch_logs_role_arn, kms_key_id, has_custom_event_selectors, has_insight_selectors, is_organization_trail, home_region, trail_arn, log_file_validation_enabled, event_selectors, insight_selectors, tags from aws_cloudtrail_trail where region = 'ap-northeast-2'
+Error: Warning: query 1 of 1 failed: ERROR: column "enable_log_file_validation" does not exist (SQLSTATE 42703)
+

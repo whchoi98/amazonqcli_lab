@@ -1,13 +1,19 @@
 #!/bin/bash
 # Compute Analysis 보고서 생성 스크립트
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
 cd $REPORT_DIR
 
 echo "💻 Compute Analysis 보고서 생성 중..."
 
-cat > 03-compute-analysis.md << 'MDEOF'
-# 컴퓨팅 리소스 분석
+cat > 03-compute-analysis.md << MDEOF
+# 💻 컴퓨팅 리소스 종합 분석
+
+> **분석 일시**: $(date +"%Y-%m-%d %H:%M:%S")  
+> **분석 대상**: AWS 계정 내 모든 컴퓨팅 리소스  
+> **분석 리전**: ap-northeast-2 (서울)
+
+이 보고서는 AWS 계정의 컴퓨팅 인프라에 대한 종합적인 분석을 제공하며, EC2 인스턴스, EKS 클러스터, Lambda 함수, Auto Scaling 그룹 등의 구성 상태와 성능 최적화 방안을 평가합니다.
 
 ## 💻 EC2 인스턴스 현황
 
@@ -39,7 +45,7 @@ else
     echo "EC2 인스턴스 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ## ⚖️ 로드 밸런서 현황
 
@@ -58,7 +64,7 @@ else
     echo "ALB 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ### Target Groups
 MDEOF
@@ -75,7 +81,7 @@ else
     echo "Target Group 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ### Auto Scaling 그룹
 MDEOF
@@ -92,7 +98,7 @@ else
     echo "Auto Scaling 그룹 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ## 🚀 서버리스 컴퓨팅
 
@@ -111,7 +117,7 @@ else
     echo "Lambda 함수 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ## 🐳 컨테이너 서비스
 
@@ -142,7 +148,7 @@ else
     echo "EKS 클러스터 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ### ECS 클러스터
 MDEOF
@@ -161,7 +167,7 @@ else
     echo "ECS 클러스터 데이터를 찾을 수 없습니다." >> 03-compute-analysis.md
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 
 ## 📋 컴퓨팅 권장사항
 
@@ -193,7 +199,7 @@ if [ -f "compute_ec2_instances.json" ] && [ -s "compute_ec2_instances.json" ]; t
     fi
 fi
 
-cat >> 03-compute-analysis.md << 'MDEOF'
+cat >> 03-compute-analysis.md << MDEOF
 2. **오버프로비저닝**: 사용률 낮은 인스턴스 타입 다운사이징
 3. **예약 인스턴스**: 장기 실행 워크로드 비용 절감
 

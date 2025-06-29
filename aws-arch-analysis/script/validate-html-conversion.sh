@@ -46,7 +46,7 @@ required_files=(
     "01-executive-summary.html:경영진 요약"
     "02-networking-analysis.html:네트워킹 분석"
     "03-compute-analysis.html:컴퓨팅 분석"
-    "04-database-analysis.html:데이터베이스 분석"
+    "05-database-analysis.html:데이터베이스 분석"
     "05-storage-analysis.html:스토리지 분석"
     "06-security-analysis.html:보안 분석"
     "07-application-analysis.html:애플리케이션 분석"

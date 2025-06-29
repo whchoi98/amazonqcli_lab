@@ -1,407 +1,279 @@
-#!/bin/bash
-# 동적 index.html 생성 스크립트 - 실제 AWS 데이터 기반
+#!/usr/bin/env python3
+"""
+빠른 Markdown to HTML 변환기
+올바른 경로를 사용하여 생성된 보고서를 HTML로 변환
+"""
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
-SAMPLE_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/sample"
+import os
+import markdown
+from pathlib import Path
+import shutil
 
-echo "🌐 동적 index.html 생성 시작..."
-
-# 디렉토리 생성
-mkdir -p "$HTML_DIR"
-
-# AWS 계정 정보 수집
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "Unknown")
-REGION=$(aws configure get region 2>/dev/null || echo "ap-northeast-2")
-CURRENT_DATE=$(date "+%Y년 %m월 %d일")
-
-# 리소스 수 계산 (파일이 없으면 0으로 설정)
-EC2_COUNT=$(jq '.rows | length' "$REPORT_DIR/compute_ec2_instances.json" 2>/dev/null || echo "0")
-VPC_COUNT=$(jq '.rows | length' "$REPORT_DIR/networking_vpc.json" 2>/dev/null || echo "0")
-RDS_COUNT=$(jq '.rows | length' "$REPORT_DIR/database_rds_instances.json" 2>/dev/null || echo "0")
-EBS_COUNT=$(jq '.rows | length' "$REPORT_DIR/storage_ebs_volumes.json" 2>/dev/null || echo "0")
-
-# 숫자가 아닌 경우 0으로 설정
-[[ "$EC2_COUNT" =~ ^[0-9]+$ ]] || EC2_COUNT=0
-[[ "$VPC_COUNT" =~ ^[0-9]+$ ]] || VPC_COUNT=0
-[[ "$RDS_COUNT" =~ ^[0-9]+$ ]] || RDS_COUNT=0
-[[ "$EBS_COUNT" =~ ^[0-9]+$ ]] || EBS_COUNT=0
-
-# 비용 정보 (예시 - 실제로는 Cost Explorer API 사용)
-MONTHLY_COST="$55.38"
-
-# 성숙도 점수 계산 (간단한 로직)
-MATURITY_SCORE="7.1"
-
-echo "📊 수집된 데이터:"
-echo "  - 계정 ID: $ACCOUNT_ID"
-echo "  - 리전: $REGION"
-echo "  - EC2: $EC2_COUNT개"
-echo "  - VPC: $VPC_COUNT개"
-echo "  - RDS: $RDS_COUNT개"
-echo "  - EBS: $EBS_COUNT개"
-
-# index.html 생성
-cat > "$HTML_DIR/index.html" << EOF
-<!DOCTYPE html>
+def create_html_template(title, content, nav_links=""):
+    """HTML 템플릿 생성"""
+    return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS 계정 종합 분석 보고서</title>
+    <title>{title} - AWS 계정 분석 보고서</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 0;
-            text-align: center;
-            margin-bottom: 30px;
-            border-radius: 10px;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        
-        .nav-card {
+            background-color: #f8f9fa;
+        }}
+        .container {{
             background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .nav-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .nav-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .nav-card p {
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .nav-card .score {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        
-        .score.excellent { background-color: #d4edda; color: #155724; }
-        .score.good { background-color: #d1ecf1; color: #0c5460; }
-        .score.fair { background-color: #fff3cd; color: #856404; }
-        .score.poor { background-color: #f8d7da; color: #721c24; }
-        
-        .summary-section {
-            background: white;
-            border-radius: 10px;
             padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .summary-section h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .metric-card {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .metric-card .number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .metric-card .label {
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .priority-section {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        
-        .priority-section h3 {
-            color: #856404;
-            margin-bottom: 15px;
-        }
-        
-        .priority-list {
-            list-style: none;
-        }
-        
-        .priority-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .priority-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: #666;
-            background: white;
             border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        h1 {{
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }}
+        h2 {{
+            color: #34495e;
             margin-top: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .nav-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .container {
-                padding: 10px;
-            }
-        }
+        }}
+        h3 {{
+            color: #7f8c8d;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }}
+        th, td {{
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }}
+        th {{
+            background-color: #3498db;
+            color: white;
+        }}
+        tr:nth-child(even) {{
+            background-color: #f2f2f2;
+        }}
+        .nav-menu {{
+            background: #2c3e50;
+            padding: 15px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 10px 10px 0 0;
+        }}
+        .nav-menu a {{
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }}
+        .nav-menu a:hover {{
+            background-color: #34495e;
+        }}
+        .status-success {{ color: #27ae60; font-weight: bold; }}
+        .status-warning {{ color: #f39c12; font-weight: bold; }}
+        .status-error {{ color: #e74c3c; font-weight: bold; }}
+        code {{
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }}
+        pre {{
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }}
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🏗️ AWS 계정 종합 분석 보고서</h1>
-            <p>계정 ID: $ACCOUNT_ID | 리전: $REGION | 분석일: $CURRENT_DATE</p>
+        <div class="nav-menu">
+            <a href="index.html">🏠 대시보드</a>
+            <a href="01-executive-summary.html">📊 경영진 요약</a>
+            <a href="02-networking-analysis.html">🌐 네트워킹</a>
+            <a href="05-storage-analysis.html">💾 스토리지</a>
+            <a href="05-database-analysis.html">🗄️ 데이터베이스</a>
+            <a href="06-security-analysis.html">🔒 보안</a>
+            <a href="07-application-analysis.html">🌐 애플리케이션</a>
+            <a href="09-cost-optimization.html">💰 비용최적화</a>
+            <a href="09-monitoring-analysis.html">📊 모니터링</a>
+            <a href="10-recommendations.html">🛠️ 권장사항</a>
         </div>
-        
-        <div class="summary-section">
-            <h2>📊 전체 현황 요약</h2>
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="number">$MATURITY_SCORE</div>
-                    <div class="label">전체 성숙도 점수</div>
-                </div>
-                <div class="metric-card">
-                    <div class="number">$MONTHLY_COST</div>
-                    <div class="label">월간 총 비용</div>
-                </div>
-                <div class="metric-card">
-                    <div class="number">$EC2_COUNT</div>
-                    <div class="label">EC2 인스턴스</div>
-                </div>
-                <div class="metric-card">
-                    <div class="number">$VPC_COUNT</div>
-                    <div class="label">VPC 개수</div>
-                </div>
-            </div>
-            
-            <div class="priority-section">
-                <h3>🔴 최우선 조치 항목</h3>
-                <ul class="priority-list">
-EOF
+        {content}
+    </div>
+</body>
+</html>"""
 
-# 최우선 조치 항목 동적 생성
-if [ "$EC2_COUNT" -gt 10 ]; then
-    echo "                    <li><strong>EC2 Right-sizing</strong> - 월 \$7-15 절약 가능 (인스턴스 수: $EC2_COUNT개)</li>" >> "$HTML_DIR/index.html"
-fi
+def create_index_html(output_dir):
+    """메인 인덱스 페이지 생성"""
+    index_content = """
+    <h1>🏠 AWS 계정 분석 대시보드</h1>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+        <h2 style="color: white; margin-top: 0;">📋 분석 개요</h2>
+        <p><strong>분석 일자:</strong> 2025년 6월 26일</p>
+        <p><strong>AWS 계정:</strong> 613137910751</p>
+        <p><strong>분석 리전:</strong> ap-northeast-2 (서울)</p>
+        <p><strong>수집된 데이터:</strong> 114개 JSON 파일 (1.5MB)</p>
+    </div>
 
-if [ "$VPC_COUNT" -gt 3 ]; then
-    echo "                    <li><strong>VPC 구조 최적화</strong> - 네트워크 복잡도 감소 (현재 VPC: $VPC_COUNT개)</li>" >> "$HTML_DIR/index.html"
-fi
-
-echo "                    <li><strong>기본 모니터링 구축</strong> - 장애 대응 시간 70% 단축</li>" >> "$HTML_DIR/index.html"
-echo "                    <li><strong>보안 그룹 감사</strong> - 보안 위험 30-50% 감소</li>" >> "$HTML_DIR/index.html"
-
-cat >> "$HTML_DIR/index.html" << EOF
-                </ul>
-            </div>
+    <h2>📊 생성된 분석 보고서</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="01-executive-summary.html" style="text-decoration: none; color: #2c3e50;">📊 경영진 요약</a></h3>
+            <p>전체 인프라 현황과 주요 발견사항을 요약한 경영진용 보고서</p>
         </div>
-        
-        <div class="nav-grid">
-            <div class="nav-card" onclick="openReport('01-executive-summary.html')">
-                <h3>📋 전체 계정 분석 요약</h3>
-                <p>AWS 계정의 전반적인 현황과 핵심 발견사항을 요약한 경영진 보고서</p>
-                <span class="score good">점수: 7.6/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('02-networking-analysis.html')">
-                <h3>🌐 네트워킹 분석</h3>
-                <p>VPC, 서브넷, 보안 그룹, Transit Gateway 등 네트워크 아키텍처 상세 분석</p>
-                <span class="score excellent">점수: 8.6/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('03-compute-analysis.html')">
-                <h3>💻 컴퓨팅 분석</h3>
-                <p>EC2, EKS, 로드밸런서 등 컴퓨팅 리소스 현황 및 최적화 방안</p>
-                <span class="score good">점수: 7.6/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('04-storage-analysis.html')">
-                <h3>💾 스토리지 분석</h3>
-                <p>S3, EBS, 백업 정책 등 스토리지 서비스 분석 및 최적화 권장사항</p>
-                <span class="score good">점수: 7.8/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('05-database-analysis.html')">
-                <h3>🗄️ 데이터베이스 분석</h3>
-                <p>Aurora MySQL, Redis, OpenSearch 등 데이터베이스 서비스 상세 분석</p>
-                <span class="score excellent">점수: 8.2/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('06-security-analysis.html')">
-                <h3>🔒 보안 분석</h3>
-                <p>IAM, 네트워크 보안, 데이터 보안, 모니터링 등 보안 아키텍처 분석</p>
-                <span class="score good">점수: 7.0/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('07-cost-optimization.html')">
-                <h3>💰 비용 최적화</h3>
-                <p>서비스별 비용 분석 및 최적화 전략, ROI 분석 및 절약 방안</p>
-                <span class="score fair">점수: 6.2/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('08-application-analysis.html')">
-                <h3>📊 애플리케이션 서비스 및 모니터링</h3>
-                <p>API Gateway, Lambda, 모니터링, 로깅 등 애플리케이션 서비스 분석</p>
-                <span class="score poor">점수: 3.0/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('09-monitoring-analysis.html')">
-                <h3>📈 모니터링 분석</h3>
-                <p>CloudWatch, 알람, 대시보드 등 모니터링 체계 분석</p>
-                <span class="score fair">점수: 5.5/10</span>
-            </div>
-            
-            <div class="nav-card" onclick="openReport('10-recommendations.html')">
-                <h3>🎯 종합 분석 및 권장사항</h3>
-                <p>전체 분석 결과를 바탕으로 한 전략적 권장사항 및 로드맵</p>
-                <span class="score good">우선순위 정의</span>
-            </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="02-networking-analysis.html" style="text-decoration: none; color: #2c3e50;">🌐 네트워킹 분석</a></h3>
+            <p>VPC, 서브넷, 보안그룹 등 네트워킹 인프라 상세 분석</p>
         </div>
-        
-        <div class="summary-section">
-            <h2>💡 주요 권장사항</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    <h4 style="color: #dc3545; margin-bottom: 10px;">🔴 즉시 조치 (1-2주)</h4>
-                    <ul style="padding-left: 20px;">
-EOF
-
-# 즉시 조치 항목 동적 생성
-if [ "$EC2_COUNT" -gt 10 ]; then
-    echo "                        <li>EC2 Right-sizing (\$7-15/월 절약)</li>" >> "$HTML_DIR/index.html"
-fi
-echo "                        <li>기본 모니터링 구축</li>" >> "$HTML_DIR/index.html"
-echo "                        <li>보안 그룹 감사</li>" >> "$HTML_DIR/index.html"
-
-cat >> "$HTML_DIR/index.html" << EOF
-                    </ul>
-                </div>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    <h4 style="color: #ffc107; margin-bottom: 10px;">🟡 단기 개선 (1-2개월)</h4>
-                    <ul style="padding-left: 20px;">
-                        <li>Reserved Instance 구매</li>
-                        <li>통합 모니터링 플랫폼</li>
-                        <li>자동화 스크립트 구축</li>
-                    </ul>
-                </div>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    <h4 style="color: #28a745; margin-bottom: 10px;">🟢 중장기 발전 (3-6개월)</h4>
-                    <ul style="padding-left: 20px;">
-                        <li>서버리스 아키텍처 도입</li>
-                        <li>CI/CD 파이프라인 구축</li>
-                        <li>고급 보안 체계</li>
-                    </ul>
-                </div>
-            </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="05-storage-analysis.html" style="text-decoration: none; color: #2c3e50;">💾 스토리지 분석</a></h3>
+            <p>EBS, S3 등 스토리지 리소스 사용 현황 및 최적화 방안</p>
         </div>
-        
-        <div class="footer">
-            <p><strong>AWS 계정 종합 분석 보고서</strong></p>
-            <p>생성일: $CURRENT_DATE | 분석 도구: Steampipe + AWS CLI | 보고서 버전: 1.0</p>
-            <p>다음 리뷰 예정일: $(date -d "+1 month" "+%Y년 %m월 %d일")</p>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="05-database-analysis.html" style="text-decoration: none; color: #2c3e50;">🗄️ 데이터베이스 분석</a></h3>
+            <p>RDS, ElastiCache 등 데이터베이스 서비스 구성 및 성능 분석</p>
+        </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="06-security-analysis.html" style="text-decoration: none; color: #2c3e50;">🔒 보안 분석</a></h3>
+            <p>IAM, KMS 등 보안 설정 현황 및 보안 강화 방안</p>
+        </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="07-application-analysis.html" style="text-decoration: none; color: #2c3e50;">🌐 애플리케이션 분석</a></h3>
+            <p>API Gateway, EventBridge 등 애플리케이션 서비스 분석</p>
+        </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="09-cost-optimization.html" style="text-decoration: none; color: #2c3e50;">💰 비용 최적화</a></h3>
+            <p>비용 분석 및 최적화 기회 식별</p>
+        </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="09-monitoring-analysis.html" style="text-decoration: none; color: #2c3e50;">📊 모니터링 분석</a></h3>
+            <p>CloudWatch 등 모니터링 도구 활용 현황 분석</p>
+        </div>
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
+            <h3><a href="10-recommendations.html" style="text-decoration: none; color: #2c3e50;">🛠️ 종합 권장사항</a></h3>
+            <p>전체 분석 결과를 바탕으로 한 통합 권장사항</p>
         </div>
     </div>
-    
-    <script>
-        function openReport(filename) {
-            // 실제 구현에서는 각 HTML 파일로 이동
-            window.open(filename, '_blank');
-        }
-        
-        // 페이지 로드 시 애니메이션 효과
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.nav-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-    </script>
-</body>
-</html>
-EOF
 
-echo "✅ 동적 index.html 생성 완료!"
-echo "📁 위치: $HTML_DIR/index.html"
-echo "🌐 브라우저에서 확인: file://$HTML_DIR/index.html"
+    <h2>🎯 주요 발견사항</h2>
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="color: #856404; margin-top: 0;">⚠️ 주요 개선 필요 사항</h3>
+        <ul>
+            <li><strong>VPC Flow Logs 미활성화:</strong> 네트워크 트래픽 모니터링 강화 필요</li>
+            <li><strong>CloudTrail 미구성:</strong> API 호출 로깅 및 감사 추적 설정 필요</li>
+            <li><strong>Config 규칙 미설정:</strong> 리소스 구성 준수 모니터링 필요</li>
+            <li><strong>GuardDuty 미활성화:</strong> 위협 탐지 서비스 구성 필요</li>
+        </ul>
+    </div>
+
+    <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="color: #0c5460; margin-top: 0;">✅ 잘 구성된 영역</h3>
+        <ul>
+            <li><strong>네트워킹 인프라:</strong> 멀티 VPC 아키텍처 및 Transit Gateway 연결</li>
+            <li><strong>데이터베이스:</strong> RDS Aurora 및 ElastiCache 클러스터 운영</li>
+            <li><strong>컨테이너:</strong> EKS 클러스터 및 Kubernetes 리소스 관리</li>
+            <li><strong>암호화:</strong> KMS 키를 통한 데이터 암호화 적용</li>
+        </ul>
+    </div>
+    """
+    
+    index_html = create_html_template("AWS 계정 분석 대시보드", index_content)
+    
+    with open(output_dir / "index.html", "w", encoding="utf-8") as f:
+        f.write(index_html)
+
+def convert_markdown_to_html():
+    """Markdown 파일들을 HTML로 변환"""
+    input_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
+    output_dir = Path("/home/ec2-user/amazonqcli_lab/html-report")
+    
+    # 출력 디렉토리 생성
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    print("🚀 Markdown to HTML 변환 시작...")
+    print(f"📁 입력 디렉토리: {input_dir}")
+    print(f"📁 출력 디렉토리: {output_dir}")
+    
+    # 메인 인덱스 페이지 생성
+    create_index_html(output_dir)
+    print("✅ index.html 생성 완료")
+    
+    # Markdown 파일 목록
+    md_files = list(input_dir.glob("*.md"))
+    print(f"📋 발견된 Markdown 파일: {len(md_files)}개")
+    
+    converted_count = 0
+    
+    for md_file in md_files:
+        try:
+            # Markdown 파일 읽기
+            with open(md_file, "r", encoding="utf-8") as f:
+                md_content = f.read()
+            
+            # Markdown을 HTML로 변환
+            html_content = markdown.markdown(
+                md_content,
+                extensions=['tables', 'fenced_code', 'toc']
+            )
+            
+            # HTML 파일명 생성
+            html_filename = md_file.stem + ".html"
+            html_path = output_dir / html_filename
+            
+            # 제목 추출 (첫 번째 # 헤더)
+            title = md_file.stem.replace("-", " ").title()
+            if md_content.startswith("#"):
+                title = md_content.split("\n")[0].replace("#", "").strip()
+            
+            # 완전한 HTML 페이지 생성
+            full_html = create_html_template(title, html_content)
+            
+            # HTML 파일 저장
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(full_html)
+            
+            file_size = html_path.stat().st_size
+            print(f"✅ {html_filename} 생성 완료 ({file_size:,} bytes)")
+            converted_count += 1
+            
+        except Exception as e:
+            print(f"❌ {md_file.name} 변환 실패: {str(e)}")
+    
+    print(f"\n🎉 변환 완료!")
+    print(f"📊 성공: {converted_count}/{len(md_files)} 파일")
+    print(f"📁 출력 위치: {output_dir}")
+    
+    # 생성된 HTML 파일 목록
+    html_files = list(output_dir.glob("*.html"))
+    print(f"\n📋 생성된 HTML 파일 ({len(html_files)}개):")
+    for html_file in sorted(html_files):
+        size = html_file.stat().st_size
+        print(f"  📄 {html_file.name} ({size:,} bytes)")
+    
+    return len(html_files)
+
+if __name__ == "__main__":
+    try:
+        total_files = convert_markdown_to_html()
+        print(f"\n🌐 브라우저에서 확인:")
+        print(f"  file:///home/ec2-user/amazonqcli_lab/html-report/index.html")
+        print(f"\n💡 로컬 웹 서버 실행:")
+        print(f"  cd /home/ec2-user/amazonqcli_lab/html-report")
+        print(f"  python3 -m http.server 8080")
+        print(f"  브라우저에서 http://localhost:8080 접속")
+        
+    except Exception as e:
+        print(f"❌ 변환 중 오류 발생: {str(e)}")

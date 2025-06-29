@@ -9,6 +9,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from datetime import datetime
 from collections import Counter, defaultdict
 
 class StorageReportGenerator:
@@ -313,7 +314,11 @@ class StorageReportGenerator:
         try:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
-                report_file.write("# 스토리지 리소스 분석\n\n")
+                report_file.write("# 💾 스토리지 리소스 종합 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 스토리지 리소스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 계정의 스토리지 인프라에 대한 종합적인 분석을 제공하며, EBS 볼륨, S3 버킷, EFS 파일 시스템, 스냅샷 등의 구성 상태와 비용 최적화 방안을 평가합니다.\n\n")
                 
                 # 각 섹션 작성
                 self.write_ebs_analysis(report_file, ebs_data)
@@ -328,6 +333,15 @@ class StorageReportGenerator:
                 report_file.write("*스토리지 리소스 분석 완료*\n")
             
             print("✅ 확장된 Storage Analysis 생성 완료: 04-storage-analysis.md")
+            
+            # Enhanced 권장사항 통계 출력
+            stats = self.get_recommendations_summary()
+            if stats['total'] > 0:
+                print(f"📋 Enhanced 권장사항 통계:")
+                print(f"   - 높은 우선순위: {stats['high_priority']}개")
+                print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+                print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+                print(f"   - 총 권장사항: {stats['total']}개")
             
         except IOError as e:
             print(f"❌ 보고서 파일 생성 실패: {e}")

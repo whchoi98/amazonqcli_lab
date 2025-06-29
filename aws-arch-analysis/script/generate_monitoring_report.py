@@ -372,9 +372,11 @@ class MonitoringReportGenerator:
         try:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
-                report_file.write("# 모니터링 및 감사 분석 보고서\n\n")
-                report_file.write(f"**생성일시:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-                report_file.write("이 보고서는 AWS 환경의 모니터링, 로깅, 감사 서비스에 대한 종합적인 분석을 제공합니다.\n\n")
+                report_file.write("# 📊 모니터링 및 감사 종합 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 모니터링 및 감사 서비스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 환경의 모니터링, 로깅, 감사 서비스에 대한 종합적인 분석을 제공하며, CloudWatch, CloudTrail, Config 등의 구성 상태와 운영 효율성을 평가합니다.\n\n")
                 
                 # 각 섹션 작성
                 self.write_data_collection_summary(report_file)
@@ -421,6 +423,15 @@ def main():
     generator.generate_report()
     
     print("\n🎉 모니터링 분석 보고서 생성이 완료되었습니다!")
+    
+    # Enhanced 권장사항 통계 출력
+    stats = generator.get_recommendations_summary()
+    if stats['total'] > 0:
+        print(f"📋 Enhanced 권장사항 통계:")
+        print(f"   - 높은 우선순위: {stats['high_priority']}개")
+        print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+        print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+        print(f"   - 총 권장사항: {stats['total']}개")
 
 if __name__ == "__main__":
     main()

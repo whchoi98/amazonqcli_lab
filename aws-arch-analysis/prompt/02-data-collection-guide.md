@@ -70,3 +70,9 @@ python3 steampipe_security_collection.py
 ### ⚠️ 주의사항
 - 일부 AWS 서비스에 대한 접근이 SCP(Service Control Policy)로 제한되어 있어 모든 데이터를 수집할 수 없습니다
 - Steampipe 플러그인 버전과 일부 쿼리가 호환되지 않을 수 있습니다
+
+### 데이터 수집 완료 확인
+- [ ] 모든 스크립트 정상 실행 완료
+- [ ] JSON 파일 생성 및 데이터 무결성 확인
+- [ ] 누락된 데이터 식별 및 보완
+- [ ] 데이터 품질 검증 완료

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-데이터베이스 분석 보고서 생성 스크립트 (Python 버전)
+확장된 데이터베이스 분석 보고서 생성 스크립트
+RDS, NoSQL, 분석 서비스 등 모든 데이터베이스 서비스 포함
 """
 
 import json
@@ -8,11 +9,36 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from datetime import datetime
 
-class DatabaseReportGenerator:
+class EnhancedDatabaseReportGenerator:
     def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 데이터베이스 서비스별 파일 매핑
+        self.database_files = {
+            # RDS 관련
+            'rds_instances': 'database_rds_instances.json',
+            'rds_clusters': 'database_rds_clusters.json',
+            'rds_snapshots': 'database_rds_snapshots.json',
+            'rds_subnet_groups': 'database_rds_subnet_groups.json',
+            'rds_parameter_groups': 'database_rds_parameter_groups.json',
+            
+            # NoSQL 관련
+            'dynamodb_tables': 'database_dynamodb_tables.json',
+            'dynamodb_backups': 'database_dynamodb_backups.json',
+            'elasticache_clusters': 'database_elasticache_clusters.json',
+            'elasticache_replication_groups': 'database_elasticache_replication_groups.json',
+            
+            # 분석 서비스
+            'redshift_clusters': 'database_redshift_clusters.json',
+            'opensearch_domains': 'database_opensearch_domains.json',
+            'emr_clusters': 'database_emr_clusters.json',
+            'kinesis_streams': 'database_kinesis_streams.json',
+            'glue_databases': 'database_glue_databases.json',
+            'athena_workgroups': 'database_athena_workgroups.json'
+        }
 
     def load_json_file(self, filename: str) -> Optional[List[Dict[str, Any]]]:
         """JSON 파일을 로드합니다."""
@@ -29,6 +55,11 @@ class DatabaseReportGenerator:
         except (json.JSONDecodeError, IOError) as e:
             print(f"Warning: Failed to load {filename}: {e}")
         return None
+
+    def safe_get(self, data: Dict, key: str, default: str = 'N/A') -> str:
+        """안전하게 딕셔너리에서 값을 가져옵니다."""
+        value = data.get(key, default)
+        return str(value) if value is not None else default
 
     def write_rds_analysis(self, report_file, rds_data: Optional[List]) -> None:
         """RDS 분석 섹션을 작성합니다."""
@@ -206,7 +237,11 @@ class DatabaseReportGenerator:
         try:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
-                report_file.write("# 데이터베이스 분석\n\n")
+                report_file.write("# 🗄️ 데이터베이스 리소스 종합 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 데이터베이스 서비스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 계정의 데이터베이스 인프라에 대한 종합적인 분석을 제공하며, RDS, Aurora, ElastiCache, DynamoDB 등의 구성 상태와 성능 최적화 방안을 평가합니다.\n\n")
                 
                 # 각 섹션 작성
                 self.write_rds_analysis(report_file, rds_data)
@@ -233,7 +268,7 @@ def main():
     
     args = parser.parse_args()
     
-    generator = DatabaseReportGenerator(args.report_dir)
+    generator = EnhancedDatabaseReportGenerator(args.report_dir)
     generator.generate_report()
 
 if __name__ == "__main__":

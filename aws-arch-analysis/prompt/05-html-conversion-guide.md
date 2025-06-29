@@ -43,8 +43,8 @@ cd ~/amazonqcli_lab/aws-arch-analysis/script
 01-executive-summary.md      → 01-executive-summary.html
 02-networking-analysis.md    → 02-networking-analysis.html
 03-compute-analysis.md       → 03-compute-analysis.html
-04-database-analysis.md      → 04-database-analysis.html
-05-storage-analysis.md       → 05-storage-analysis.html
+04-storage-analysis.md       → 04-storage-analysis.html
+05-database-analysis.md      → 05-database-analysis.html
 06-security-analysis.md      → 06-security-analysis.html
 07-application-analysis.md   → 07-application-analysis.html
 08-monitoring-analysis.md    → 08-monitoring-analysis.html
@@ -58,8 +58,8 @@ index.html                   # 메인 대시보드
 01-executive-summary.html    # 경영진 요약
 02-networking-analysis.html  # 네트워킹 분석
 03-compute-analysis.html     # 컴퓨팅 분석
-04-database-analysis.html    # 데이터베이스 분석
-05-storage-analysis.html     # 스토리지 분석
+04-storage-analysis.html     # 스토리지 분석
+05-database-analysis.html    # 데이터베이스 분석
 06-security-analysis.html    # 보안 분석
 07-application-analysis.html # 애플리케이션 분석
 08-monitoring-analysis.html  # 모니터링 분석

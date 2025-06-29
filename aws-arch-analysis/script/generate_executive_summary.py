@@ -150,7 +150,11 @@ class ExecutiveSummaryGenerator:
         try:
             with open(report_path, 'w', encoding='utf-8') as report_file:
                 # 헤더 작성
-                report_file.write("# AWS 인프라 분석 - 경영진 요약\n\n")
+                report_file.write("# 📊 AWS 계정 종합 분석\n\n")
+                report_file.write(f"> **분석 일시**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
+                report_file.write(f"> **분석 대상**: AWS 계정 내 모든 리소스 및 서비스  \n")
+                report_file.write(f"> **분석 리전**: ap-northeast-2 (서울)\n\n")
+                report_file.write("이 보고서는 AWS 계정의 전체 인프라에 대한 종합적인 분석을 제공하며, 네트워킹, 컴퓨팅, 스토리지, 데이터베이스, 보안, 비용 최적화 관점에서 현재 상태를 평가하고 개선 방안을 제시합니다.\n\n")
                 
                 # 각 섹션 작성
                 self.write_overview(report_file)

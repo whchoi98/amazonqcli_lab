@@ -18,7 +18,7 @@ mkdir -p "$HTML_DIR/data"
 
 # 1. 메인 CSS 파일 생성
 echo "🎨 CSS 스타일 파일 생성 중..."
-cat > "$HTML_DIR/assets/css/style.css" << 'EOF'
+cat > "$HTML_DIR/assets/css/style.css" << EOF
 * {
     margin: 0;
     padding: 0;
@@ -96,7 +96,7 @@ echo "✅ CSS 파일 생성 완료"
 
 # 2. 반응형 CSS 파일 생성
 echo "📱 반응형 CSS 파일 생성 중..."
-cat > "$HTML_DIR/assets/css/responsive.css" << 'EOF'
+cat > "$HTML_DIR/assets/css/responsive.css" << EOF
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .container {
@@ -129,7 +129,7 @@ EOF
 
 # 3. 인쇄용 CSS 파일 생성
 echo "🖨️ 인쇄용 CSS 파일 생성 중..."
-cat > "$HTML_DIR/assets/css/print.css" << 'EOF'
+cat > "$HTML_DIR/assets/css/print.css" << EOF
 @media print {
     .header {
         background: none !important;
@@ -156,7 +156,7 @@ echo "✅ 모든 CSS 파일 생성 완료"
 
 # 4. 메인 JavaScript 파일 생성
 echo "⚡ JavaScript 파일 생성 중..."
-cat > "$HTML_DIR/assets/js/main.js" << 'EOF'
+cat > "$HTML_DIR/assets/js/main.js" << EOF
 function openReport(filename) {
     window.open(filename, '_blank');
 }
@@ -177,14 +177,14 @@ EOF
 
 # 5. 네비게이션 JavaScript 파일 생성
 echo "🧭 네비게이션 JavaScript 파일 생성 중..."
-cat > "$HTML_DIR/assets/js/navigation.js" << 'EOF'
+cat > "$HTML_DIR/assets/js/navigation.js" << EOF
 // 네비게이션 기능
 function navigateToReport(reportId) {
     const reportFiles = {
         'executive': '01-executive-summary.html',
         'networking': '02-networking-analysis.html',
         'compute': '03-compute-analysis.html',
-        'database': '04-database-analysis.html',
+        'database': '05-database-analysis.html',
         'storage': '05-storage-analysis.html',
         'security': '06-security-analysis.html',
         'application': '07-application-analysis.html',
@@ -212,7 +212,7 @@ EOF
 
 # 6. 차트 JavaScript 파일 생성
 echo "📊 차트 JavaScript 파일 생성 중..."
-cat > "$HTML_DIR/assets/js/charts.js" << 'EOF'
+cat > "$HTML_DIR/assets/js/charts.js" << EOF
 // 차트 생성 함수들
 function createResourceChart(data) {
     // 리소스 분포 차트 생성 로직
@@ -232,7 +232,7 @@ EOF
 
 # 7. 검색 JavaScript 파일 생성
 echo "🔍 검색 JavaScript 파일 생성 중..."
-cat > "$HTML_DIR/assets/js/search.js" << 'EOF'
+cat > "$HTML_DIR/assets/js/search.js" << EOF
 // 검색 기능
 function searchReports(query) {
     const searchResults = [];

@@ -53,8 +53,8 @@ class MarkdownToHtmlConverter:
                 'icon': '💻'
             },
             {
-                'file': '04-database-analysis.md',
-                'html': '04-database-analysis.html',
+                'file': '05-database-analysis.md',
+                'html': '05-database-analysis.html',
                 'title': '🗄️ 데이터베이스 분석',
                 'description': 'RDS, DynamoDB 등 데이터베이스 리소스를 분석합니다.',
                 'score': '우수 (88/100)',

@@ -100,6 +100,8 @@ class CostReportGenerator:
 > **분석 대상**: AWS 계정 내 모든 서비스 비용  
 > **분석 리전**: ap-northeast-2 (서울)
 
+이 보고서는 AWS 계정의 비용 구조에 대한 종합적인 분석을 제공하며, 서비스별 비용 현황, 사용량 트렌드, Reserved Instance 활용도 등을 평가하여 비용 최적화 방안을 제시합니다.
+
 ## 📊 Executive Summary
 
 ### 비용 현황 개요
