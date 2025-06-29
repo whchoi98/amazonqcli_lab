@@ -431,23 +431,19 @@ class EnhancedSecurityReportGenerator:
                 self.write_secrets_management_analysis(report_file, data_dict)
                 self.write_comprehensive_security_recommendations(report_file, data_dict)
                 
-                # 마무리
-                report_file.write("---\n")
-                report_file.write("**📋 보고서 생성 정보**\n")
-                report_file.write(f"- 생성 일시: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                report_file.write(f"- 분석 파일 수: {len([f for f in self.security_files.values() if self.load_json_file(f)])}\n")
-                report_file.write("- 분석 도구: Enhanced Security Report Generator v2.0\n\n")
-                report_file.write("*AWS 보안 종합 분석 완료*\n")
+                # 마무리 섹션 추가
+                self.write_footer_section(report_file)
             
             print("✅ Enhanced Security Analysis 생성 완료: 06-security-analysis.md")
             print(f"📁 보고서 위치: {report_path}")
             print(f"📊 보고서 크기: {report_path.stat().st_size:,} bytes")
             
             # Enhanced 권장사항 통계 출력
-            stats = self.get_recommendations_summary()
-            if stats['total'] > 0:
-                print(f"📋 Enhanced 권장사항 통계:")
-                print(f"   - 높은 우선순위: {stats['high_priority']}개")
+            if hasattr(self, 'get_recommendations_summary'):
+                stats = self.get_recommendations_summary()
+                if stats['total'] > 0:
+                    print(f"📋 Enhanced 권장사항 통계:")
+                    print(f"   - 높은 우선순위: {stats['high_priority']}개")
                 print(f"   - 중간 우선순위: {stats['medium_priority']}개")
                 print(f"   - 낮은 우선순위: {stats['low_priority']}개")
                 print(f"   - 총 권장사항: {stats['total']}개")
@@ -455,6 +451,21 @@ class EnhancedSecurityReportGenerator:
         except IOError as e:
             print(f"❌ 보고서 파일 생성 실패: {e}")
             sys.exit(1)
+
+    def write_footer_section(self, report_file):
+        """보고서 마무리 섹션 추가"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        report_file.write(f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 보안 검토 권장 주기: 주 1회
+""")
 
 def main():
     """메인 함수"""

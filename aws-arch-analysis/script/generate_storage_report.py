@@ -328,24 +328,39 @@ class StorageReportGenerator:
                 self.write_backup_analysis(report_file)
                 self.write_recommendations(report_file)
                 
-                # 마무리
-                report_file.write("---\n")
-                report_file.write("*스토리지 리소스 분석 완료*\n")
+                # 마무리 섹션 추가
+                self.write_footer_section(report_file)
             
             print("✅ 확장된 Storage Analysis 생성 완료: 04-storage-analysis.md")
             
             # Enhanced 권장사항 통계 출력
-            stats = self.get_recommendations_summary()
-            if stats['total'] > 0:
-                print(f"📋 Enhanced 권장사항 통계:")
-                print(f"   - 높은 우선순위: {stats['high_priority']}개")
-                print(f"   - 중간 우선순위: {stats['medium_priority']}개")
-                print(f"   - 낮은 우선순위: {stats['low_priority']}개")
-                print(f"   - 총 권장사항: {stats['total']}개")
+            if hasattr(self, 'get_recommendations_summary'):
+                stats = self.get_recommendations_summary()
+                if stats['total'] > 0:
+                    print(f"📋 Enhanced 권장사항 통계:")
+                    print(f"   - 높은 우선순위: {stats['high_priority']}개")
+                    print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+                    print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+                    print(f"   - 총 권장사항: {stats['total']}개")
             
         except IOError as e:
             print(f"❌ 보고서 파일 생성 실패: {e}")
             sys.exit(1)
+
+    def write_footer_section(self, report_file):
+        """보고서 마무리 섹션 추가"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        report_file.write(f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 스토리지 검토 권장 주기: 월 1회
+""")
 
 def main():
     """메인 함수"""

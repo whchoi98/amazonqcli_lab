@@ -677,6 +677,9 @@ class DatabaseReportGenerator:
         """보고서를 파일로 저장"""
         output_path = self.report_dir / filename
         
+        # 마무리 섹션 추가
+        content += self.get_footer_section()
+        
         try:
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(content)
@@ -690,6 +693,21 @@ class DatabaseReportGenerator:
         except Exception as e:
             self.logger.error(f"❌ 보고서 저장 실패: {e}")
             sys.exit(1)
+
+    def get_footer_section(self):
+        """보고서 마무리 섹션 생성"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        return f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 데이터베이스 검토 권장 주기: 월 1회
+"""
 
 def main():
     """메인 함수"""

@@ -212,6 +212,136 @@ class NetworkingReportGenerator(NetworkingRecommendations):
         else:
             report_file.write("Network ACL 데이터를 찾을 수 없습니다.\n")
 
+    def write_tgw_section(self, report_file):
+        """Transit Gateway 섹션 생성"""
+        report_file.write("\n## 🌐 Transit Gateway 분석\n\n")
+        
+        # Transit Gateway 기본 정보
+        tgw_data = self.load_json_file("networking_transit_gateway.json")
+        
+        if tgw_data:
+            tgw_count = len(tgw_data)
+            report_file.write(f"### Transit Gateway 현황\n")
+            report_file.write(f"**총 Transit Gateway 수:** {tgw_count}개\n\n")
+            
+            report_file.write("| TGW ID | 상태 | 설명 | 기본 라우팅 테이블 연결 | 기본 라우팅 테이블 전파 | 태그 |\n")
+            report_file.write("|--------|------|------|------------------------|------------------------|------|\n")
+            
+            for tgw in tgw_data:
+                tgw_id = tgw.get('transit_gateway_id', 'N/A')
+                state = tgw.get('state', 'N/A')
+                description = tgw.get('description', '설명 없음')
+                default_route_table_association = tgw.get('default_route_table_association', 'N/A')
+                default_route_table_propagation = tgw.get('default_route_table_propagation', 'N/A')
+                tag_name = tgw.get('tags', {}).get('Name', 'N/A') if tgw.get('tags') else 'N/A'
+                
+                report_file.write(f"| {tgw_id} | {state} | {description} | {default_route_table_association} | {default_route_table_propagation} | {tag_name} |\n")
+        else:
+            report_file.write("### Transit Gateway 현황\n")
+            report_file.write("Transit Gateway가 구성되지 않았습니다.\n\n")
+        
+        # TGW VPC Attachments
+        tgw_attachments = self.load_json_file("networking_tgw_vpc_attachments.json")
+        
+        if tgw_attachments:
+            attachment_count = len(tgw_attachments)
+            report_file.write(f"### Transit Gateway VPC 연결\n")
+            report_file.write(f"**총 VPC 연결 수:** {attachment_count}개\n\n")
+            
+            report_file.write("| 연결 ID | TGW ID | VPC ID | 상태 | 서브넷 ID | 태그 |\n")
+            report_file.write("|---------|--------|--------|------|-----------|------|\n")
+            
+            for attachment in tgw_attachments:
+                attachment_id = attachment.get('transit_gateway_attachment_id', 'N/A')
+                tgw_id = attachment.get('transit_gateway_id', 'N/A')
+                vpc_id = attachment.get('vpc_id', 'N/A')
+                state = attachment.get('state', 'N/A')
+                subnet_ids = ', '.join(attachment.get('subnet_ids', [])) if attachment.get('subnet_ids') else 'N/A'
+                tag_name = attachment.get('tags', {}).get('Name', 'N/A') if attachment.get('tags') else 'N/A'
+                
+                report_file.write(f"| {attachment_id} | {tgw_id} | {vpc_id} | {state} | {subnet_ids} | {tag_name} |\n")
+        else:
+            report_file.write("### Transit Gateway VPC 연결\n")
+            report_file.write("VPC 연결이 구성되지 않았습니다.\n\n")
+        
+        # TGW Route Tables
+        tgw_route_tables = self.load_json_file("networking_tgw_route_tables.json")
+        
+        if tgw_route_tables:
+            route_table_count = len(tgw_route_tables)
+            report_file.write(f"### Transit Gateway 라우팅 테이블\n")
+            report_file.write(f"**총 라우팅 테이블 수:** {route_table_count}개\n\n")
+            
+            report_file.write("| 라우팅 테이블 ID | TGW ID | 기본 연결 테이블 | 기본 전파 테이블 | 상태 | 태그 |\n")
+            report_file.write("|------------------|--------|------------------|------------------|------|------|\n")
+            
+            for rt in tgw_route_tables:
+                rt_id = rt.get('transit_gateway_route_table_id', 'N/A')
+                tgw_id = rt.get('transit_gateway_id', 'N/A')
+                default_association_route_table = rt.get('default_association_route_table', False)
+                default_propagation_route_table = rt.get('default_propagation_route_table', False)
+                state = rt.get('state', 'N/A')
+                tag_name = rt.get('tags', {}).get('Name', 'N/A') if rt.get('tags') else 'N/A'
+                
+                report_file.write(f"| {rt_id} | {tgw_id} | {default_association_route_table} | {default_propagation_route_table} | {state} | {tag_name} |\n")
+        else:
+            report_file.write("### Transit Gateway 라우팅 테이블\n")
+            report_file.write("라우팅 테이블이 구성되지 않았습니다.\n\n")
+
+    def write_vpc_peering_section(self, report_file):
+        """VPC Peering 섹션 생성"""
+        report_file.write("\n## 🔗 VPC Peering 분석\n\n")
+        
+        peering_data = self.load_json_file("networking_vpc_peering.json")
+        
+        if peering_data:
+            peering_count = len(peering_data)
+            active_count = len([p for p in peering_data if p.get('status_code') == 'active'])
+            
+            report_file.write(f"### VPC Peering 현황\n")
+            report_file.write(f"**총 VPC Peering 연결 수:** {peering_count}개 (활성: {active_count}개)\n\n")
+            
+            report_file.write("| Peering ID | 상태 | 요청자 VPC | 수락자 VPC | 요청자 리전 | 수락자 리전 | 태그 |\n")
+            report_file.write("|------------|------|------------|------------|-------------|-------------|------|\n")
+            
+            for peering in peering_data:
+                peering_id = peering.get('id', 'N/A')
+                status = peering.get('status_code', 'N/A')
+                requester_vpc = peering.get('requester_vpc_id', 'N/A')
+                accepter_vpc = peering.get('accepter_vpc_id', 'N/A')
+                requester_region = peering.get('requester_region', 'N/A')
+                accepter_region = peering.get('accepter_region', 'N/A')
+                tag_name = peering.get('tags', {}).get('Name', 'N/A') if peering.get('tags') else 'N/A'
+                
+                report_file.write(f"| {peering_id} | {status} | {requester_vpc} | {accepter_vpc} | {requester_region} | {accepter_region} | {tag_name} |\n")
+            
+            # 상태별 분석
+            report_file.write("\n### VPC Peering 상태 분석\n")
+            status_counts = {}
+            for peering in peering_data:
+                status = peering.get('status_code', 'unknown')
+                status_counts[status] = status_counts.get(status, 0) + 1
+            
+            report_file.write("| 상태 | 개수 | 설명 |\n")
+            report_file.write("|------|------|------|\n")
+            
+            status_descriptions = {
+                'active': '활성 상태 - 정상적으로 트래픽 전송 가능',
+                'pending-acceptance': '수락 대기 중 - 상대방의 수락 필요',
+                'rejected': '거부됨 - 연결 요청이 거부됨',
+                'expired': '만료됨 - 수락 기한이 지남',
+                'failed': '실패 - 연결 생성 실패',
+                'deleted': '삭제됨 - 연결이 삭제됨'
+            }
+            
+            for status, count in status_counts.items():
+                description = status_descriptions.get(status, '알 수 없는 상태')
+                report_file.write(f"| {status} | {count} | {description} |\n")
+                
+        else:
+            report_file.write("### VPC Peering 현황\n")
+            report_file.write("VPC Peering 연결이 구성되지 않았습니다.\n\n")
+
     def write_recommendations_section(self, report_file):
         """Enhanced 권장사항 섹션 생성"""
         
@@ -223,7 +353,10 @@ class NetworkingReportGenerator(NetworkingRecommendations):
             'vpc': self.load_json_file("networking_vpc.json"),
             'elastic_ips': self.load_json_file("networking_eip.json"),
             'nat': self.load_json_file("networking_nat.json"),
-            'vpc_endpoints': self.load_json_file("networking_vpc_endpoints.json")
+            'vpc_endpoints': self.load_json_file("networking_vpc_endpoints.json"),
+            'transit_gateway': self.load_json_file("networking_transit_gateway.json"),
+            'tgw_vpc_attachments': self.load_json_file("networking_tgw_vpc_attachments.json"),
+            'vpc_peering': self.load_json_file("networking_vpc_peering.json")
         }
         
         # Enhanced 권장사항 생성
@@ -334,27 +467,43 @@ class NetworkingReportGenerator(NetworkingRecommendations):
                 self.write_gateways_section(report_file)
                 self.write_elastic_ip_section(report_file)
                 self.write_network_acl_section(report_file)
+                self.write_tgw_section(report_file)
+                self.write_vpc_peering_section(report_file)
                 self.write_recommendations_section(report_file)
                 self.write_security_analysis(report_file)
-                self.write_cost_optimization_section(report_file)
-                
-                # 마무리
-                report_file.write("\n---\n*네트워킹 분석 완료*\n")
-            
-            print("✅ Networking Analysis 생성 완료: 02-networking-analysis.md")
-            
-            # Enhanced 권장사항 통계 출력
-            stats = self.get_recommendations_summary()
-            if stats['total'] > 0:
-                print(f"📋 Enhanced 권장사항 통계:")
-                print(f"   - 높은 우선순위: {stats['high_priority']}개")
-                print(f"   - 중간 우선순위: {stats['medium_priority']}개")
-                print(f"   - 낮은 우선순위: {stats['low_priority']}개")
-                print(f"   - 총 권장사항: {stats['total']}개")
-            
-        except IOError as e:
-            print(f"❌ 보고서 파일 생성 실패: {e}")
-            sys.exit(1)
+                self.write_footer_section(report_file)
+        
+        except Exception as e:
+            print(f"❌ 오류 발생: {e}")
+            return False
+        
+        return True
+
+    def write_footer_section(self, report_file):
+        """보고서 마무리 섹션 추가"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        report_file.write(f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 네트워킹 검토 권장 주기: 월 1회
+""")
+        
+        print("✅ Networking Analysis 생성 완료: 02-networking-analysis.md")
+        
+        # Enhanced 권장사항 통계 출력
+        stats = self.get_recommendations_summary()
+        if stats['total'] > 0:
+            print(f"📋 Enhanced 권장사항 통계:")
+            print(f"   - 높은 우선순위: {stats['high_priority']}개")
+            print(f"   - 중간 우선순위: {stats['medium_priority']}개")
+            print(f"   - 낮은 우선순위: {stats['low_priority']}개")
+            print(f"   - 총 권장사항: {stats['total']}개")
 
 def main():
     """메인 함수"""

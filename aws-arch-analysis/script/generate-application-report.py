@@ -317,9 +317,25 @@ class ApplicationReportGenerator:
             for rec in recommendations:
                 report_file.write(f"{rec}\n")
             
-            report_file.write(f"\n---\n*리포트 생성 완료: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
+            # 마무리 섹션 추가
+            self.write_footer_section(report_file)
         
         self.log_success(f"📄 리포트 생성 완료: {self.output_file}")
+
+    def write_footer_section(self, report_file):
+        """보고서 마무리 섹션 추가"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        report_file.write(f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 애플리케이션 검토 권장 주기: 월 1회
+""")
         return str(self.output_file)
 
 def main():

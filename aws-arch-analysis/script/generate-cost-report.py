@@ -454,12 +454,6 @@ class CostReportGenerator:
    - 전문 컨설팅 서비스
 
 ---
-
-*📅 분석 완료 시간: {self.current_time}*  
-*🔄 다음 비용 검토 권장 주기: 주 1회*  
-*💰 비용 최적화 목표: 월간 비용 20% 절감*
-
----
 """
         
         return forecast
@@ -497,6 +491,9 @@ class CostReportGenerator:
         """보고서 파일 저장"""
         report_path = self.report_dir / "07-cost-optimization.md"
         
+        # 마무리 섹션 추가
+        content += self.get_footer_section()
+        
         try:
             with open(report_path, 'w', encoding='utf-8') as f:
                 f.write(content)
@@ -513,6 +510,21 @@ class CostReportGenerator:
             return False
         
         return True
+
+    def get_footer_section(self):
+        """보고서 마무리 섹션 생성"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        return f"""
+## 📞 추가 지원
+
+이 보고서에 대한 질문이나 추가 분석이 필요한 경우:
+- AWS Support 케이스 생성
+- AWS Well-Architected Review 수행
+- AWS Professional Services 문의
+
+📅 분석 완료 시간: {current_time} 🔄 다음 비용 검토 권장 주기: 주 1회
+"""
 
 def main():
     """메인 함수"""
