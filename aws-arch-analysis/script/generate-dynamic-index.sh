@@ -1,7 +1,7 @@
 #!/bin/bash
 # 동적 index.html 생성 스크립트 - 실제 AWS 데이터 기반
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
 HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
 SAMPLE_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/sample"
 
@@ -27,8 +27,14 @@ EBS_COUNT=$(jq '.rows | length' "$REPORT_DIR/storage_ebs_volumes.json" 2>/dev/nu
 [[ "$RDS_COUNT" =~ ^[0-9]+$ ]] || RDS_COUNT=0
 [[ "$EBS_COUNT" =~ ^[0-9]+$ ]] || EBS_COUNT=0
 
-# 비용 정보 (예시 - 실제로는 Cost Explorer API 사용)
-MONTHLY_COST="$55.38"
+# 비용 정보 (Cost Explorer 데이터에서 추출)
+MONTHLY_COST_RAW=$(jq -r '[.rows[].blended_cost_amount] | add' "$REPORT_DIR/cost_by_service_monthly.json" 2>/dev/null || echo "55.38")
+# 비용을 달러 형식으로 변환
+if [[ "$MONTHLY_COST_RAW" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+    MONTHLY_COST=$(printf "\$%.2f" "$MONTHLY_COST_RAW")
+else
+    MONTHLY_COST="\$55.38"  # 기본값
+fi
 
 # 성숙도 점수 계산 (간단한 로직)
 MATURITY_SCORE="7.1"

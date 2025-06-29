@@ -213,6 +213,49 @@ convert_markdown_to_html() {
 import re
 import sys
 
+def convert_numbered_recommendations(text):
+    """번호가 매겨진 권장사항을 HTML로 변환"""
+    # 1. **제목**: 내용 형태를 처리
+    pattern = r'^(\d+)\.\s*\*\*([^*]+)\*\*:\s*(.+)$'
+    
+    lines = text.split('\n')
+    result = []
+    in_recommendations = False
+    
+    for line in lines:
+        # 권장사항 섹션 시작 감지
+        if '권장사항' in line and ('##' in line or '###' in line):
+            in_recommendations = True
+            result.append(line)
+            continue
+        
+        # 다른 섹션 시작 시 권장사항 섹션 종료
+        if line.startswith('##') and in_recommendations and '권장사항' not in line:
+            in_recommendations = False
+        
+        # 권장사항 목록 처리
+        if in_recommendations and re.match(pattern, line.strip()):
+            match = re.match(pattern, line.strip())
+            if match:
+                number = match.group(1)
+                title = match.group(2)
+                content = match.group(3)
+                
+                # HTML 형태로 변환
+                html_line = f'<div class="recommendation-item">'
+                html_line += f'<div class="recommendation-number">{number}</div>'
+                html_line += f'<div class="recommendation-content">'
+                html_line += f'<strong class="recommendation-title">{title}</strong>: '
+                html_line += f'<span class="recommendation-text">{content}</span>'
+                html_line += f'</div></div>'
+                
+                result.append(html_line)
+                continue
+        
+        result.append(line)
+    
+    return '\n'.join(result)
+
 def convert_markdown_table(text):
     """Markdown 테이블을 HTML 테이블로 변환"""
     lines = text.split('\n')
@@ -588,6 +631,12 @@ EOF
 )
         
         generate_html_template "$title" "$content" "$html_file"
+        
+        # 권장사항이 포함된 파일인 경우 추가 개선 적용
+        if [[ "$html_file" == *"recommendations"* ]] || [[ "$html_file" == *"monitoring"* ]] || [[ "$html_file" == *"security"* ]]; then
+            python3 "$SCRIPT_DIR/enhance-recommendations.py" "$HTML_DIR/$html_file" 2>/dev/null || true
+        fi
+        
         echo "✅ 완료: $html_file"
     else
         echo "⚠️ 파일 없음: $md_file"
