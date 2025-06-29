@@ -1,7 +1,7 @@
 #!/bin/bash
 # Markdown을 HTML로 변환하는 스크립트 (간단한 버전)
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
 HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
 
 echo "📝 Markdown 파일들을 HTML로 변환 시작..."
@@ -604,12 +604,12 @@ echo "🔄 변환 시작..."
 convert_markdown_to_html "01-executive-summary.md" "01-executive-summary.html" "경영진 요약"
 convert_markdown_to_html "02-networking-analysis.md" "02-networking-analysis.html" "네트워킹 분석"
 convert_markdown_to_html "03-compute-analysis.md" "03-compute-analysis.html" "컴퓨팅 분석"
-convert_markdown_to_html "04-database-analysis.md" "04-database-analysis.html" "데이터베이스 분석"
-convert_markdown_to_html "05-storage-analysis.md" "05-storage-analysis.html" "스토리지 분석"
+convert_markdown_to_html "04-storage-analysis.md" "04-storage-analysis.html" "스토리지 분석"
+convert_markdown_to_html "05-database-analysis.md" "05-database-analysis.html" "데이터베이스 분석"
 convert_markdown_to_html "06-security-analysis.md" "06-security-analysis.html" "보안 분석"
-convert_markdown_to_html "07-application-analysis.md" "07-application-analysis.html" "애플리케이션 분석"
-convert_markdown_to_html "08-monitoring-analysis.md" "08-monitoring-analysis.html" "모니터링 분석"
-convert_markdown_to_html "09-cost-optimization.md" "09-cost-optimization.html" "비용 최적화"
+convert_markdown_to_html "07-cost-optimization.md" "07-cost-optimization.html" "비용 최적화"
+convert_markdown_to_html "08-application-analysis.md" "08-application-analysis.html" "애플리케이션 분석"
+convert_markdown_to_html "09-monitoring-analysis.md" "09-monitoring-analysis.html" "모니터링 분석"
 convert_markdown_to_html "10-recommendations.md" "10-recommendations.html" "종합 권장사항"
 
 echo ""

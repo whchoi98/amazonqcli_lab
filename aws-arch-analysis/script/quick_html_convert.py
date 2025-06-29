@@ -108,7 +108,7 @@ def create_html_template(title, content, nav_links=""):
             <a href="07-application-analysis.html">🌐 애플리케이션</a>
             <a href="09-cost-optimization.html">💰 비용최적화</a>
             <a href="09-monitoring-analysis.html">📊 모니터링</a>
-            <a href="10-comprehensive-recommendations.html">🛠️ 권장사항</a>
+            <a href="10-recommendations.html">🛠️ 권장사항</a>
         </div>
         {content}
     </div>
@@ -163,7 +163,7 @@ def create_index_html(output_dir):
             <p>CloudWatch 등 모니터링 도구 활용 현황 분석</p>
         </div>
         <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: white;">
-            <h3><a href="10-comprehensive-recommendations.html" style="text-decoration: none; color: #2c3e50;">🛠️ 종합 권장사항</a></h3>
+            <h3><a href="10-recommendations.html" style="text-decoration: none; color: #2c3e50;">🛠️ 종합 권장사항</a></h3>
             <p>전체 분석 결과를 바탕으로 한 통합 권장사항</p>
         </div>
     </div>

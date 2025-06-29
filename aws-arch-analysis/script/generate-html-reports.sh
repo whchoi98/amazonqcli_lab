@@ -1,7 +1,7 @@
 #!/bin/bash
 # HTML 보고서 생성 스크립트 - 샘플 기반 동적 생성
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
 HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
 SAMPLE_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/sample"
 SCRIPT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/script"
@@ -318,22 +318,6 @@ else
     echo "💡 수동으로 변환하려면: cd $SCRIPT_DIR && ./convert-md-to-html.sh"
 fi
 
-# 11. 자동 압축 파일 생성
-echo ""
-echo "📦 보고서 압축 파일 생성 중..."
-if [ -f "$SCRIPT_DIR/compress-html-reports.sh" ]; then
-    cd "$SCRIPT_DIR"
-    ./compress-html-reports.sh
-    if [ $? -eq 0 ]; then
-        echo "✅ 압축 파일 생성 완료!"
-    else
-        echo "⚠️ 압축 파일 생성에서 오류가 발생했습니다."
-    fi
-else
-    echo "❌ 압축 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/compress-html-reports.sh"
-    echo "💡 수동으로 압축하려면: cd $SCRIPT_DIR && ./compress-html-reports.sh"
-fi
-
 # 5. 자동 압축 파일 생성
 echo ""
 echo "📦 보고서 압축 파일 생성 중..."
@@ -377,22 +361,6 @@ fi
 
 # 원래 디렉토리로 복귀
 cd "$CURRENT_DIR"
-
-# 11. 자동 압축 파일 생성
-echo ""
-echo "📦 보고서 압축 파일 생성 중..."
-if [ -f "$SCRIPT_DIR/compress-html-reports.sh" ]; then
-    cd "$SCRIPT_DIR"
-    ./compress-html-reports.sh
-    if [ $? -eq 0 ]; then
-        echo "✅ 압축 파일 생성 완료!"
-    else
-        echo "⚠️ 압축 파일 생성에서 오류가 발생했습니다."
-    fi
-else
-    echo "❌ 압축 스크립트를 찾을 수 없습니다: $SCRIPT_DIR/compress-html-reports.sh"
-    echo "💡 수동으로 압축하려면: cd $SCRIPT_DIR && ./compress-html-reports.sh"
-fi
 
 # 6. 결과 확인 및 요약
 echo ""

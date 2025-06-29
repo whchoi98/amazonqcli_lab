@@ -327,7 +327,7 @@ cat >> "$HTML_DIR/index.html" << EOF
                 <span class="score fair">점수: 5.5/10</span>
             </div>
             
-            <div class="nav-card" onclick="openReport('10-comprehensive-recommendations.html')">
+            <div class="nav-card" onclick="openReport('10-recommendations.html')">
                 <h3>🎯 종합 분석 및 권장사항</h3>
                 <p>전체 분석 결과를 바탕으로 한 전략적 권장사항 및 로드맵</p>
                 <span class="score good">우선순위 정의</span>
