@@ -90,22 +90,22 @@ q --profile aws-analysis aws sts get-caller-identity로 프로파일이 제대�
 
 **01단계 프롬프트:**
 ```
-prompt/01-role-and-environment.md 파일을 읽어서 AWS 계정 분석을 위한 시니어 클라우드 아키텍트 역할을 설정해줘.
+01-role-and-environment.md를 실행해줘.
 ```
 
 **02단계 프롬프트:**
 ```
-prompt/02-data-collection-guide.md를 참고해서 script/collect_all_data.py를 실행해서 AWS 계정의 모든 리소스 데이터를 수집해줘.
+02-data-collection-guide.md를 실행해줘.
 ```
 
 **03단계 프롬프트:**
 ```
-prompt/03-report-generation-guide.md를 기반으로 script/generate_all_reports.py를 실행해서 10개의 Enhanced 분석 보고서를 생성해줘.
+03-report-generation-guide.md를 실행해줘.
 ```
 
 **04단계 프롬프트:**
 ```
-prompt/04-html-conversion-guide.md를 참고해서 script/convert-md-to-html-simple.sh를 실행해서 Markdown 보고서를 전문적인 HTML로 변환해줘.
+04-html-conversion-guide.md를 실행해줘.
 ```
 
 ## 📖 단계별 실행 가이드 (Amazon Q CLI 자연어 실행)
@@ -116,8 +116,7 @@ prompt/04-html-conversion-guide.md를 참고해서 script/convert-md-to-html-sim
 
 **Amazon Q CLI에서 실행할 프롬프트:**
 ```
-prompt/01-role-and-environment.md 파일의 내용을 읽어서 AWS 계정 분석을 위한 시니어 클라우드 아키텍트 역할을 설정해줘. 
-분석 환경은 ap-northeast-2 리전을 기본으로 하고, 전체 AWS 계정 리소스를 대상으로 한국어 보고서를 생성할 예정이야.
+01-role-and-environment.md를 실행해줘.
 ```
 
 **주요 내용:**
@@ -132,8 +131,7 @@ prompt/01-role-and-environment.md 파일의 내용을 읽어서 AWS 계정 분�
 
 **Amazon Q CLI에서 실행할 프롬프트:**
 ```
-prompt/02-data-collection-guide.md 파일을 참고해서 AWS 계정의 모든 리소스 데이터를 수집해줘.
-script/collect_all_data.py 스크립트를 실행해서 네트워킹, 컴퓨팅, 컨테이너, 스토리지, 데이터베이스, 보안, 모니터링, 애플리케이션, 비용 등 9개 영역의 데이터를 종합적으로 수집해줘.
+02-data-collection-guide.md 파일을 참고해서 AWS 계정의 모든 리소스 데이터를 수집해줘.
 ```
 
 **수집되는 데이터:**
@@ -150,8 +148,8 @@ script/collect_all_data.py 스크립트를 실행해서 네트워킹, 컴퓨팅,
 
 **Amazon Q CLI에서 실행할 프롬프트:**
 ```
-prompt/03-report-generation-guide.md 파일을 기반으로 수집된 AWS 데이터를 분석해서 Enhanced 보고서를 생성해줘.
-script/generate_all_reports.py를 실행해서 경영진 요약부터 종합 권장사항까지 10개의 전문적인 분석 보고서를 만들어줘.
+03-report-generation-guide.md 파일을 기반으로 수집된 AWS 데이터를 분석해서 Enhanced 보고서를 생성해줘.
+경영진 요약부터 종합 권장사항까지 10개의 전문적인 분석 보고서를 만들어줘.
 각 보고서는 데이터 기반의 정량적 권장사항을 포함하고, 우선순위별로 분류해서 실행 가능한 개선안을 제시해줘.
 ```
 
@@ -178,7 +176,7 @@ script/generate_all_reports.py를 실행해서 경영진 요약부터 종합 권
 
 **Amazon Q CLI에서 실행할 프롬프트:**
 ```
-prompt/04-html-conversion-guide.md 파일을 참고해서 생성된 10개의 Markdown 보고서를 전문적인 HTML 형식으로 변환해줘.
+04-html-conversion-guide.md 파일을 참고해서 생성된 10개의 Markdown 보고서를 전문적인 HTML 형식으로 변환해줘.
 script/convert-md-to-html-simple.sh 스크립트를 실행해서 시각적으로 우수한 HTML 보고서를 만들고,
 필요하면 script/generate-html-reports.sh로 index.html과 assets 폴더까지 포함한 완전한 웹 보고서를 생성해줘.
 그라데이션 헤더, 호버 효과, 권장사항 박스 등 전문적인 스타일링을 적용해줘.
@@ -190,11 +188,6 @@ script/convert-md-to-html-simple.sh 스크립트를 실행해서 시각적으로
 - **assets 폴더** (CSS, JS 스타일링)
 - **전문적 스타일링** (그라데이션, 호버 효과, 권장사항 박스)
 
-**변환 검증 프롬프트:**
-```
-script/validate-html-conversion.sh 스크립트를 실행해서 HTML 변환이 제대로 완료되었는지 확인해줘.
-10개 HTML 파일과 index.html, assets 폴더가 모두 생성되었는지 검증하고 결과를 알려줘.
-```
 
 ## 📁 디렉토리 구조
 

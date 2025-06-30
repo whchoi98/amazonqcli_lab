@@ -68,19 +68,63 @@ generate_html_template() {
         }
         
         .analysis-table thead {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            color: #ffffff;
+            background: #f8f9fa !important;
+            color: #000000;
         }
         
         .analysis-table th {
-            color: #ffffff !important;
+            color: #000000 !important;
             font-weight: 700;
             font-size: 14px;
             letter-spacing: 0.3px;
             padding: 16px 14px;
             text-align: left;
             border-bottom: 2px solid #2980b9;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            background: #f8f9fa !important;
+        }
+        
+        /* 테이블 헤더만 검정색 볼드 */
+        table th,
+        .report-content th {
+            color: #000000 !important;
+            font-weight: 700;
+            background-color: #f8f9fa !important;
+        }
+        
+        /* 테이블 헤더 링크도 검정색 */
+        table th a,
+        .report-content th a {
+            color: #000000 !important;
+            text-decoration: none;
+        }
+        
+        table th a:hover,
+        .report-content th a:hover {
+            color: #333333 !important;
+            text-decoration: underline;
+        }
+        
+        /* 일반 테이블 셀은 기본 스타일 */
+        table td {
+            color: #2c3e50 !important;
+            font-weight: 500;
+        }
+        
+        /* 첫 번째 열만 약간 진하게 (헤더 제외) */
+        table td:first-child {
+            color: #000000 !important;
+            font-weight: 600;
+        }
+        
+        /* 첫 번째 열 링크 */
+        table td:first-child a {
+            color: #000000 !important;
+            text-decoration: none;
+        }
+        
+        table td:first-child a:hover {
+            color: #333333 !important;
+            text-decoration: underline;
         }
         
         .analysis-table td {
@@ -178,7 +222,11 @@ generate_html_template() {
             padding: 8px; 
             text-align: left; 
         }
-        .report-content th { background-color: #f2f2f2; }
+        .report-content th { 
+            background-color: #f8f9fa !important; 
+            color: #000000 !important;
+            font-weight: 700;
+        }
         .report-content code { 
             background: #f4f4f4; 
             padding: 2px 4px; 

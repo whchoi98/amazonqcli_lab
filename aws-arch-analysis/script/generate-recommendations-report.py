@@ -146,7 +146,7 @@ class RecommendationsReportGenerator:
         return f"""## 📊 Executive Summary
 
 ### 아키텍처 성숙도 종합 평가
-본 분석은 AWS Well-Architected Framework의 5개 기둥을 기준으로 현재 인프라의 성숙도를 평가하고, 
+본 분석은 AWS Well-Architected Framework의 5개 핵심사상을 기준으로 현재 인프라의 성숙도를 평가하고, 
 우선순위별 개선 방안을 제시합니다.
 
 ---
