@@ -1,7 +1,12 @@
 #!/bin/bash
 # HTML 보고서 자동 압축 스크립트
 
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# 상대 경로로 디렉토리 설정
+HTML_DIR="${PROJECT_ROOT}/html-report"
 
 echo "📦 HTML 보고서 압축 파일 생성 중..."
 

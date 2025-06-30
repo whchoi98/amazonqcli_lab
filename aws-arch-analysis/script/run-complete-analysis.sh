@@ -1,9 +1,14 @@
 #!/bin/bash
 # AWS 아키텍처 분석 전체 프로세스 실행 스크립트
 
-SCRIPT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/script"
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# 상대 경로로 디렉토리 설정
+SCRIPT_DIR="${PROJECT_ROOT}/aws-arch-analysis/script"
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
+HTML_DIR="${PROJECT_ROOT}/html-report"
 
 echo "🚀 AWS 아키텍처 분석 전체 프로세스 시작..."
 echo "📅 시작 시간: $(date)"

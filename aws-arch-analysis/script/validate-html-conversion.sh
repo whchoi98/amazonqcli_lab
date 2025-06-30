@@ -1,8 +1,13 @@
 #!/bin/bash
 # HTML 변환 결과 자동 검증 스크립트
 
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# 상대 경로로 디렉토리 설정
+HTML_DIR="${PROJECT_ROOT}/html-report"
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
 
 echo "🔍 HTML 변환 결과 검증 시작..."
 echo "📅 검증 시간: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -46,12 +51,12 @@ required_files=(
     "01-executive-summary.html:경영진 요약"
     "02-networking-analysis.html:네트워킹 분석"
     "03-compute-analysis.html:컴퓨팅 분석"
+    "04-storage-analysis.html:스토리지 분석"
     "05-database-analysis.html:데이터베이스 분석"
-    "05-storage-analysis.html:스토리지 분석"
     "06-security-analysis.html:보안 분석"
-    "07-application-analysis.html:애플리케이션 분석"
-    "08-monitoring-analysis.html:모니터링 분석"
-    "09-cost-optimization.html:비용 최적화"
+    "07-cost-optimization.html:비용 최적화"
+    "08-application-analysis.html:애플리케이션 분석"
+    "09-monitoring-analysis.html:모니터링 분석"
     "10-recommendations.html:종합 권장사항"
 )
 

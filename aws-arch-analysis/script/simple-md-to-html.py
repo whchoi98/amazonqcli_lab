@@ -8,20 +8,24 @@ import sys
 from pathlib import Path
 
 def process_markdown_formatting(text):
-    """기본 Markdown 포맷팅을 HTML로 변환"""
+    """기본 Markdown 포맷팅을 HTML로 변환 - 개선된 버전"""
     if not text:
         return text
     
-    # 1. 볼드 텍스트 (**text** -> <strong>text</strong>)
-    text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+    # 1. 볼드 텍스트 (**text** -> <strong>text</strong>) - 더 강화된 패턴
+    # 다양한 케이스 처리: **텍스트**, **텍스트 with spaces**, **한글텍스트**
+    text = re.sub(r'\*\*([^*\n]+?)\*\*', r'<strong>\1</strong>', text)
     
-    # 2. 이탤릭 텍스트 (*text* -> <em>text</em>)
+    # 2. 추가 볼드 패턴 - 줄바꿈이 포함된 경우도 처리
+    text = re.sub(r'\*\*([^*]+?)\*\*', r'<strong>\1</strong>', text, flags=re.DOTALL)
+    
+    # 3. 이탤릭 텍스트 (*text* -> <em>text</em>) - 볼드와 충돌하지 않도록 개선
     text = re.sub(r'(?<!\*)\*([^*\n]+?)\*(?!\*)', r'<em>\1</em>', text)
     
-    # 3. 인라인 코드
+    # 4. 인라인 코드
     text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
     
-    # 4. 링크
+    # 5. 링크
     text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', text)
     
     return text
@@ -216,7 +220,11 @@ def main():
         sys.exit(1)
     
     md_file = sys.argv[1]
-    report_dir = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
+    
+    # 스크립트 위치 기반 상대 경로 설정
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.join(script_dir, "..", "..")
+    report_dir = os.path.join(project_root, "aws-arch-analysis", "report")
     
     try:
         file_path = os.path.join(report_dir, md_file)

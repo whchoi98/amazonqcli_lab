@@ -1,9 +1,14 @@
 #!/bin/bash
 # 간단한 Markdown to HTML 변환 스크립트
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
-SCRIPT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/script"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# 상대 경로로 디렉토리 설정
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
+HTML_DIR="${PROJECT_ROOT}/html-report"
+SCRIPT_DIR="${PROJECT_ROOT}/aws-arch-analysis/script"
 
 echo "📝 Markdown 파일들을 HTML로 변환 시작..."
 

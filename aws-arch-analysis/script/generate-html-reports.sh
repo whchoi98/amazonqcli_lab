@@ -1,10 +1,15 @@
 #!/bin/bash
 # HTML 보고서 생성 스크립트 - 샘플 기반 동적 생성
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
-HTML_DIR="/home/ec2-user/amazonqcli_lab/html-report"
-SAMPLE_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/sample"
-SCRIPT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/script"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# 상대 경로로 디렉토리 설정
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
+HTML_DIR="${PROJECT_ROOT}/html-report"
+SAMPLE_DIR="${PROJECT_ROOT}/aws-arch-analysis/sample"
+SCRIPT_DIR="${PROJECT_ROOT}/aws-arch-analysis/script"
 
 echo "🌐 HTML 보고서 생성 시작..."
 echo "📁 출력 디렉토리: $HTML_DIR"
