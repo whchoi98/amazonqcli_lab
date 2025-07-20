@@ -13,7 +13,12 @@ from typing import List, Tuple
 from datetime import datetime
 
 class SteampipeCostCollector:
-    def __init__(self, region: str = "ap-northeast-2", report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+    def __init__(self, region: str = "ap-northeast-2", report_dir: str = None):
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        if report_dir is None:
+            script_dir = Path(__file__).parent
+            project_root = script_dir.parent.parent
+            report_dir = str(project_root / "aws-arch-analysis" / "report")
         self.region = region
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)

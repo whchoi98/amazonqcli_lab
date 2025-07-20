@@ -4,8 +4,12 @@ import os
 from datetime import datetime
 
 def main():
-    input_file = "/home/ec2-user/report/aws-resources-detailed-report.md"
-    output_file = "/home/ec2-user/report/aws-resources-style-based.html"
+    # 스크립트의 실제 위치를 기준으로 경로 설정
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    
+    input_file = str(project_root / "aws-arch-analysis" / "report" / "aws-resources-detailed-report.md")
+    output_file = str(project_root / "aws-arch-analysis" / "report" / "aws-resources-style-based.html")
     
     # Convert markdown to HTML
     md = markdown.Markdown(extensions=['markdown.extensions.tables', 'markdown.extensions.toc'])

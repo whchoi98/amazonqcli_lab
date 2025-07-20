@@ -95,7 +95,10 @@ def main():
     print(f"📅 완료 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # 보고서 파일 확인
-    report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
+    # 스크립트의 실제 위치를 기준으로 경로 설정
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    report_dir = project_root / "aws-arch-analysis" / "report"
     if report_dir.exists():
         md_files = list(report_dir.glob("*.md"))
         total_size = sum(f.stat().st_size for f in md_files)

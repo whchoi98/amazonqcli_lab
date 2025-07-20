@@ -20,7 +20,10 @@ NC='\033[0m' # No Color
 
 # 전역 변수
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+OUTPUT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
 SUCCESSFUL_COLLECTIONS=0
 TOTAL_ITEMS=0
 TOTAL_QUERIES=0

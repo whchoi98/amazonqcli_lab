@@ -109,6 +109,18 @@ cat > ~/.aws/amazonq/mcp.json << 'EOF'
           "FASTMCP_LOG_LEVEL": "ERROR"
         },
         "transportType": "stdio"
+      },
+      "awslabs.cloudwatch-mcp-server": {
+        "autoApprove": [],
+        "disabled": false,
+        "command": "uvx",
+        "args": [
+          "awslabs.cloudwatch-mcp-server@latest"
+        ],
+        "env": {
+          "FASTMCP_LOG_LEVEL": "ERROR"
+        },
+        "transportType": "stdio"
       }
     }
 }
@@ -129,6 +141,7 @@ echo "   🌍 awslabs.terraform-mcp-server - Terraform 지원"
 echo "   ⚓ kubernetes - Kubernetes 관리"
 echo "   🎭 playwright - 웹 브라우저 자동화"
 echo "   🚀 awslabs.eks-mcp-server - EKS 클러스터 관리"
+echo "   📈 awslabs.cloudwatch-mcp-server - CloudWatch 모니터링 및 로그 분석"
 
 echo ""
 echo "======================================================"

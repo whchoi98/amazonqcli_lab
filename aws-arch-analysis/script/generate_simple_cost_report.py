@@ -10,7 +10,12 @@ from datetime import datetime
 from pathlib import Path
 
 class SimpleCostReportGenerator:
-    def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+    def __init__(self, report_dir: str = None):
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        if report_dir is None:
+            script_dir = Path(__file__).parent
+            project_root = script_dir.parent.parent
+            report_dir = str(project_root / "aws-arch-analysis" / "report")
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
         self.current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

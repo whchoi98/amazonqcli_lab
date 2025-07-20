@@ -4,7 +4,10 @@
 
 # 설정 변수
 REGION="${AWS_REGION:-ap-northeast-2}"
-REPORT_DIR="${REPORT_DIR:-/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report}"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPORT_DIR="${REPORT_DIR:-${PROJECT_ROOT}/aws-arch-analysis/report}"
 OUTPUT_FILE="$REPORT_DIR/08-application-analysis.md"
 
 # 색상 정의

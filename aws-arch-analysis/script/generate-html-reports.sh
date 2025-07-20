@@ -257,7 +257,7 @@ echo "✅ 모든 JavaScript 파일 생성 완료"
 echo "📋 실제 AWS 데이터 기반 JSON 데이터 파일 생성 중..."
 
 # 실제 데이터에서 리소스 수 추출
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
+# 이미 동적 경로 설정됨
 EC2_COUNT=$(jq '.rows | length' "$REPORT_DIR/compute_ec2_instances.json" 2>/dev/null || echo "34")
 VPC_COUNT=$(jq '.rows | length' "$REPORT_DIR/networking_vpc.json" 2>/dev/null || echo "5")
 RDS_COUNT=$(jq '.rows | length' "$REPORT_DIR/database_rds_instances.json" 2>/dev/null || echo "2")

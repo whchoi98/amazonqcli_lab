@@ -1,7 +1,10 @@
 #!/bin/bash
 # Executive Summary 보고서 생성 스크립트
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "N/A")
 REGION="ap-northeast-2"
 ANALYSIS_DATE=$(date +"%Y-%m-%d")

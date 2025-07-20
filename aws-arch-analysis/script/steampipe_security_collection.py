@@ -15,7 +15,10 @@ from datetime import datetime
 class SteampipeSecurityCollector:
     def __init__(self, region: str = "ap-northeast-2"):
         self.region = region
-        self.report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        script_dir = Path(__file__).parent
+        project_root = script_dir.parent.parent
+        self.report_dir = project_root / "aws-arch-analysis" / "report"
         self.report_dir.mkdir(parents=True, exist_ok=True)
         self.total_count = 0
         self.success_count = 0

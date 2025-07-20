@@ -197,8 +197,12 @@ def create_index_html(output_dir):
 
 def convert_markdown_to_html():
     """Markdown 파일들을 HTML로 변환"""
-    input_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
-    output_dir = Path("/home/ec2-user/amazonqcli_lab/html-report")
+    # 스크립트의 실제 위치를 기준으로 경로 설정
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    
+    input_dir = project_root / "aws-arch-analysis" / "report"
+    output_dir = project_root / "html-report"
     
     # 출력 디렉토리 생성
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -269,9 +273,9 @@ if __name__ == "__main__":
     try:
         total_files = convert_markdown_to_html()
         print(f"\n🌐 브라우저에서 확인:")
-        print(f"  file:///home/ec2-user/amazonqcli_lab/html-report/index.html")
+        print(f"  file://{output_dir}/index.html")
         print(f"\n💡 로컬 웹 서버 실행:")
-        print(f"  cd /home/ec2-user/amazonqcli_lab/html-report")
+        print(f"  cd {output_dir}")
         print(f"  python3 -m http.server 8080")
         print(f"  브라우저에서 http://localhost:8080 접속")
         

@@ -14,7 +14,10 @@ from datetime import datetime
 class ReportGenerator:
     def __init__(self):
         self.script_dir = Path(__file__).parent
-        self.report_dir = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report")
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        script_dir = Path(__file__).parent
+        project_root = script_dir.parent.parent
+        self.report_dir = project_root / "aws-arch-analysis" / "report"
         self.report_dir.mkdir(parents=True, exist_ok=True)
         
         # 보고서 생성 스크립트 매핑 (실제 존재하는 스크립트만)
@@ -70,7 +73,7 @@ class ReportGenerator:
             
             if result.returncode == 0:
                 # 생성된 보고서를 올바른 위치로 이동
-                old_path = Path("/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report") / report_name
+                old_path = self.report_dir / report_name
                 new_path = self.report_dir / report_name
                 
                 if old_path.exists():

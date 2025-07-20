@@ -11,7 +11,12 @@ from pathlib import Path
 from typing import List, Tuple
 
 class SteampipeNetworkingCollector:
-    def __init__(self, region: str = "ap-northeast-2", report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+    def __init__(self, region: str = "ap-northeast-2", report_dir: str = None):
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        if report_dir is None:
+            script_dir = Path(__file__).parent
+            project_root = script_dir.parent.parent
+            report_dir = str(project_root / "aws-arch-analysis" / "report")
         self.region = region
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
@@ -324,7 +329,12 @@ def main():
     
     parser = argparse.ArgumentParser(description="Steampipe 기반 네트워킹 리소스 데이터 수집 (실제 스키마 기준)")
     parser.add_argument("--region", default=os.getenv("AWS_REGION", "ap-northeast-2"), help="AWS 리전")
-    parser.add_argument("--report-dir", default=os.getenv("REPORT_DIR", "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"), help="보고서 디렉토리")
+    # 스크립트의 실제 위치를 기준으로 기본 경로 설정
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    default_report_dir = str(project_root / "aws-arch-analysis" / "report")
+    
+    parser.add_argument("--report-dir", default=os.getenv("REPORT_DIR", default_report_dir), help="보고서 디렉토리")
     
     args = parser.parse_args()
     

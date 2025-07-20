@@ -11,7 +11,12 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 class ExecutiveSummaryGenerator:
-    def __init__(self, report_dir: str = "/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"):
+    def __init__(self, report_dir: str = None):
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        if report_dir is None:
+            script_dir = Path(__file__).parent
+            project_root = script_dir.parent.parent
+            report_dir = str(project_root / "aws-arch-analysis" / "report")
         self.report_dir = Path(report_dir)
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -178,7 +183,12 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="경영진 요약 보고서 생성")
-    parser.add_argument("--report-dir", default="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report", help="보고서 디렉토리")
+    # 스크립트의 실제 위치를 기준으로 기본 경로 설정
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    default_report_dir = str(project_root / "aws-arch-analysis" / "report")
+    
+    parser.add_argument("--report-dir", default=default_report_dir, help="보고서 디렉토리")
     
     args = parser.parse_args()
     

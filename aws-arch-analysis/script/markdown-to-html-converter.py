@@ -19,8 +19,15 @@ except ImportError:
     exit(1)
 
 class MarkdownToHtmlConverter:
-    def __init__(self, report_dir="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report", 
-                 output_dir="/home/ec2-user/amazonqcli_lab/html-report"):
+    def __init__(self, report_dir=None, output_dir=None):
+        # 스크립트의 실제 위치를 기준으로 경로 설정
+        script_dir = Path(__file__).parent
+        project_root = script_dir.parent.parent
+        
+        if report_dir is None:
+            report_dir = str(project_root / "aws-arch-analysis" / "report")
+        if output_dir is None:
+            output_dir = str(project_root / "html-report")
         self.report_dir = Path(report_dir)
         self.output_dir = Path(output_dir)
         self.account_id = self.get_account_id()

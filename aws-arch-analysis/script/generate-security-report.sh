@@ -2,7 +2,10 @@
 # Security Analysis 보고서 생성 스크립트 (Enhanced Version)
 # 수집된 보안 데이터를 바탕으로 종합적인 보안 태세 분석 보고서 생성
 
-REPORT_DIR="/home/ec2-user/amazonqcli_lab/aws-arch-analysis/report"
+# 스크립트의 실제 위치를 기준으로 경로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPORT_DIR="${PROJECT_ROOT}/aws-arch-analysis/report"
 cd $REPORT_DIR
 
 echo "🛡️ Security Analysis 보고서 생성 중..."
