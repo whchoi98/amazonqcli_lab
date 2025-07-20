@@ -49,11 +49,12 @@ cat > ~/.aws/amazonq/mcp.json << 'EOF'
         "disabled": false,
         "autoApprove": []
       },
-      "awslabs.cost-analysis-mcp-server": {
+      "awslabs.cost-explorer-mcp-server": {
         "command": "uvx",
-        "args": ["awslabs.cost-analysis-mcp-server@latest"],
+        "args": ["awslabs.cost-explorer-mcp-server@latest"],
         "env": {
-          "FASTMCP_LOG_LEVEL": "ERROR"
+          "FASTMCP_LOG_LEVEL": "ERROR",
+          "AWS_PROFILE": "your-aws-profile"
         },
         "disabled": false,
         "autoApprove": []
@@ -98,17 +99,18 @@ cat > ~/.aws/amazonq/mcp.json << 'EOF'
         ]
       },
       "awslabs.eks-mcp-server": {
-        "autoApprove": [],
-        "disabled": false,
         "command": "uvx",
         "args": [
           "awslabs.eks-mcp-server@latest",
-          "--allow-write"
+          "--allow-write",
+          "--allow-sensitive-data-access"
         ],
         "env": {
           "FASTMCP_LOG_LEVEL": "ERROR"
         },
-        "transportType": "stdio"
+        "autoApprove": [],
+        "disabled": false
+      }
       },
       "awslabs.cloudwatch-mcp-server": {
         "autoApprove": [],
