@@ -110,7 +110,6 @@ cat > ~/.aws/amazonq/mcp.json << 'EOF'
         },
         "autoApprove": [],
         "disabled": false
-      }
       },
       "awslabs.cloudwatch-mcp-server": {
         "autoApprove": [],
