@@ -1,22 +1,33 @@
+bash
 #!/bin/bash
 
-# 🛠️ Amazon Q MCP 서버 설정 스크립트
-# MCP (Model Context Protocol) 서버들을 설정하여 Amazon Q의 기능을 확장합니다.
+# 🛠️ Kiro CLI MCP 서버 설정 스크립트
+# MCP (Model Context Protocol) 서버들을 설정하여 Kiro의 기능을 확장합니다.
 
 set -e
 
 echo "======================================================"
-echo "🚀 Amazon Q MCP 서버 설정 시작"
+echo "🚀 Kiro MCP 서버 설정 시작"
 echo "======================================================"
 
-# 1. 먼저 디렉토리가 존재하는지 확인하고 필요하면 생성합니다
-echo "📁 [1/2] MCP 설정 디렉토리 생성 중..."
-mkdir -p ~/.aws/amazonq/
-echo "✅ 디렉토리 생성 완료: ~/.aws/amazonq/"
+# 1. 디렉토리 생성
+echo "📁 [1/3] MCP 설정 디렉토리 생성 중..."
+mkdir -p ~/.kiro/
+echo "✅ 디렉토리 생성 완료: ~/.kiro/"
 
-# 2. MCP 설정 파일 생성
-echo "📝 [2/2] MCP 설정 파일 생성 중..."
-cat > ~/.aws/amazonq/mcp.json << 'EOF'
+# 2. uvx 설치 확인
+echo "🔍 [2/3] uvx 설치 확인 중..."
+if ! command -v uvx &> /dev/null; then
+    echo "⚠️  uvx가 설치되어 있지 않습니다. 설치 중..."
+    pip install uv
+    echo "✅ uvx 설치 완료"
+else
+    echo "✅ uvx가 이미 설치되어 있습니다"
+fi
+
+# 3. MCP 설정 파일 생성
+echo "📝 [3/3] MCP 설정 파일 생성 중..."
+cat > ~/.kiro/mcp.json << 'EOF'
 {
   "mcpServers": {
     "aws-knowledge-mcp-server": {
@@ -181,9 +192,8 @@ cat > ~/.aws/amazonq/mcp.json << 'EOF'
 }
 EOF
 
-echo "✅ MCP 설정 파일 생성 완료: ~/.aws/amazonq/mcp.json"
+echo "✅ MCP 설정 파일 생성 완료: ~/.kiro/mcp.json"
 
-# 설정 파일 확인
 echo ""
 echo "📋 생성된 MCP 서버 목록:"
 echo "   🌐 aws-knowledge-mcp-server - AWS 지식 베이스 (HTTP)"
@@ -208,8 +218,8 @@ echo "======================================================"
 echo "🎉 MCP 서버 설정이 완료되었습니다!"
 echo ""
 echo "💡 사용 방법:"
-echo "   1. Amazon Q CLI를 재시작하세요"
+echo "   1. Kiro CLI를 재시작하세요"
 echo "   2. 이제 확장된 기능들을 사용할 수 있습니다"
 echo ""
-echo "🔍 설정 파일 위치: ~/.aws/amazonq/mcp.json"
+echo "🔍 설정 파일 위치: ~/.kiro/mcp.json"
 echo "======================================================"
