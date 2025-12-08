@@ -12,8 +12,8 @@ echo "======================================================"
 
 # 1. 디렉토리 생성
 echo "📁 [1/3] MCP 설정 디렉토리 생성 중..."
-mkdir -p ~/.kiro/
-echo "✅ 디렉토리 생성 완료: ~/.kiro/"
+mkdir -p ~/.kiro/settings
+echo "✅ 디렉토리 생성 완료: ~/.kiro/settings"
 
 # 2. uvx 설치 확인
 echo "🔍 [2/3] uvx 설치 확인 중..."
@@ -27,7 +27,7 @@ fi
 
 # 3. MCP 설정 파일 생성
 echo "📝 [3/3] MCP 설정 파일 생성 중..."
-cat > ~/.kiro/mcp.json << 'EOF'
+cat > ~/.kiro/settings/mcp.json << 'EOF'
 {
   "mcpServers": {
     "aws-knowledge-mcp-server": {
@@ -192,7 +192,7 @@ cat > ~/.kiro/mcp.json << 'EOF'
 }
 EOF
 
-echo "✅ MCP 설정 파일 생성 완료: ~/.kiro/mcp.json"
+echo "✅ MCP 설정 파일 생성 완료: ~/.kiro/settings/mcp.json"
 
 echo ""
 echo "📋 생성된 MCP 서버 목록:"
@@ -220,6 +220,7 @@ echo ""
 echo "💡 사용 방법:"
 echo "   1. Kiro CLI를 재시작하세요"
 echo "   2. 이제 확장된 기능들을 사용할 수 있습니다"
+echo "   3. Kiro CLI 로그인 후 /mcp 명령으로 mcp server 로딩을 확인하세요."
 echo ""
-echo "🔍 설정 파일 위치: ~/.kiro/mcp.json"
+echo "🔍 설정 파일 위치: ~/.kiro/settings/mcp.json"
 echo "======================================================"
