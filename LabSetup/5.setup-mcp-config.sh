@@ -1,4 +1,3 @@
-bash
 #!/bin/bash
 
 # 🛠️ Kiro CLI MCP 서버 설정 스크립트
