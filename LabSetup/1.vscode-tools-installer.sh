@@ -5,9 +5,9 @@
 
 set -e
 
-KUBECTL_VERSION="1.31.3"
-HELM_VERSION="3.16.4"
-K9S_VERSION="0.32.7"
+KUBECTL_VERSION="1.33.0"
+HELM_VERSION="4.1.1"
+K9S_VERSION="0.50.18"
 CURRENT_USER=$(whoami)
 export HOME="/home/${CURRENT_USER}"
 
@@ -70,7 +70,7 @@ echo "------------------------------------------------------"
 echo "📦 [4/9] kubectl ${KUBECTL_VERSION} 설치 중..."
 echo "------------------------------------------------------"
 
-curl -sLO "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/2024-12-12/bin/linux/amd64/kubectl"
+curl -sLO "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/2025-05-01/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 kubectl version --client --output=yaml

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 최적화된 Amazon Q MCP 설정 스크립트
+# 최적화된 Kiro MCP 설정 스크립트
 # 현재 시스템 상태를 고려한 효율적인 설치
 
 set -e
 
 echo "======================================================"
-echo "🚀 최적화된 Amazon Q MCP 설정 시작"
+echo "🚀 최적화된 Kiro MCP 설정 시작"
 echo "======================================================"
 
 # 현재 상태 확인
@@ -93,6 +93,6 @@ echo ""
 echo "💡 다음 단계:"
 echo "   1. 새 터미널을 열거나 'source ~/.bashrc' 실행"
 echo "   2. './5.setup-mcp-config.sh' 실행하여 MCP 서버 설정"
-echo "   3. Amazon Q CLI 재시작"
-echo "   4. 'q chat' 명령어로 확장된 기능 사용"
+echo "   3. Kiro CLI 재시작"
+echo "   4. Kiro CLI 로그인 후 /mcp 명령으로 MCP 서버 로딩 확인"
 echo "======================================================"
