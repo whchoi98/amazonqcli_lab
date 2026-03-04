@@ -61,9 +61,9 @@ managedNodeGroups:
     volumeEncrypted: true
     # Node volume configuration
     # 노드 볼륨 설정
-    amiFamily: AmazonLinux2
-    # Use Amazon Linux 2 AMI
-    # Amazon Linux 2 AMI 사용
+    amiFamily: AmazonLinux2023
+    # Use Amazon Linux 2023 AMI
+    # Amazon Linux 2023 AMI 사용
     labels:
       nodegroup-type: "${PRIVATE_MGMD_NODE}"
       # Label for node group

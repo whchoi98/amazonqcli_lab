@@ -42,7 +42,7 @@ Kiro CLI와 MCP(Model Context Protocol) 서버를 활용한 AWS 인프라 실습
 ```
 
 ### 서비스 구성
-- **DMZ VPC**: 퍼블릭 서브넷, NAT Gateway, Redis, OpenSearch
+- **DMZ VPC**: 퍼블릭 서브넷, NAT Gateway, Valkey, OpenSearch
 - **VPC01**: 프라이빗 워크로드, Aurora MySQL
 - **VPC02**: 추가 워크로드 영역
 - **EKS**: 컨테이너 오케스트레이션 (선택적)
@@ -169,12 +169,12 @@ chmod +x *.sh
 
 ## 🔧 선택적 서비스 배포
 
-### Redis 클러스터
+### Valkey 클러스터
 ```bash
 ./0.deploy-redis.sh
 ```
 - **위치**: DMZ VPC
-- **구성**: ElastiCache Redis 클러스터
+- **구성**: ElastiCache Valkey 8.2 클러스터 모드 (2 샤드 x 2 노드)
 - **템플릿**: `redis-cluster-stack.yml`
 
 ### Aurora MySQL
@@ -215,7 +215,7 @@ LabSetup/
 ├── 배포 스크립트
 │   ├── 0.deploy-all-vpcs.sh          # VPC 일괄 배포
 │   ├── 0.deploy-tgw.sh               # Transit Gateway 배포
-│   ├── 0.deploy-redis.sh             # Redis 배포
+│   ├── 0.deploy-redis.sh             # Valkey 배포
 │   └── 0.deploy-aurora.sh            # Aurora MySQL 배포
 ├── 환경 설정 스크립트
 │   ├── 1.vscode-tools-installer.sh   # 개발 도구 설치
@@ -236,7 +236,7 @@ LabSetup/
     ├── 3.VPC02.yml                   # VPC02 템플릿
     ├── 4.TGW.yml                     # Transit Gateway 템플릿
     ├── aurora-mysql-stack.yml        # Aurora MySQL 템플릿
-    ├── redis-cluster-stack.yml       # Redis 클러스터 템플릿
+    ├── redis-cluster-stack.yml       # Valkey 클러스터 템플릿
     └── opensearch-stack.yml          # OpenSearch 템플릿
 ```
 
