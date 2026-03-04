@@ -63,6 +63,7 @@ echo "🔧 [2/3] EKS 환경변수 설정 중..."
 EKSCLUSTER_NAME="eksworkshop"
 EKS_VERSION="1.33"
 INSTANCE_TYPE="m6i.xlarge"
+PUBLIC_MGMD_NODE="managed-frontend-workloads"
 PRIVATE_MGMD_NODE="managed-backend-workloads"
 
 echo "✅ EKS 환경변수 설정 완료"

@@ -1,11 +1,11 @@
 #!/bin/bash
-# dmz_eks_cleanup.sh: DMZPVPC EKS 클러스터 삭제 스크립트
+# dmz_eks_cleanup.sh: DMZVPC EKS 클러스터 삭제 스크립트
 
 set -e
 
 source ~/.bash_profile
 
-echo "🗑️  DMZPVPC EKS 클러스터 삭제 시작"
+echo "🗑️  DMZVPC EKS 클러스터 삭제 시작"
 echo ""
 echo "⚠️  주의: 이 작업은 다음을 삭제합니다:"
 echo "   - EKS 클러스터: ${EKSCLUSTER_NAME}"
@@ -23,8 +23,8 @@ echo "🚀 EKS 클러스터 삭제를 시작합니다..."
 echo "⏰ 예상 소요 시간: 10-15분"
 
 # EKS 클러스터 삭제 실행
-if [[ -f ~/amazonqcli_lab/LabSetup/ekscluster.yaml ]]; then
-    eksctl delete cluster -f ~/amazonqcli_lab/LabSetup/ekscluster.yaml 
+if [[ -f $HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml ]]; then
+    eksctl delete cluster -f $HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml
 else
     eksctl delete cluster --name ${EKSCLUSTER_NAME} --region ${AWS_REGION}
 fi

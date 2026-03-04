@@ -79,7 +79,7 @@ echo "   ⚠️  배포 중에는 중단하지 마세요!"
 
 aws cloudformation deploy \
   --stack-name VPC01-Aurora-MySQL \
-  --template-file "~/amazonqcli_lab/LabSetup/aurora-mysql-stack.yml" \
+  --template-file "$HOME/amazonqcli_lab/LabSetup/aurora-mysql-stack.yml" \
   --parameter-overrides \
     VPC01StackName=VPC01 \
     DBName=$DB_NAME \

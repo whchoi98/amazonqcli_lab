@@ -72,7 +72,7 @@ cat > ~/.kiro/settings/mcp_commented.json << 'EOF'
     // Diagram MCP - AWS 아키텍처 다이어그램 생성
     "awslabs.aws-diagram-mcp-server": {
       "command": "uvx",
-      "args": ["awslabs.aws-diagram-mcp-server"],
+      "args": ["awslabs.aws-diagram-mcp-server@latest"],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
       },
@@ -249,7 +249,7 @@ cat > ~/.kiro/settings/mcp.json << 'EOF'
     },
     "awslabs.aws-diagram-mcp-server": {
       "command": "uvx",
-      "args": ["awslabs.aws-diagram-mcp-server"],
+      "args": ["awslabs.aws-diagram-mcp-server@latest"],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
       },

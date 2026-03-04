@@ -52,12 +52,17 @@ fi
 
 # Node.js 버전 확인 및 업그레이드 (필요시)
 echo "📦 [4/6] Node.js 상태 확인..."
-NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -lt 18 ]; then
-    echo "   🔄 Node.js 업그레이드 중..."
+if ! command -v node &> /dev/null; then
+    echo "   🔄 Node.js 설치 중..."
     sudo dnf install -y nodejs npm
 else
-    echo "   ✅ Node.js 버전 적합 (v$(node --version))"
+    NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
+    if [ "$NODE_VERSION" -lt 18 ]; then
+        echo "   🔄 Node.js 업그레이드 중..."
+        sudo dnf install -y nodejs npm
+    else
+        echo "   ✅ Node.js 버전 적합 ($(node --version))"
+    fi
 fi
 
 # AWS Bedrock 액세스 확인

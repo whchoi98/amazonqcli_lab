@@ -27,7 +27,7 @@ echo "======================================================"
 echo ""
 echo "🔄 EKS 클러스터 구성 파일 생성 중..."
 
-cat > ~/amazonqcli_lab/LabSetup/eksworkshop.yaml << YAML_EOF
+cat > $HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml << YAML_EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
@@ -85,10 +85,10 @@ managedNodeGroups:
         cloudWatch: true
 
 cloudWatch:
-    clusterLogging:
-        enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-        # Enable CloudWatch logging for specified components
-        # 지정된 구성 요소에 대해 CloudWatch 로깅 활성화
+  clusterLogging:
+    enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+    # Enable CloudWatch logging for specified components
+    # 지정된 구성 요소에 대해 CloudWatch 로깅 활성화
 
 iam:
   withOIDC: true
@@ -96,17 +96,17 @@ iam:
   # 클러스터에 IAM OIDC 프로바이더 활성화
 
 addons:
-- name: vpc-cni
-  attachPolicyARNs:
-    - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-- name: coredns
-  version: latest
-- name: kube-proxy
-  version: latest
-- name: aws-ebs-csi-driver
-  wellKnownPolicies:
-    ebsCSIController: true
-    # Enable add-ons for network, storage, and DN
+  - name: vpc-cni
+    attachPolicyARNs:
+      - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies:
+      ebsCSIController: true
+    # Enable add-ons for network, storage, and DNS
 
 YAML_EOF
 

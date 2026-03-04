@@ -60,7 +60,7 @@ echo "   예상 소요 시간: 15-20분"
 
 aws cloudformation deploy \
   --stack-name ${STACK_NAME} \
-  --template-file "~/amazonqcli_lab/LabSetup/redis-cluster-stack.yml" \
+  --template-file "$HOME/amazonqcli_lab/LabSetup/redis-cluster-stack.yml" \
   --parameter-overrides \
     DMZVPCStackName=DMZVPC \
     NodeType=cache.t3.medium \

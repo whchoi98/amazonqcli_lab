@@ -56,12 +56,16 @@ echo "------------------------------------------------------"
 
 sudo yum -y install jq gettext bash-completion && echo "✅ 기본 유틸리티 설치 완료"
 
-# sponge 설치
+# sponge 설치 (moreutils 패키지)
 if ! command -v sponge &>/dev/null; then
-  echo "📦 sponge 수동 설치 중..."
-  curl -sLO https://raw.githubusercontent.com/joeyh/moreutils/master/sponge
-  chmod +x sponge
-  sudo mv sponge /usr/local/bin/
+  echo "📦 sponge 설치 중..."
+  sudo yum -y install moreutils 2>/dev/null || {
+    echo "   moreutils 패키지 없음, 소스에서 컴파일 중..."
+    curl -sLO https://raw.githubusercontent.com/joeyh/moreutils/master/sponge.c
+    gcc -o sponge sponge.c
+    sudo mv sponge /usr/local/bin/
+    rm -f sponge.c
+  }
   echo "✅ sponge 설치 완료"
 fi
 
@@ -75,7 +79,7 @@ chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 kubectl version --client --output=yaml
 kubectl completion bash > "${HOME}/.kubectl_completion"
-echo "source ${HOME}/.kubectl_completion" >> "${HOME}/.bashrc"
+grep -q 'source.*\.kubectl_completion' "${HOME}/.bashrc" 2>/dev/null || echo "source ${HOME}/.kubectl_completion" >> "${HOME}/.bashrc"
 source "${HOME}/.kubectl_completion" 2>/dev/null || true
 echo "✅ kubectl 설치 완료"
 
@@ -84,8 +88,12 @@ echo "------------------------------------------------------"
 echo "🔍 [5/9] fzf, kns, ktx 설치 중..."
 echo "------------------------------------------------------"
 
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install --all --no-zsh --no-fish --no-bash
+if [ -d ~/.fzf ]; then
+  cd ~/.fzf && git pull
+else
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+fi
+~/.fzf/install --all --no-zsh --no-fish
 
 wget -q https://raw.githubusercontent.com/blendle/kns/master/bin/kns
 wget -q https://raw.githubusercontent.com/blendle/kns/master/bin/ktx
@@ -93,7 +101,7 @@ chmod +x kns ktx
 sudo mv kns ktx /usr/local/bin/
 
 # kubectl 유용한 alias 추가
-echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L beta.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name -L karpenter.sh/capacity-type'" >> "${HOME}/.bashrc"
+grep -q 'alias kgn=' "${HOME}/.bashrc" 2>/dev/null || echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L beta.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name -L karpenter.sh/capacity-type'" >> "${HOME}/.bashrc"
 
 echo "✅ fzf, kns, ktx 설치 완료"
 
@@ -126,7 +134,7 @@ helm repo update
 
 # Helm 자동완성 설정
 helm completion bash > ~/.helm_completion
-echo "source ~/.helm_completion" >> "${HOME}/.bashrc"
+grep -q 'source.*\.helm_completion' "${HOME}/.bashrc" 2>/dev/null || echo "source ~/.helm_completion" >> "${HOME}/.bashrc"
 . ~/.helm_completion 2>/dev/null || true
 
 echo "✅ Helm 설치 완료"
@@ -150,7 +158,8 @@ echo "------------------------------------------------------"
 
 # /etc/profile.d/bash_completion.sh가 존재하면 로드
 if [ -f /etc/profile.d/bash_completion.sh ]; then
-  echo "[ -f /etc/profile.d/bash_completion.sh ] && . /etc/profile.d/bash_completion.sh" >> "${HOME}/.bash_profile"
+  grep -q 'bash_completion.sh' "${HOME}/.bash_profile" 2>/dev/null || \
+    echo "[ -f /etc/profile.d/bash_completion.sh ] && . /etc/profile.d/bash_completion.sh" >> "${HOME}/.bash_profile"
 fi
 
 # 설치된 도구 확인

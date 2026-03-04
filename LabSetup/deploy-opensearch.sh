@@ -75,7 +75,7 @@ echo "   ⚠️  배포 중에는 중단하지 마세요!"
 
 aws cloudformation deploy \
   --stack-name DMZVPC-OpenSearch \
-  --template-file "~/amazonqcli_lab/LabSetup/opensearch-stack.yml" \
+  --template-file "$HOME/amazonqcli_lab/LabSetup/opensearch-stack.yml" \
   --parameter-overrides \
     DMZVPCStackName=DMZVPC \
     OpenSearchDomainName=dmzvpc-opensearch \

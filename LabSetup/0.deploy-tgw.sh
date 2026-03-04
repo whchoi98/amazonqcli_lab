@@ -70,7 +70,7 @@ echo "   예상 소요 시간: 5-10분"
 aws cloudformation deploy \
   --region ${AWS_REGION} \
   --stack-name "TGW" \
-  --template-file "~/amazonqcli_lab/LabSetup/4.TGW.yml" \
+  --template-file "$HOME/amazonqcli_lab/LabSetup/4.TGW.yml" \
   --capabilities CAPABILITY_NAMED_IAM
 
 echo ""
