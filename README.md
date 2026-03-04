@@ -174,11 +174,11 @@ source ~/.bashrc
 
 ### Valkey 클러스터
 ```bash
-./0.deploy-redis.sh
+./0.deploy-valkey.sh
 ```
 - **위치**: DMZ VPC
 - **구성**: ElastiCache Valkey 8.2 클러스터 모드 (2 샤드 x 2 노드)
-- **템플릿**: `redis-cluster-stack.yml`
+- **템플릿**: `valkey-cluster-stack.yml`
 
 ### Aurora MySQL
 ```bash
@@ -218,7 +218,7 @@ LabSetup/
 ├── 배포 스크립트
 │   ├── 0.deploy-all-vpcs.sh          # VPC 일괄 배포
 │   ├── 0.deploy-tgw.sh               # Transit Gateway 배포
-│   ├── 0.deploy-redis.sh             # Valkey 배포
+│   ├── 0.deploy-valkey.sh             # Valkey 배포
 │   └── 0.deploy-aurora.sh            # Aurora MySQL 배포
 ├── 환경 설정 스크립트
 │   ├── 1.vscode-tools-installer.sh   # 개발 도구 설치
@@ -239,7 +239,7 @@ LabSetup/
     ├── 3.VPC02.yml                   # VPC02 템플릿
     ├── 4.TGW.yml                     # Transit Gateway 템플릿
     ├── aurora-mysql-stack.yml        # Aurora MySQL 템플릿
-    ├── redis-cluster-stack.yml       # Valkey 클러스터 템플릿
+    ├── valkey-cluster-stack.yml       # Valkey 클러스터 템플릿
     └── opensearch-stack.yml          # OpenSearch 템플릿
 ```
 

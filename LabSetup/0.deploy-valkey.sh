@@ -15,7 +15,7 @@ echo "======================================================"
 echo "📋 배포 정보:"
 echo "   - 리전: ${AWS_REGION}"
 echo "   - 스택 이름: ${STACK_NAME}"
-echo "   - 템플릿: ~/amazonqcli_lab/LabSetup/redis-cluster-stack.yml"
+echo "   - 템플릿: ~/amazonqcli_lab/LabSetup/valkey-cluster-stack.yml"
 echo "   - 노드 타입: cache.t3.medium"
 echo "   - 구성: 클러스터 모드 (2 샤드 x 2 노드)"
 echo "   - 엔진: Valkey 8.2"
@@ -60,7 +60,7 @@ echo "   예상 소요 시간: 15-20분"
 
 aws cloudformation deploy \
   --stack-name ${STACK_NAME} \
-  --template-file "$HOME/amazonqcli_lab/LabSetup/redis-cluster-stack.yml" \
+  --template-file "$HOME/amazonqcli_lab/LabSetup/valkey-cluster-stack.yml" \
   --parameter-overrides \
     DMZVPCStackName=DMZVPC \
     NodeType=cache.t3.medium \
