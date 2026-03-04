@@ -74,7 +74,21 @@ cd amazonqcli_lab/LabSetup
 chmod +x *.sh
 ```
 
-### 3. 기본 인프라 배포 (병렬 실행)
+### 3. 개발 환경 설정 (먼저 실행)
+```bash
+# AWS CLI, kubectl, helm 등 개발 도구 설치 (약 5-10분 소요)
+./1.vscode-tools-installer.sh
+
+# AWS 환경 변수 설정 (Account ID, Region)
+./2.set-aws-env.sh
+source ~/.bash_profile
+
+# KMS 키 구성
+./3.kms-setup.sh
+source ~/.bash_profile
+```
+
+### 4. 인프라 배포 (병렬 실행)
 ```bash
 # 모든 VPC 동시 배포 (약 10-15분 소요)
 ./0.deploy-all-vpcs.sh
@@ -83,22 +97,11 @@ chmod +x *.sh
 ./0.deploy-tgw.sh
 ```
 
-### 4. 개발 환경 설정
-```bash
-# VSCode 및 개발 도구 설치 (약 5-10분 소요)
-./1.vscode-tools-installer.sh
-
-# AWS 환경 변수 설정
-./2.set-aws-env.sh
-
-# KMS 키 구성
-./3.kms-setup.sh
-```
-
 ### 5. Kiro CLI 및 MCP 설정
 ```bash
 # Python 3.12, uv, Node.js 설치
 ./4.install_core_mcp.sh
+source ~/.bashrc
 
 # MCP 구성 파일 생성
 ./5.setup-mcp-config.sh

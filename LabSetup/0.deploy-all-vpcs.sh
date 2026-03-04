@@ -16,13 +16,17 @@ echo "   - 배포 방식: 병렬 배포"
 echo "======================================================"
 
 # S3 버킷 이름 생성
-BUCKET_NAME=$(aws iam list-account-aliases --query 'AccountAliases[0]' --output text)-$(date +%Y%m%d)-cf-template
+ACCOUNT_ALIAS=$(aws iam list-account-aliases --query 'AccountAliases[0]' --output text 2>/dev/null)
+if [ -z "$ACCOUNT_ALIAS" ] || [ "$ACCOUNT_ALIAS" = "None" ]; then
+    ACCOUNT_ALIAS=$(aws sts get-caller-identity --query Account --output text)
+fi
+BUCKET_NAME=${ACCOUNT_ALIAS}-$(date +%Y%m%d)-cf-template
 
 echo "🔄 [1/3] DMZVPC 배포 시작..."
 # DMZVPC 배포 (백그라운드에서 실행)
 {
-    echo "📦 S3 버킷 생성: ${BUCKET_NAME}"
-    aws s3 mb s3://${BUCKET_NAME} --region ${AWS_REGION}
+    echo "📦 S3 버킷 확인/생성: ${BUCKET_NAME}"
+    aws s3 mb s3://${BUCKET_NAME} --region ${AWS_REGION} 2>/dev/null || echo "   (버킷이 이미 존재합니다)"
     
     echo "🚀 DMZVPC CloudFormation 배포 중..."
     aws cloudformation deploy \

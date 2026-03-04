@@ -66,7 +66,21 @@ Kiro CLI와 MCP(Model Context Protocol) 서버를 활용한 AWS 인프라 실습
 chmod +x *.sh
 ```
 
-### 2. 기본 인프라 배포 (병렬 실행)
+### 2. 개발 환경 설정 (먼저 실행)
+```bash
+# AWS CLI, kubectl, helm 등 개발 도구 설치 (약 5-10분 소요)
+./1.vscode-tools-installer.sh
+
+# AWS 환경 변수 설정 (Account ID, Region)
+./2.set-aws-env.sh
+source ~/.bash_profile
+
+# KMS 키 구성
+./3.kms-setup.sh
+source ~/.bash_profile
+```
+
+### 3. 인프라 배포 (병렬 실행)
 ```bash
 # 모든 VPC 동시 배포 (약 10-15분 소요)
 ./0.deploy-all-vpcs.sh
@@ -75,22 +89,11 @@ chmod +x *.sh
 ./0.deploy-tgw.sh
 ```
 
-### 3. 개발 환경 설정
-```bash
-# VSCode 및 개발 도구 설치 (약 5-10분 소요)
-./1.vscode-tools-installer.sh
-
-# AWS 환경 변수 설정
-./2.set-aws-env.sh
-
-# KMS 키 구성
-./3.kms-setup.sh
-```
-
 ### 4. Kiro CLI 및 MCP 설정
 ```bash
 # Python 3.12, uv, Node.js 설치
 ./4.install_core_mcp.sh
+source ~/.bashrc
 
 # MCP 구성 파일 생성
 ./5.setup-mcp-config.sh
@@ -316,22 +319,25 @@ aws cloudformation describe-stacks --stack-name [스택이름] --query 'Stacks[0
 
 ## 📊 실행 순서 요약
 
-1. **인프라 구축** (Phase 1)
+1. **개발 환경** (Phase 1 - 먼저 실행)
+   ```bash
+   ./1.vscode-tools-installer.sh  # 개발 도구 (AWS CLI 포함)
+   ./2.set-aws-env.sh            # AWS 환경
+   source ~/.bash_profile
+   ./3.kms-setup.sh              # KMS 설정
+   source ~/.bash_profile
+   ```
+
+2. **인프라 구축** (Phase 2)
    ```bash
    ./0.deploy-all-vpcs.sh    # VPC 배포 (병렬)
    ./0.deploy-tgw.sh         # Transit Gateway
    ```
 
-2. **개발 환경** (Phase 2)
-   ```bash
-   ./1.vscode-tools-installer.sh  # 개발 도구
-   ./2.set-aws-env.sh            # AWS 환경
-   ./3.kms-setup.sh              # KMS 설정
-   ```
-
 3. **AI 도구** (Phase 3)
    ```bash
    ./4.install_core_mcp.sh       # 런타임 설치
+   source ~/.bashrc
    ./5.setup-mcp-config.sh       # MCP 구성
    ```
 

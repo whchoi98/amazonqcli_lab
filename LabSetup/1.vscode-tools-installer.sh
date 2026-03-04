@@ -24,8 +24,12 @@ echo "------------------------------------------------------"
 
 # AWS CLI 다운로드 및 설치
 curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && echo "✅ AWS CLI zip 파일 다운로드 완료"
-unzip -q awscliv2.zip && echo "✅ 압축 해제 완료"
-sudo ./aws/install && echo "✅ AWS CLI 설치 완료"
+unzip -oq awscliv2.zip && echo "✅ 압축 해제 완료"
+if command -v aws &> /dev/null; then
+  sudo ./aws/install --update && echo "✅ AWS CLI 업데이트 완료"
+else
+  sudo ./aws/install && echo "✅ AWS CLI 설치 완료"
+fi
 
 # PATH 및 자동완성 설정
 export PATH=/usr/local/bin:$PATH
