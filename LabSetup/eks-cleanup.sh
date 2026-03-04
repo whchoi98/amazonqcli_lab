@@ -1,5 +1,5 @@
 #!/bin/bash
-# dmz_eks_cleanup.sh: DMZVPC EKS 클러스터 삭제 스크립트
+# eks-cleanup.sh: DMZVPC EKS 클러스터 삭제 스크립트
 
 set -e
 

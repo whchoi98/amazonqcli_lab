@@ -29,7 +29,7 @@ DMZVPC_STATUS=$(aws cloudformation describe-stacks --stack-name DMZVPC --query '
 if [[ "$DMZVPC_STATUS" != "CREATE_COMPLETE" && "$DMZVPC_STATUS" != "UPDATE_COMPLETE" ]]; then
     echo "❌ DMZVPC 스택이 준비되지 않았습니다. 상태: $DMZVPC_STATUS"
     echo "   먼저 DMZVPC 스택을 배포하세요:"
-    echo "   ./0.deploy-all-vpcs.sh"
+    echo "   ./4.deploy-all-vpcs.sh"
     exit 1
 fi
 

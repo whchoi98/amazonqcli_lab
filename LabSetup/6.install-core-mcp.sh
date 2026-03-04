@@ -74,9 +74,9 @@ else
     echo "      필요한 권한: bedrock:ListFoundationModels, bedrock:InvokeModel"
 fi
 
-# MCP 설정 파일은 별도로 생성하세요 (5.setup-mcp-config.sh 사용)
+# MCP 설정 파일은 별도로 생성하세요 (7.setup-mcp-config.sh 사용)
 echo "📝 [6/6] MCP 설정 파일 생성은 별도 스크립트로 진행하세요..."
-echo "   ./5.setup-mcp-config.sh 를 실행하여 MCP 서버 설정을 완료하세요"
+echo "   ./7.setup-mcp-config.sh 를 실행하여 MCP 서버 설정을 완료하세요"
 
 # 환경 변수 설정
 echo "🔧 환경 변수 설정..."
@@ -97,7 +97,7 @@ echo "🎉 기본 패키지 설치가 완료되었습니다!"
 echo ""
 echo "💡 다음 단계:"
 echo "   1. 새 터미널을 열거나 'source ~/.bashrc' 실행"
-echo "   2. './5.setup-mcp-config.sh' 실행하여 MCP 서버 설정"
+echo "   2. './7.setup-mcp-config.sh' 실행하여 MCP 서버 설정"
 echo "   3. Kiro CLI 재시작"
 echo "   4. Kiro CLI 로그인 후 /mcp 명령으로 MCP 서버 로딩 확인"
 echo "======================================================"

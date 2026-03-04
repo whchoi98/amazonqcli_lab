@@ -14,11 +14,11 @@ echo "📁 [1/3] MCP 설정 디렉토리 생성 중..."
 mkdir -p ~/.kiro/settings
 echo "✅ 디렉토리 생성 완료: ~/.kiro/settings"
 
-# 2. uvx 설치 확인 (4.install_core_mcp.sh에서 uv와 함께 설치됨)
+# 2. uvx 설치 확인 (6.install-core-mcp.sh에서 uv와 함께 설치됨)
 echo "🔍 [2/3] uvx 설치 확인 중..."
 export PATH="$HOME/.local/bin:$PATH"
 if ! command -v uvx &> /dev/null; then
-    echo "⚠️  uvx가 설치되어 있지 않습니다. 먼저 4.install_core_mcp.sh를 실행하세요."
+    echo "⚠️  uvx가 설치되어 있지 않습니다. 먼저 6.install-core-mcp.sh를 실행하세요."
     echo "   또는 uv를 직접 설치합니다..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"

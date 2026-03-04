@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # DMZVPC에 EKS 클러스터를 배포하는 스크립트
-# dmz_eks_shell.sh에 의해 자동 생성됨
+# eks-setup-env.sh에 의해 자동 생성됨
 
 set -e
 

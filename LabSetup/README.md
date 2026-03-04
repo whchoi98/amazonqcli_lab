@@ -69,7 +69,7 @@ chmod +x *.sh
 ### 2. 개발 환경 설정 (먼저 실행)
 ```bash
 # AWS CLI, kubectl, helm 등 개발 도구 설치 (약 5-10분 소요)
-./1.vscode-tools-installer.sh
+./1.install-dev-tools.sh
 
 # AWS 환경 변수 설정 (Account ID, Region)
 ./2.set-aws-env.sh
@@ -83,75 +83,66 @@ source ~/.bash_profile
 ### 3. 인프라 배포 (병렬 실행)
 ```bash
 # 모든 VPC 동시 배포 (약 10-15분 소요)
-./0.deploy-all-vpcs.sh
+./4.deploy-all-vpcs.sh
 
 # Transit Gateway 배포
-./0.deploy-tgw.sh
+./5.deploy-tgw.sh
 ```
 
 ### 4. Kiro CLI 및 MCP 설정
 ```bash
 # Python 3.12, uv, Node.js 설치
-./4.install_core_mcp.sh
+./6.install-core-mcp.sh
 source ~/.bashrc
 
 # MCP 구성 파일 생성
-./5.setup-mcp-config.sh
+./7.setup-mcp-config.sh
 ```
 
 ## 📖 상세 가이드
 
-### Phase 1: 네트워킹 인프라
+### Phase 1: 개발 환경 구성
 
-#### 1. VPC 배포 (`0.deploy-all-vpcs.sh`)
-- **기능**: DMZ VPC, VPC01, VPC02를 병렬로 배포
-- **소요 시간**: 약 10-15분
-- **특징**: 
-  - S3 버킷 자동 생성 및 템플릿 업로드
-  - 배포 상태 실시간 모니터링
-  - 병렬 배포로 시간 단축
-
-**배포 리소스:**
-- **DMZ VPC**: 퍼블릭/프라이빗 서브넷, NAT Gateway, Internet Gateway
-- **VPC01/VPC02**: 프라이빗 서브넷, 라우팅 테이블
-
-#### 2. Transit Gateway 구성 (`0.deploy-tgw.sh`)
-- **기능**: VPC 간 연결 및 라우팅 설정
-- **구성 요소**:
-  - Transit Gateway 생성
-  - VPC Attachment 구성
-  - 라우팅 테이블 설정
-
-### Phase 2: 개발 환경 구성
-
-#### 3. 개발 도구 설치 (`1.vscode-tools-installer.sh`)
+#### 1. 개발 도구 설치 (`1.install-dev-tools.sh`)
 **설치되는 도구:**
 - **AWS CLI**: 최신 버전 + 자동완성
 - **Session Manager Plugin**: EC2 인스턴스 접근
-- **kubectl** (v1.31.3): Kubernetes 클러스터 관리
+- **kubectl** (v1.33.0): Kubernetes 클러스터 관리
 - **eksctl**: EKS 클러스터 생성/관리
-- **Helm** (v3.16.4): Kubernetes 패키지 관리
-- **k9s** (v0.32.7): Kubernetes 클러스터 모니터링
+- **Helm** (v4.1.1): Kubernetes 패키지 관리
+- **k9s** (v0.50.18): Kubernetes 클러스터 모니터링
 - **추가 도구**: fzf, jq, gettext, bash-completion
 
-#### 4. AWS 환경 설정 (`2.set-aws-env.sh`)
+#### 2. AWS 환경 설정 (`2.set-aws-env.sh`)
 - AWS CLI 프로파일 구성
 - 환경 변수 설정
 - 리전 및 계정 정보 확인
 
-#### 5. KMS 설정 (`3.kms-setup.sh`)
+#### 3. KMS 설정 (`3.kms-setup.sh`)
 - 암호화용 KMS 키 생성
 - 키 정책 및 별칭 구성
 
+### Phase 2: 인프라 배포
+
+#### 4. VPC 배포 (`4.deploy-all-vpcs.sh`)
+- **기능**: DMZ VPC, VPC01, VPC02를 병렬로 배포
+- **소요 시간**: 약 10-15분
+- **특징**: S3 버킷 자동 생성, 병렬 배포로 시간 단축
+
+#### 5. Transit Gateway 구성 (`5.deploy-tgw.sh`)
+- **기능**: VPC 간 연결 및 라우팅 설정
+- **구성 요소**: Transit Gateway 생성, VPC Attachment, 라우팅 테이블
+
 ### Phase 3: Kiro CLI 및 MCP
 
-#### 6. 핵심 런타임 설치 (`4.install_core_mcp.sh`)
+#### 6. 핵심 런타임 설치 (`6.install-core-mcp.sh`)
 **설치 구성요소:**
 - **Python 3.12**: 최신 Python 런타임
 - **uv**: 고성능 Python 패키지 관리자
 - **Node.js**: JavaScript 런타임 (MCP 서버용)
 
-#### 7. MCP 구성 (`5.setup-mcp-config.sh`)
+#### 7. MCP 구성 (`7.setup-mcp-config.sh`)
+
 - MCP 서버 구성 파일 생성 (`~/.kiro/settings/mcp.json`)
 - Kiro CLI와 MCP 연동 설정
 - 필요한 의존성 패키지 설치
@@ -160,7 +151,7 @@ source ~/.bashrc
 
 ### Valkey 클러스터
 ```bash
-./0.deploy-valkey.sh
+./deploy-valkey.sh
 ```
 - **위치**: DMZ VPC
 - **구성**: ElastiCache Valkey 8.2 클러스터 모드 (2 샤드 x 2 노드)
@@ -168,7 +159,7 @@ source ~/.bashrc
 
 ### Aurora MySQL
 ```bash
-./0.deploy-aurora.sh
+./deploy-aurora.sh
 ```
 - **위치**: VPC01
 - **구성**: Aurora MySQL 클러스터 (Multi-AZ)
@@ -185,10 +176,10 @@ source ~/.bashrc
 ### EKS 클러스터
 ```bash
 # EKS 클러스터 생성
-./dmz_eks_shell.sh
+./eks-setup-env.sh
 
 # eksctl 구성 및 배포
-./dmz_eksctl_shell.sh
+./eks-create-cluster.sh
 
 # 클러스터 구성 확인 (dry-run)
 eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
@@ -197,31 +188,31 @@ eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/ekswo
 eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml
 
 # 정리 (필요시)
-./dmz_eks_cleanup.sh
+./eks-cleanup.sh
 ```
 
 ## 📁 파일 구조
 
 ```
 LabSetup/
-├── 인프라 배포 스크립트
-│   ├── 0.deploy-all-vpcs.sh          # VPC 일괄 배포
-│   ├── 0.deploy-tgw.sh               # Transit Gateway 배포
-│   ├── 0.deploy-valkey.sh             # Valkey 배포
-│   └── 0.deploy-aurora.sh            # Aurora MySQL 배포
-├── 환경 설정 스크립트
-│   ├── 1.vscode-tools-installer.sh   # 개발 도구 설치
+├── Phase 1: 개발 환경
+│   ├── 1.install-dev-tools.sh        # 개발 도구 설치 (AWS CLI, kubectl, helm 등)
 │   ├── 2.set-aws-env.sh              # AWS 환경 설정
 │   └── 3.kms-setup.sh                # KMS 키 설정
-├── MCP 및 Q CLI 설정
-│   ├── 4.install_core_mcp.sh         # 핵심 런타임 설치
-│   └── 5.setup-mcp-config.sh         # MCP 구성
-├── EKS 관리 스크립트
-│   ├── dmz_eks_shell.sh              # EKS 클러스터 생성
-│   ├── dmz_eksctl_shell.sh           # eksctl 구성
-│   └── dmz_eks_cleanup.sh            # EKS 정리
-├── 추가 서비스
+├── Phase 2: 인프라 배포
+│   ├── 4.deploy-all-vpcs.sh          # VPC 일괄 배포 (병렬)
+│   └── 5.deploy-tgw.sh               # Transit Gateway 배포
+├── Phase 3: Kiro CLI 및 MCP
+│   ├── 6.install-core-mcp.sh         # 핵심 런타임 설치 (Python, uv, Node.js)
+│   └── 7.setup-mcp-config.sh         # MCP 구성
+├── 선택적 서비스 배포
+│   ├── deploy-valkey.sh              # Valkey 클러스터 배포
+│   ├── deploy-aurora.sh              # Aurora MySQL 배포
 │   └── deploy-opensearch.sh          # OpenSearch 배포
+├── EKS 관리 스크립트
+│   ├── eks-setup-env.sh              # EKS 환경 변수 설정
+│   ├── eks-create-cluster.sh         # eksctl 클러스터 구성 생성
+│   └── eks-cleanup.sh                # EKS 클러스터 정리
 └── CloudFormation 템플릿
     ├── 1.DMZVPC.yml                  # DMZ VPC 템플릿
     ├── 2.VPC01.yml                   # VPC01 템플릿
@@ -293,12 +284,12 @@ aws cloudformation describe-stack-events \
 ### 전체 환경 정리 (역순)
 ```bash
 # EKS 클러스터 정리 (배포한 경우)
-./dmz_eks_cleanup.sh
+./eks-cleanup.sh
 
 # CloudFormation 스택 삭제 (의존성 순서 고려)
 aws cloudformation delete-stack --stack-name opensearch-stack
 aws cloudformation delete-stack --stack-name aurora-mysql-stack  
-aws cloudformation delete-stack --stack-name redis-cluster-stack
+aws cloudformation delete-stack --stack-name DMZVPC-Redis
 aws cloudformation delete-stack --stack-name tgw-stack
 aws cloudformation delete-stack --stack-name vpc02-stack
 aws cloudformation delete-stack --stack-name vpc01-stack
@@ -321,7 +312,7 @@ aws cloudformation describe-stacks --stack-name [스택이름] --query 'Stacks[0
 
 1. **개발 환경** (Phase 1 - 먼저 실행)
    ```bash
-   ./1.vscode-tools-installer.sh  # 개발 도구 (AWS CLI 포함)
+   ./1.install-dev-tools.sh  # 개발 도구 (AWS CLI 포함)
    ./2.set-aws-env.sh            # AWS 환경
    source ~/.bash_profile
    ./3.kms-setup.sh              # KMS 설정
@@ -330,26 +321,26 @@ aws cloudformation describe-stacks --stack-name [스택이름] --query 'Stacks[0
 
 2. **인프라 구축** (Phase 2)
    ```bash
-   ./0.deploy-all-vpcs.sh    # VPC 배포 (병렬)
-   ./0.deploy-tgw.sh         # Transit Gateway
+   ./4.deploy-all-vpcs.sh    # VPC 배포 (병렬)
+   ./5.deploy-tgw.sh         # Transit Gateway
    ```
 
 3. **AI 도구** (Phase 3)
    ```bash
-   ./4.install_core_mcp.sh       # 런타임 설치
+   ./6.install-core-mcp.sh       # 런타임 설치
    source ~/.bashrc
-   ./5.setup-mcp-config.sh       # MCP 구성
+   ./7.setup-mcp-config.sh       # MCP 구성
    ```
 
 4. **선택적 서비스**
    ```bash
-   ./0.deploy-valkey.sh           # Valkey (선택)
-   ./0.deploy-aurora.sh          # Aurora (선택)
+   ./deploy-valkey.sh           # Valkey (선택)
+   ./deploy-aurora.sh          # Aurora (선택)
    ./deploy-opensearch.sh        # OpenSearch (선택)
    
    # EKS 클러스터 (선택)
-   ./dmz_eks_shell.sh           # EKS 환경 준비
-   ./dmz_eksctl_shell.sh        # eksctl 구성
+   ./eks-setup-env.sh           # EKS 환경 준비
+   ./eks-create-cluster.sh        # eksctl 구성
    eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
    eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml
    ```

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # DMZVPC의 VPC와 Subnet 정보를 추출하여 환경 변수로 저장하고,
-# 이를 기반으로 dmz_eksctl_shell.sh를 생성하는 스크립트
+# 이를 기반으로 eks-create-cluster.sh를 생성하는 스크립트
 
 set -e
 
