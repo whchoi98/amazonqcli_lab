@@ -182,14 +182,48 @@ source ~/.bashrc
 ./eks-create-cluster.sh
 
 # 클러스터 구성 확인 (dry-run)
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
+eksctl create cluster --config-file=$HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
 
 # 실제 클러스터 생성
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml
+eksctl create cluster --config-file=$HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml
+
+# Sample Application 배포 (Retail Store)
+kubectl apply -k ~/amazonqcli_lab/LabSetup/base-application/
+
+# 배포 상태 확인
+kubectl get pods -A | grep -E "carts|catalog|checkout|orders|ui"
+
+# UI 서비스 접근 (포트 포워딩)
+kubectl port-forward -n ui svc/ui 8080:80
 
 # 정리 (필요시)
+kubectl delete -k ~/amazonqcli_lab/LabSetup/base-application/
 ./eks-cleanup.sh
 ```
+
+#### Sample Application 구성
+EKS 클러스터 생성 후 `base-application/` 디렉토리의 Retail Store 샘플 앱을 배포할 수 있습니다.
+
+```
+                         ┌─────────┐
+                         │   UI    │ ← 진입점 (port 80)
+                         └────┬────┘
+              ┌───────────┬───┴───┬───────────┐
+              ▼           ▼       ▼           ▼
+         ┌────────┐  ┌────────┐ ┌──────┐ ┌────────┐
+         │ Catalog│  │  Carts │ │Orders│ │Checkout│
+         └───┬────┘  └───┬────┘ └──┬───┘ └───┬────┘
+             ▼           ▼        ▼          ▼
+         MySQL 8.0   DynamoDB  PostgreSQL  Redis 6.0
+```
+
+| 서비스 | 네임스페이스 | 설명 |
+|--------|------------|------|
+| **UI** | `ui` | 프론트엔드 웹 인터페이스 |
+| **Catalog** | `catalog` | 상품 카탈로그 + MySQL |
+| **Carts** | `carts` | 장바구니 + DynamoDB Local |
+| **Orders** | `orders` | 주문 처리 + PostgreSQL |
+| **Checkout** | `checkout` | 결제 + Redis |
 
 ## 📁 파일 구조
 
@@ -213,6 +247,14 @@ LabSetup/
 │   ├── eks-setup-env.sh              # EKS 환경 변수 설정
 │   ├── eks-create-cluster.sh         # eksctl 클러스터 구성 생성
 │   └── eks-cleanup.sh                # EKS 클러스터 정리
+├── Sample Application (kubectl apply -k)
+│   └── base-application/             # Retail Store 마이크로서비스
+│       ├── ui/                       # 프론트엔드
+│       ├── catalog/                  # 상품 카탈로그 + MySQL
+│       ├── carts/                    # 장바구니 + DynamoDB
+│       ├── orders/                   # 주문 + PostgreSQL
+│       ├── checkout/                 # 결제 + Redis
+│       └── kustomization.yaml        # Kustomize 루트
 └── CloudFormation 템플릿
     ├── 1.DMZVPC.yml                  # DMZ VPC 템플릿
     ├── 2.VPC01.yml                   # VPC01 템플릿

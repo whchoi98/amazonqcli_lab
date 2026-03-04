@@ -188,10 +188,20 @@ source ~/.bashrc
 # eksctl 구성 및 배포
 ./eks-create-cluster.sh
 
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
-eksctl create cluster --config-file=/home/ec2-user/amazonqcli_lab/LabSetup/eksworkshop.yaml
+eksctl create cluster --config-file=$HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml --dry-run
+eksctl create cluster --config-file=$HOME/amazonqcli_lab/LabSetup/eksworkshop.yaml
+
+# Sample Application 배포 (Retail Store)
+kubectl apply -k ~/amazonqcli_lab/LabSetup/base-application/
+
+# 배포 상태 확인
+kubectl get pods -A | grep -E "carts|catalog|checkout|orders|ui"
+
+# UI 서비스 접근 (포트 포워딩)
+kubectl port-forward -n ui svc/ui 8080:80
 
 # 정리 (필요시)
+kubectl delete -k ~/amazonqcli_lab/LabSetup/base-application/
 ./eks-cleanup.sh
 ```
 
@@ -217,6 +227,14 @@ LabSetup/
 │   ├── eks-setup-env.sh              # EKS 환경 변수 설정
 │   ├── eks-create-cluster.sh         # eksctl 클러스터 구성 생성
 │   └── eks-cleanup.sh                # EKS 클러스터 정리
+├── Sample Application (kubectl apply -k)
+│   └── base-application/             # Retail Store 마이크로서비스
+│       ├── ui/                       # 프론트엔드
+│       ├── catalog/                  # 상품 카탈로그 + MySQL
+│       ├── carts/                    # 장바구니 + DynamoDB
+│       ├── orders/                   # 주문 + PostgreSQL
+│       ├── checkout/                 # 결제 + Redis
+│       └── kustomization.yaml        # Kustomize 루트
 └── CloudFormation 템플릿
     ├── 1.DMZVPC.yml                  # DMZ VPC 템플릿
     ├── 2.VPC01.yml                   # VPC01 템플릿
